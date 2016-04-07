@@ -18,6 +18,9 @@ local g_WorldCorporationsIM = InstanceManager:new( "WorldCorporationInstance", "
 local g_WorldFranchisesIM = InstanceManager:new( "WorldFranchiseInstance", "Base", Controls.WorldFranchisesStack );
 local g_WorldMonopolyResourcesIM = InstanceManager:new( "WorldMonopolyResourceInstance", "Base", Controls.MonopolyResourcesStack );
 
+-- File disabled until we can stabilize Corporations
+ContextPtr:SetHide(true);
+
 g_Tabs = {
 	["Monopolies"] = {
 		Panel = Controls.MonopoliesPanel,

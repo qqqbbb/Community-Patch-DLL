@@ -104,10 +104,16 @@
 
 		<!-- Notifications-->
 		<Row Tag="TXT_KEY_CORPORATION_FOUNDED">
-			<Text>You have founded [COLOR_POSITIVE_TEXT]{@1_BldgName}[ENDCOLOR]! To spread your new Corporation far and wide, build Corporate Offices in owned Cities and send [ICON_INTERNATIONAL_TRADE] Trade Routes from these Cities to foreign Cities![NEWLINE][NEWLINE]See the 'Monopolies and Corporations' tab of the Economic Overview for more information.</Text>
+			<Text>You have founded [COLOR_POSITIVE_TEXT]{@1_CorporationName}[ENDCOLOR]! To spread your new Corporation far and wide, build Corporate Offices in owned Cities and send [ICON_INTERNATIONAL_TRADE] Trade Routes from these Cities to foreign Cities!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_FOUNDED_SUMMARY">
 			<Text>Corporation Founded!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CORPORATION_FOUNDED_OTHER_PLAYER">
+			<Text>{1_PlayerName} has founded [COLOR_POSITIVE_TEXT]{@1_CorporationName}[ENDCOLOR]! This Corporation can no longer be established unless the other player's Corporation Headquarters is destroyed (on city capture).</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CORPORATION_FOUNDED_OTHER_PLAYER_SUMMARY">
+			<Text>{1_PlayerName} has founded a Corporation!</Text>
 		</Row>
 
 		<Row Tag="TXT_KEY_NOTIFICATION_TRADE_UNIT_CORPORATION_BUILDING_SUMMARY">

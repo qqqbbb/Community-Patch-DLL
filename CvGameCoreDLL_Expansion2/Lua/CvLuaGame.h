@@ -476,6 +476,12 @@ protected:
 	LUAAPIEXTN(AnyoneHasUnit, bool, iUnitType);
 	LUAAPIEXTN(AnyoneHasUnitClass, bool, iUnitClassType);
 #endif
+
+#if defined(MOD_BALANCE_CORE)
+	static int lFoundCorporation(lua_State* L);
+	static int lCanFoundCorporation(lua_State* L);
+	static int lIsCorporationFounded(lua_State* L);
+#endif
 };
 
 #endif //CVLUAGAME_H

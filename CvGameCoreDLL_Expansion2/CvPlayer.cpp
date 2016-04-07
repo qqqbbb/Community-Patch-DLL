@@ -705,6 +705,9 @@ CvPlayer::CvPlayer() :
 	m_pDiplomacyAI = FNEW(CvDiplomacyAI, c_eCiv5GameplayDLL, 0);
 	m_pReligions = FNEW(CvPlayerReligions, c_eCiv5GameplayDLL, 0);
 	m_pReligionAI = FNEW(CvReligionAI, c_eCiv5GameplayDLL, 0);
+#if defined(MOD_BALANCE_CORE)
+	m_pCorporations = FNEW(CvPlayerCorporations, c_eCiv5GameplayDLL, 0);
+#endif
 	m_pPlayerTechs = FNEW(CvPlayerTechs, c_eCiv5GameplayDLL, 0);
 	m_pFlavorManager = FNEW(CvFlavorManager, c_eCiv5GameplayDLL, 0);
 	m_pTacticalAI = FNEW(CvTacticalAI, c_eCiv5GameplayDLL, 0);
@@ -774,6 +777,9 @@ CvPlayer::~CvPlayer()
 	SAFE_DELETE(m_pTrade);
 	SAFE_DELETE(m_pTradeAI);
 	SAFE_DELETE(m_pLeagueAI);
+#if defined(MOD_BALANCE_CORE)
+	SAFE_DELETE(m_pCorporations);
+#endif
 }
 
 
@@ -1145,6 +1151,9 @@ void CvPlayer::uninit()
 	m_pDiplomacyAI->Uninit();
 	m_pReligions->Uninit();
 	m_pReligionAI->Uninit();
+#if defined(MOD_BALANCE_CORE)
+	m_pCorporations->Uninit();
+#endif
 	m_pEspionage->Uninit();
 	m_pEspionageAI->Uninit();
 	m_pTrade->Uninit();
@@ -1908,6 +1917,9 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 		m_pDiplomacyAI->Init(this);
 		m_pReligions->Init(this);
 		m_pReligionAI->Init(GC.GetGameBeliefs(), this);
+#if defined(MOD_BALANCE_CORE)
+		m_pCorporations->Init(this);
+#endif
 		m_pPlayerTechs->Init(GC.GetGameTechs(), this, false);
 		m_pPlayerPolicies->Init(GC.GetGamePolicies(), this, false);
 		m_pTacticalAI->Init(this);
@@ -14097,24 +14109,6 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	if(pBuildingInfo->IsSecondaryPantheon())
 	{
 		ChangeSecondReligionPantheonCount((pBuildingInfo->IsSecondaryPantheon()) ? iChange : 0);
-	}
-	if(pBuildingInfo->GetCorporationHQID() > 0 && GetCorporateFounderID() <= 0)
-	{
-		SetCorporateFounderID(pBuildingInfo->GetCorporationHQID());
-		if(GetID() == GC.getGame().getActivePlayer())
-		{
-			Localization::String strMessage;
-			Localization::String strSummary;
-			strMessage = Localization::Lookup("TXT_KEY_CORPORATION_FOUNDED");
-			strMessage << (pBuildingInfo->GetTextKey());
-			strSummary = Localization::Lookup("TXT_KEY_CORPORATION_FOUNDED_SUMMARY");
-
-			CvNotifications* pNotification = GetNotifications();
-			if(pNotification)
-			{
-				pNotification->Add(NOTIFICATION_GENERIC, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, -1, GetID());
-			}
-		}
 	}
 	if(pBuildingInfo->GetCorporationMaxFranchises() != 0)
 	{
@@ -37105,6 +37099,14 @@ CvPlayerReligions* CvPlayer::GetReligions() const
 	return m_pReligions;
 }
 
+#if defined(MOD_BALANCE_CORE)
+//	--------------------------------------------------------------------------------
+CvPlayerCorporations* CvPlayer::GetCorporations() const
+{
+	return m_pCorporations;
+}
+#endif
+
 //	--------------------------------------------------------------------------------
 CvReligionAI* CvPlayer::GetReligionAI() const
 {
@@ -37277,6 +37279,9 @@ void CvPlayer::Read(FDataStream& kStream)
 	m_pDiplomacyAI->Read(kStream);
 	m_pReligions->Read(kStream);
 	m_pReligionAI->Read(kStream);
+#if defined(MOD_BALANCE_CORE)
+	m_pCorporations->Read(kStream);
+#endif
 	m_pPlayerTechs->Read(kStream);
 	m_pFlavorManager->Read(kStream);
 	m_pTacticalAI->Read(kStream);
@@ -37499,6 +37504,9 @@ void CvPlayer::Write(FDataStream& kStream) const
 	m_pDiplomacyAI->Write(kStream);
 	m_pReligions->Write(kStream);
 	m_pReligionAI->Write(kStream);
+#if defined(MOD_BALANCE_CORE)
+	m_pCorporations->Write(kStream);
+#endif
 	m_pPlayerTechs->Write(kStream);
 	m_pFlavorManager->Write(kStream);
 	m_pTacticalAI->Write(kStream);

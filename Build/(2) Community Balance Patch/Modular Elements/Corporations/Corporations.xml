@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Created by ModBuddy on 3/3/2016 6:04:19 PM -->
 <GameData>
+	<!-- New -->
+	<Table name="Corporations">
+		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
+		<Column name="Type" type="text" notnull="true" unique="true"/>
+		<Column name="Description" type="text" reference="Language_en_US(Tag)" default="NULL"/>
+		<Column name="Civilopedia" type="text" reference="Language_en_US(Tag)"/>
+		<Column name="HeadquartersBuildingClass" type="text" reference="BuildingClasses(Type)"/>
+		<Column name="OfficeBuildingClass" type="text" reference="BuildingClasses(Type)"/>
+		<Column name="FranchiseBuildingClass" type="text" reference="BuildingClasses(Type)"/>
+		<Column name="PortraitIndex" type="integer" default="-1"/>
+		<Column name="IconAtlas" type="text" default="NULL" reference="IconTextureAtlases(Atlas)"/>
+	</Table>
+	<Corporations>
+		<Row>
+			<ID>0</ID>
+			<Type>CORPORATION_TRADER_SIDS</Type>
+			<Description>TXT_KEY_CORPORATION_TRADER_SIDS</Description>
+			<Civilopedia>TXT_KEY_CORPORATION_TRADER_SIDS_PEDIA</Civilopedia>
+			<HeadquartersBuildingClass>BUILDINGCLASS_TRADER_SIDS_HQ</HeadquartersBuildingClass>
+			<OfficeBuildingClass>BUILDINGCLASS_TRADER_SIDS</OfficeBuildingClass>
+			<FranchiseBuildingClass>BUILDINGCLASS_TRADER_SIDS_FRANCHISE</FranchiseBuildingClass>
+			<PortraitIndex>1</PortraitIndex>
+			<IconAtlas>CORP_ATLAS</IconAtlas>
+		</Row>
+	</Corporations>
+	
+	<!-- Old -->
+	
 	<BuildingClasses>
 		<Row>
 			<Type>BUILDINGCLASS_TRADER_SIDS_HQ</Type>
@@ -150,7 +178,6 @@
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_TRADER_SIDS</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_TRADER_SIDS</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_TRADER_SIDS</CorporationTradeRouteBonusHelp>
-			<FreeBuildingThisCity>BUILDINGCLASS_TRADER_SIDS</FreeBuildingThisCity>
 			<TradeRouteLandDistanceModifier>100</TradeRouteLandDistanceModifier>
 			<NumTradeRouteBonus>2</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>

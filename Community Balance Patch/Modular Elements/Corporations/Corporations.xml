@@ -178,7 +178,6 @@
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_TRADER_SIDS</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_TRADER_SIDS</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_TRADER_SIDS</CorporationTradeRouteBonusHelp>
-			<FreeBuildingThisCity>BUILDINGCLASS_TRADER_SIDS</FreeBuildingThisCity>
 			<TradeRouteLandDistanceModifier>100</TradeRouteLandDistanceModifier>
 			<NumTradeRouteBonus>2</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>

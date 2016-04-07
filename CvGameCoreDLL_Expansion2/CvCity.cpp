@@ -11505,6 +11505,23 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				}
 			}
 
+#if defined(MOD_BALANCE_CORE)
+			// Corporations check: Will this building found a corporation?
+			for(int iI = 0; iI < GC.getNumCorporationInfos(); iI++)
+			{
+				CorporationTypes eCorporation = (CorporationTypes) iI;
+				CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+				if(pkCorporationInfo != NULL)
+				{
+					// This is a corporation HQ
+					if(pkCorporationInfo->GetHeadquartersBuildingClass() == (BuildingClassTypes) pBuildingInfo->GetBuildingClassType())
+					{
+						GC.getGame().GetGameCorporations()->FoundCorporation(getOwner(), eCorporation, this);
+					}
+				}
+			}
+#endif
+
 			// Free building
 			BuildingClassTypes eFreeBuildingClassThisCity = (BuildingClassTypes)pBuildingInfo->GetFreeBuildingThisCity();
 			if(eFreeBuildingClassThisCity != NO_BUILDINGCLASS)

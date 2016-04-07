@@ -73,5 +73,63 @@ FDataStream& operator<<(FDataStream&, const CvCorporation&);
 FDataStream& operator>>(FDataStream&, CorporationTypes&);
 FDataStream& operator<<(FDataStream&, const CorporationTypes&);
 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  CLASS:		CvPlayerCorporations
+//!  \brief		All the information about corporations for a player
+//
+//!  Key Attributes:
+//!  - This object is created inside the CvPlayer object and accessed through CvPlayer
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+class CvPlayerCorporations
+{
+public:
+	CvPlayerCorporations(void);
+	~CvPlayerCorporations(void);
+	void Init(CvPlayer* pPlayer);
+	void Uninit();
+	void Reset();
+	void Read(FDataStream& kStream);
+	void Write(FDataStream& kStream);
+
+	bool HasFoundedCorporation() const;
+	CorporationTypes GetFoundedCorporation() const;
+	void SetFoundedCorporation(CorporationTypes eCorporation);
+	void DestroyCorporation();
+private:
+	CvPlayer* m_pPlayer;
+	CorporationTypes m_eFoundedCorporation;
+};
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  CLASS:		CvGameCorporations
+//!  \brief		All the information about corporations founded and active in the game
+//
+//!  Key Attributes:
+//!  - Core data in this class is a list of CvCorporations
+//!  - This object is created inside the CvGame object and accessed through CvGame
+//!  - Provides convenience functions to the other game subsystems to quickly summarize
+//!    information on the corporations in place
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+class CvGameCorporations
+{
+public:
+	CvGameCorporations(void);
+	~CvGameCorporations(void);
+
+	void Init();
+	void DoTurn();
+
+	void DestroyCorporation(CorporationTypes eCorporation);
+	void FoundCorporation(PlayerTypes ePlayer, CorporationTypes eCorporation, CvCity* pHeadquarters);
+	bool CanFoundCorporation(PlayerTypes ePlayer, CorporationTypes eCorporation) const;
+
+	bool IsCorporationFounded(CorporationTypes eCorporation) const;
+
+	std::vector<CvCorporation> m_ActiveCorporations;
+};
+
+FDataStream& operator>>(FDataStream&, CvGameCorporations&);
+FDataStream& operator<<(FDataStream&, const CvGameCorporations&);
+
 #endif
 #endif

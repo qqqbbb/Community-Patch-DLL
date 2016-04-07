@@ -49,6 +49,9 @@ class CvDangerPlots;
 #if defined(MOD_BALANCE_CORE_SETTLER)
 	class CvDistanceMap;
 #endif
+#if defined(MOD_BALANCE_CORE)
+	class CvPlayerCorporations;
+#endif
 class CvCityConnections;
 class CvNotifications;
 class CvTreasury;
@@ -2402,6 +2405,9 @@ public:
 	CvTradeAI* GetTradeAI() const;
 	CvLeagueAI* GetLeagueAI() const;
 	CvNotifications* GetNotifications() const;
+#if defined(MOD_BALANCE_CORE)
+	CvPlayerCorporations* GetCorporations() const;
+#endif
 #if defined(MOD_API_EXTENSIONS)
 	int AddNotification(NotificationTypes eNotificationType, const char* sMessage, const char* sSummary, CvPlot* pPlot = NULL, int iGameDataIndex = -1, int iExtraGameData = -1);
 	int AddNotification(NotificationTypes eNotificationType, const char* sMessage, const char* sSummary, int iGameDataIndex, int iExtraGameData = -1);
@@ -3229,6 +3235,10 @@ protected:
 	// Religion AI
 	CvPlayerReligions* m_pReligions;
 	CvReligionAI* m_pReligionAI;
+
+#if defined(MOD_BALANCE_CORE)
+	CvPlayerCorporations* m_pCorporations;
+#endif
 
 	// AI Tactics
 	CvTacticalAI* m_pTacticalAI;

@@ -483,6 +483,12 @@ void CvLuaGame::RegisterMembers(lua_State* L)
 	Method(AnyoneHasUnit);
 	Method(AnyoneHasUnitClass);
 #endif
+
+#if defined(MOD_BALANCE_CORE)
+	Method(FoundCorporation);
+	Method(CanFoundCorporation);
+	Method(IsCorporationFounded);
+#endif
 }
 //------------------------------------------------------------------------------
 
@@ -3678,6 +3684,34 @@ int CvLuaGame::lAnyoneHasUnitClass(lua_State* L)
 {
 	const UnitClassTypes iUnitClassType = static_cast<UnitClassTypes>(luaL_checkint(L, 1));
 	lua_pushboolean(L, GC.getGame().AnyoneHasUnitClass(iUnitClassType));
+	return 1;
+}
+#endif
+
+#if defined(MOD_BALANCE_CORE)
+int CvLuaGame::lFoundCorporation(lua_State* L)
+{
+	const PlayerTypes ePlayer = static_cast<PlayerTypes>(luaL_checkint(L, 1));
+	const CorporationTypes eCorporation = static_cast<CorporationTypes>(luaL_checkint(L, 2));
+	CvCity* pkCity = CvLuaCity::GetInstance(L, 3);
+	GC.getGame().GetGameCorporations()->FoundCorporation(ePlayer, eCorporation, pkCity);
+	return 1;
+}
+
+int CvLuaGame::lCanFoundCorporation(lua_State* L)
+{
+	const PlayerTypes ePlayer = static_cast<PlayerTypes>(luaL_checkint(L, 1));
+	const CorporationTypes eCorporation = static_cast<CorporationTypes>(luaL_checkint(L, 2));
+	bool bResult = GC.getGame().GetGameCorporations()->CanFoundCorporation(ePlayer, eCorporation);
+	lua_pushboolean(L, bResult);
+	return 1;
+}
+
+int CvLuaGame::lIsCorporationFounded(lua_State* L)
+{
+	const CorporationTypes eCorporation = static_cast<CorporationTypes>(luaL_checkint(L, 1));
+	bool bResult = GC.getGame().GetGameCorporations()->IsCorporationFounded(eCorporation);
+	lua_pushboolean(L, bResult);
 	return 1;
 }
 #endif
