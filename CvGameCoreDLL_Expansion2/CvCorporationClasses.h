@@ -5,6 +5,8 @@
 
 #if defined(MOD_BALANCE_CORE)
 
+#include "CvWeightedVector.h"
+
 class CvCorporationEntry: public CvBaseInfo
 {
 public:
@@ -91,6 +93,8 @@ public:
 	void Read(FDataStream& kStream);
 	void Write(FDataStream& kStream);
 
+	CvCity* GetHeadquarters() const;
+
 	bool HasFoundedCorporation() const;
 	CorporationTypes GetFoundedCorporation() const;
 	void SetFoundedCorporation(CorporationTypes eCorporation);
@@ -99,6 +103,8 @@ private:
 	CvPlayer* m_pPlayer;
 	CorporationTypes m_eFoundedCorporation;
 };
+
+typedef FStaticVector<CvCorporation, 16, false, c_eCiv5GameplayDLL > CorporationList;
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  CLASS:		CvGameCorporations
@@ -119,13 +125,16 @@ public:
 	void Init();
 	void DoTurn();
 
+	CvCorporation* GetCorporation(CorporationTypes eCorporation);
+
 	void DestroyCorporation(CorporationTypes eCorporation);
 	void FoundCorporation(PlayerTypes ePlayer, CorporationTypes eCorporation, CvCity* pHeadquarters);
 	bool CanFoundCorporation(PlayerTypes ePlayer, CorporationTypes eCorporation) const;
 
 	bool IsCorporationFounded(CorporationTypes eCorporation) const;
+	bool IsCorporationHeadquarters(CvCity* pCity) const;
 
-	std::vector<CvCorporation> m_ActiveCorporations;
+	CorporationList m_ActiveCorporations;
 };
 
 FDataStream& operator>>(FDataStream&, CvGameCorporations&);

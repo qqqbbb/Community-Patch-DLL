@@ -6859,6 +6859,43 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 	}
 #endif
 #if defined(MOD_BALANCE_CORE)
+	// Corporation building?
+	for(iI = 0; iI < GC.getNumCorporationInfos(); iI++)
+	{
+		CorporationTypes eCorporation = (CorporationTypes) iI;
+		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+		if(pkCorporationInfo)
+		{
+			// This building is a franchise - cannot construct EVER
+			if(pkBuildingInfo->GetBuildingClassType() == pkCorporationInfo->GetFranchiseBuildingClass())
+			{
+				return false;
+			}
+
+			CvPlayerCorporations* pPlayerCorporation = GET_PLAYER(getOwner()).GetCorporations();
+			
+			// Corporation HQ
+			if(pkBuildingInfo->GetBuildingClassType() == pkCorporationInfo->GetHeadquartersBuildingClass())
+			{
+				// Cannot construct if corporation exists or we've founded a corporation already
+				if(pPlayerCorporation->HasFoundedCorporation() ||
+					GC.getGame().GetGameCorporations()->IsCorporationFounded(eCorporation))
+				{
+					return false;
+				}
+			}
+			
+			// Corporation Office
+			if(pkBuildingInfo->GetBuildingClassType() == pkCorporationInfo->GetOfficeBuildingClass())
+			{
+				// Cannot construct if we do not have this corporation
+				if(pPlayerCorporation->GetFoundedCorporation() != eCorporation)
+				{
+					return false;
+				}
+			}
+		}
+	}
 	if(GET_PLAYER(getOwner()).GetCorporateFounderID() > 0 && pkBuildingInfo->GetCorporationHQID() > 0)
 	{
 		return false;

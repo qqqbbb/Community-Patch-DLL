@@ -4337,35 +4337,7 @@ int CvLuaPlayer::lGetCorpID(lua_State* L)
 int CvLuaPlayer::lGetCorporationHeadquarters(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
-	int iCorporation = pkPlayer->GetCorporateFounderID();
-	CvCity* pkCity = NULL;
-
-	if(iCorporation > 0)
-	{
-		// Find building of this Corporation type
-		for(int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
-		{
-			BuildingTypes eBuilding = (BuildingTypes) iI;
-			CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
-			if(pkBuildingInfo)
-			{
-				if(pkBuildingInfo->GetCorporationHQID() == iCorporation)
-				{
-					// Look through cities for their building
-					int iLoop = 0;
-					for(CvCity* pCity = pkPlayer->firstCity(&iLoop); pCity != NULL; pCity = pkPlayer->nextCity(&iLoop))
-					{
-						if(pCity->HasBuilding((BuildingTypes) eBuilding))
-						{
-							pkCity = pCity;
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-
+	CvCity* pkCity = pkPlayer->GetCorporations()->GetHeadquarters();
 	CvLuaCity::Push(L, pkCity);
 	return 1;
 }

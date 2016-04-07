@@ -2791,7 +2791,6 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 				}
 				UpdateReligion();
 			}
-
 #endif
 			pNotifications->Add(NOTIFICATION_CITY_LOST, locString.toUTF8(), locSummary.toUTF8(), pOldCity->getX(), pOldCity->getY(), -1);
 		}
@@ -2901,6 +2900,32 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	else if(pOldCity->getOriginalOwner() == GetID())
 	{
 		GET_PLAYER(pOldCity->getOriginalOwner()).changeCitiesLost(-1);
+	}
+
+	// Was this city a corporation HQ?
+	CorporationTypes eCorporation = GET_PLAYER(pOldCity->getOwner()).GetCorporations()->GetFoundedCorporation();
+	if(eCorporation != NO_CORPORATION)
+	{
+		if(pOldCity == GET_PLAYER(pOldCity->getOwner()).GetCorporations()->GetHeadquarters())
+		{
+			// Destroy this corporation!
+			GC.getGame().GetGameCorporations()->DestroyCorporation(eCorporation);
+
+			CvNotifications* pNotifications = GET_PLAYER(pOldCity->getOwner()).GetNotifications();
+			if(pNotifications)
+			{
+				Localization::String strSummary;
+				Localization::String strMessage;
+				
+				CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+
+				strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_CORPORATION_DESTROYED_SUMMARY");
+				strSummary << pkCorporationInfo->GetDescription();
+				strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_CORPORATION_DESTROYED");
+				strMessage << pkCorporationInfo->GetDescription();
+				pNotifications->Add(NOTIFICATION_GENERIC, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, -1, -1);
+			}
+		}
 	}
 
 	if(bConquest)

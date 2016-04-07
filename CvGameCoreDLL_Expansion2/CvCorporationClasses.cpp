@@ -279,6 +279,25 @@ void CvPlayerCorporations::DestroyCorporation()
 	SetFoundedCorporation(NO_CORPORATION);
 }
 
+// Get our headquarters
+CvCity* CvPlayerCorporations::GetHeadquarters() const
+{
+	if(!HasFoundedCorporation())
+		return NULL;
+
+	CvCorporation* pCorporation = GC.getGame().GetGameCorporations()->GetCorporation(GetFoundedCorporation());
+	if(pCorporation)
+	{
+		CvPlot* pHQPlot = GC.getMap().plot(pCorporation->m_iHeadquartersCityX, pCorporation->m_iHeadquartersCityY);
+		if(pHQPlot)
+		{
+			return pHQPlot->getPlotCity();
+		}
+	}
+
+	return NULL;
+}
+
 void CvPlayerCorporations::SetFoundedCorporation(CorporationTypes eCorporation)
 {
 	m_eFoundedCorporation = eCorporation;
@@ -319,10 +338,26 @@ void CvGameCorporations::DoTurn()
 {
 }
 
+// Get this Corporation, or NULL if it does not exist
+CvCorporation* CvGameCorporations::GetCorporation(CorporationTypes eCorporation)
+{
+	CorporationList::iterator it;
+	for(it = m_ActiveCorporations.begin(); it != m_ActiveCorporations.end(); it++)
+	{
+		if(it->m_eCorporation == eCorporation)
+		{
+			return it;
+		}
+	}
+
+	return NULL;
+}
+
 // Destroy eCorporation
 void CvGameCorporations::DestroyCorporation(CorporationTypes eCorporation)
 {
-	for(std::vector<CvCorporation>::iterator it = m_ActiveCorporations.begin(); it != m_ActiveCorporations.end(); it++)
+	CorporationList::iterator it;
+	for(it = m_ActiveCorporations.begin(); it != m_ActiveCorporations.end(); it++)
 	{
 		CvCorporation kCorporation = (*it);
 		if(kCorporation.m_eCorporation == eCorporation)
@@ -332,6 +367,8 @@ void CvGameCorporations::DestroyCorporation(CorporationTypes eCorporation)
 
 			// Destroy corporation for this player
 			kPlayer.GetCorporations()->DestroyCorporation();
+
+			m_ActiveCorporations.erase(it);
 		}
 	}
 }
@@ -384,7 +421,7 @@ void CvGameCorporations::FoundCorporation(PlayerTypes ePlayer, CorporationTypes 
 			Localization::String strMessage;
 			Localization::String strSummary;
 			strMessage = Localization::Lookup("TXT_KEY_CORPORATION_FOUNDED");
-			strMessage << (pkCorporationInfo->GetDescriptionKey());
+			strMessage << (pkCorporationInfo->GetDescription());
 			strSummary = Localization::Lookup("TXT_KEY_CORPORATION_FOUNDED_SUMMARY");
 			if(pNotification)
 			{
@@ -449,9 +486,27 @@ bool CvGameCorporations::CanFoundCorporation(PlayerTypes ePlayer, CorporationTyp
 // Has eCorporation been founded yet?
 bool CvGameCorporations::IsCorporationFounded(CorporationTypes eCorporation) const
 {
-	for(std::vector<CvCorporation>::const_iterator it = m_ActiveCorporations.begin(); it != m_ActiveCorporations.end(); it++)
+	CorporationList::const_iterator it;
+	for(it = m_ActiveCorporations.begin(); it != m_ActiveCorporations.end(); it++)
 	{
 		if((*it).m_eCorporation == eCorporation)
+			return true;
+	}
+
+	return false;
+}
+
+// Is pCity a Corporations headquarters?
+bool CvGameCorporations::IsCorporationHeadquarters(CvCity* pCity) const
+{
+	if(pCity == NULL)
+		return false;
+
+	CorporationList::const_iterator it;
+	for(it = m_ActiveCorporations.begin(); it != m_ActiveCorporations.end(); it++)
+	{
+		if((*it).m_iHeadquartersCityX == pCity->getX() &&
+			(*it).m_iHeadquartersCityY == pCity->getY())
 			return true;
 	}
 
@@ -487,7 +542,7 @@ FDataStream& operator<<(FDataStream& saveTo, const CvGameCorporations& readFrom)
 	saveTo << uiVersion;
 	MOD_SERIALIZE_INIT_WRITE(saveTo);
 
-	std::vector<CvCorporation>::const_iterator it;
+	CorporationList::const_iterator it;
 	saveTo << readFrom.m_ActiveCorporations.size();
 	for(it = readFrom.m_ActiveCorporations.begin(); it != readFrom.m_ActiveCorporations.end(); it++)
 	{
