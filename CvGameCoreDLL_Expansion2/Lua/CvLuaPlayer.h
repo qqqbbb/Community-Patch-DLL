@@ -1239,13 +1239,8 @@ protected:
 	static int lGetInternationalTradeRouteCorporationModifierScience(lua_State* L);
 	static int lGetNumberofGlobalFranchises(lua_State* L);
 	static int lGetNumberofOffices(lua_State* L);
-	static int lGetCorporationName(lua_State* L);
-	static int lGetCorporationHelper(lua_State* L);
 	static int lGetMaxFranchises(lua_State* L);
 	static int lGetCorpID(lua_State* L);
-	static int lGetCorporationHeadquarters(lua_State* L);
-	static int lGetOfficeBuilding(lua_State* L);
-	static int lGetFranchiseBuilding(lua_State* L);
 	static int lGetCorporationFoundedTurn(lua_State* L);
 	static int lGetCurrentOfficeBenefit(lua_State* L);
 #endif

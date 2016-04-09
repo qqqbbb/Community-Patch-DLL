@@ -6896,7 +6896,7 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 			}
 		}
 	}
-	if(GET_PLAYER(getOwner()).GetCorporateFounderID() > 0 && pkBuildingInfo->GetCorporationHQID() > 0)
+	if(GET_PLAYER(getOwner()).GetCorporations()->HasFoundedCorporation() && pkBuildingInfo->GetCorporationHQID() > 0)
 	{
 		return false;
 	}
@@ -11840,9 +11840,20 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		{
 			ChangeCorporationGPChange(pBuildingInfo->GetCorporationGPChange() * iChange);
 		}
-		if(MOD_BALANCE_CORE && (pBuildingInfo->GetCorporationID() > 0) && (pBuildingInfo->GetCorporationHQID() <= 0))
+		if(MOD_BALANCE_CORE)
 		{
-			SetHasOffice(true);
+			CorporationTypes eCorporation = GET_PLAYER(getOwner()).GetCorporations()->GetFoundedCorporation();
+			if (eCorporation != NO_CORPORATION)
+			{
+				CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+				if (pkCorporationInfo)
+				{
+					if (pkCorporationInfo->GetOfficeBuildingClass() == pBuildingInfo->GetBuildingClassType())
+					{
+						SetHasOffice(iChange > 0 ? true : false);
+					}
+				}
+			}
 		}
 		if(MOD_BALANCE_CORE && (pBuildingInfo->GetBorderObstacleCity() > 0))
 		{
@@ -14513,7 +14524,7 @@ int CvCity::getGreatPeopleRateModifier() const
 #if defined(MOD_BALANCE_CORE)
 	if(GetCorporationGPChange() > 0)
 	{
-		int iFranchises = GET_PLAYER(getOwner()).GetCorporateFranchisesWorldwide();
+		int iFranchises = GET_PLAYER(getOwner()).GetCorporations()->GetNumFranchises();
 		if(iFranchises > 0)
 		{
 			iNewValue += (iFranchises * GetCorporationGPChange());
@@ -19528,7 +19539,7 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex) const
 #if defined(MOD_BALANCE_CORE)
 	if(GetCorporationYieldChange(eIndex) > 0)
 	{
-		int iFranchises = GET_PLAYER(getOwner()).GetCorporateFranchisesWorldwide();
+		int iFranchises = GET_PLAYER(getOwner()).GetCorporations()->GetNumFranchises();
 		if(iFranchises > 0)
 		{
 			iValue += (iFranchises * GetCorporationYieldChange(eIndex));
@@ -20496,6 +20507,52 @@ bool CvCity::IsFranchised(PlayerTypes ePlayer)
 	CvAssertMsg(ePlayer < MAX_PLAYERS, "eIndex expected to be < MAX_PLAYERS");
 	return m_abFranchised[ePlayer];
 }
+
+bool CvCity::IsHeadquarters(CorporationTypes eCorporation) const
+{
+	VALIDATE_OBJECT
+
+	CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+	if (pkCorporationInfo == NULL)
+		return false;
+
+	BuildingClassTypes eHeadquarters = pkCorporationInfo->GetHeadquartersBuildingClass();
+	if (eHeadquarters == NO_BUILDINGCLASS)
+		return false;
+
+	return HasBuildingClass(eHeadquarters);
+}
+
+bool CvCity::IsHasOffice(CorporationTypes eCorporation) const
+{
+	VALIDATE_OBJECT
+
+		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+	if (pkCorporationInfo == NULL)
+		return false;
+
+	BuildingClassTypes eOffice = pkCorporationInfo->GetOfficeBuildingClass();
+	if (eOffice == NO_BUILDINGCLASS)
+		return false;
+
+	return HasBuildingClass(eOffice);
+}
+
+bool CvCity::IsHasFranchise(CorporationTypes eCorporation) const
+{
+	VALIDATE_OBJECT
+
+		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+	if (pkCorporationInfo == NULL)
+		return false;
+
+	BuildingClassTypes eFranchse = pkCorporationInfo->GetFranchiseBuildingClass();
+	if (eFranchse == NO_BUILDINGCLASS)
+		return false;
+
+	return HasBuildingClass(eFranchse);
+}
+
 void CvCity::SetHasOffice(bool bValue)
 {
 	VALIDATE_OBJECT

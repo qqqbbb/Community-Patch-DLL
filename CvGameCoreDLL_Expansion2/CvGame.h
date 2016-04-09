@@ -435,7 +435,7 @@ public:
 #if defined(MOD_BALANCE_CORE)
 	void debugSyncChecksum();
 
-	PlayerTypes GetCorporationFounder( int iCorporateID ) const;
+	PlayerTypes GetCorporationFounder( CorporationTypes eCorporation ) const;
 	int GetNumCorporationsFounded() const;
 #if defined (MOD_BALANCE_CORE_RESOURCE_MONOPOLIES)
 	PlayerTypes GetGreatestPlayerResourceMonopoly(ResourceTypes eResource) const;
@@ -447,7 +447,6 @@ public:
 	uint getNumReplayMessages() const;
 	const CvReplayMessage* getReplayMessage(uint i) const;
 #if defined(MOD_BALANCE_CORE_HAPPINESS)
-//	void CorpCheck();
 	void getGlobalAverage() const;
 	int GetCultureAverage() const;
 	void SetCultureAverage(int iValue);

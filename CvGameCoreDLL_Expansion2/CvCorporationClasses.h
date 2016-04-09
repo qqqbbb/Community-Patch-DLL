@@ -15,6 +15,7 @@ public:
 	
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
+	int GetMaxFranchises() const;
 	BuildingClassTypes GetHeadquartersBuildingClass() const;
 	BuildingClassTypes GetOfficeBuildingClass() const;
 	BuildingClassTypes GetFranchiseBuildingClass() const;
@@ -22,6 +23,8 @@ protected:
 	BuildingClassTypes m_eHeadquartersBuildingClass;
 	BuildingClassTypes m_eOfficeBuildingClass;
 	BuildingClassTypes m_eFranchiseBuildingClass;
+
+	int m_iMaxFranchises;
 
 private:
 	CvCorporationEntry(const CvCorporationEntry&);
@@ -93,7 +96,27 @@ public:
 	void Read(FDataStream& kStream);
 	void Write(FDataStream& kStream);
 
+	CvCorporation* GetCorporation() const;
+
 	CvCity* GetHeadquarters() const;
+
+	int GetAdditionalNumFranchises() const;
+	void ChangeAdditionalNumFranchises(int iChange);
+
+	int GetMaxNumFranchises() const;
+	int GetNumFranchises() const;
+
+	int GetNumOffices() const;
+
+	void RecalculateNumOffices();
+	void RecalculateNumFranchises();
+
+	void BuildFranchiseInCity(CvCity* pOriginCity, CvCity* pDestCity);
+	void BuildRandomFranchiseInCity();
+
+	CvString GetCurrentOfficeBenefit();
+
+	void ClearCorporationFromCity(CvCity* pCity);
 
 	bool HasFoundedCorporation() const;
 	CorporationTypes GetFoundedCorporation() const;
@@ -102,6 +125,10 @@ public:
 private:
 	CvPlayer* m_pPlayer;
 	CorporationTypes m_eFoundedCorporation;
+
+	int m_iNumOffices;
+	int m_iNumFranchises;
+	int m_iAdditionalNumFranchises;
 };
 
 typedef FStaticVector<CvCorporation, 16, false, c_eCiv5GameplayDLL > CorporationList;
@@ -126,6 +153,7 @@ public:
 	void DoTurn();
 
 	CvCorporation* GetCorporation(CorporationTypes eCorporation);
+	int GetNumActiveCorporations() const;
 
 	void DestroyCorporation(CorporationTypes eCorporation);
 	void FoundCorporation(PlayerTypes ePlayer, CorporationTypes eCorporation, CvCity* pHeadquarters);

@@ -2381,8 +2381,8 @@ int CvLuaGame::lGetPromiseDuration(lua_State* L)
 
 int CvLuaGame::lGetCorporationFounder(lua_State* L)
 {
-	const int iCorporationID = luaL_checkint(L, 1);
-	int iReturn = (int) GC.getGame().GetCorporationFounder(iCorporationID);
+	const CorporationTypes eCorporation = (CorporationTypes) luaL_checkint(L, 1);
+	int iReturn = (int) GC.getGame().GetCorporationFounder(eCorporation);
 	lua_pushinteger(L, iReturn);
 	return 1;
 }

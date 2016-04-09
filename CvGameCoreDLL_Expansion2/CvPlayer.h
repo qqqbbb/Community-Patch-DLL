@@ -1417,24 +1417,9 @@ public:
 	int GetAbleToMarryCityStatesCount() const;
 	void ChangeAbleToMarryCityStatesCount(int iChange);
 
-	void SetCorporateFounderID(int iValue);
-	int GetCorporateFounderID() const;
-
-	void SetCorporateFoundedTurn(int iValue);
-	int GetCorporateFoundedTurn() const;
-
-	void ChangeCorporationMaxFranchises(int iValue);
-	int GetCorporationMaxFranchises() const;
-
 	void DoFreedomCorp();
 
 	CvString GetCurrentOfficeBenefit() const;
-
-	void CalculateCorporateFranchisesWorldwide();
-	int GetCorporateFranchisesWorldwide() const;
-	void SetCorporateFranchisesWorldwide(int iValue);
-
-	int GetMaxFranchises();
 
 	bool AreTradeRoutesInvulnerable() const;
 	void SetTradeRoutesInvulnerable(bool bValue);
@@ -2943,10 +2928,6 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iNoPartisans;
 	FAutoVariable<int, CvPlayer> m_iSpawnCooldown;
 	FAutoVariable<int, CvPlayer> m_iAbleToMarryCityStatesCount;
-	FAutoVariable<int, CvPlayer> m_iCorporateFounderID;
-	FAutoVariable<int, CvPlayer> m_iCorporateFoundedTurn;
-	FAutoVariable<int, CvPlayer> m_iCorporationMaxFranchises;
-	FAutoVariable<int, CvPlayer> m_iCorporateFranchises;
 	FAutoVariable<bool, CvPlayer> m_bTradeRoutesInvulnerable;
 	FAutoVariable<int, CvPlayer> m_iTRSpeedBoost;
 	FAutoVariable<int, CvPlayer> m_iVotesPerGPT;

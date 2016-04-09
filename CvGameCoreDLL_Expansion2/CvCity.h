@@ -1017,6 +1017,10 @@ public:
 	void ChangeFreeBuildingTradeTargetCity(int iChange);
 	void SetFreeBuildingTradeTargetCity(int iValue);
 
+	bool IsHeadquarters(CorporationTypes eCorporation) const;
+	bool IsHasOffice(CorporationTypes eCorporation) const;
+	bool IsHasFranchise(CorporationTypes eCorporation) const;
+
 	int GetCorporationYieldChange(YieldTypes eIndex) const;
 	void ChangeCorporationYieldChange(YieldTypes eIndex, int iChange);
 	void SetCorporationYieldChange(YieldTypes eIndex, int iValue);
