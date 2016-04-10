@@ -49,12 +49,30 @@ bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	const char* szTextVal = NULL;
 	szTextVal = kResults.GetText("HeadquartersBuildingClass");
 	m_eHeadquartersBuildingClass = (BuildingClassTypes) GC.getInfoTypeForString(szTextVal, true);
-	
+
 	szTextVal = kResults.GetText("OfficeBuildingClass");
 	m_eOfficeBuildingClass = (BuildingClassTypes) GC.getInfoTypeForString(szTextVal, true);
 	
 	szTextVal = kResults.GetText("FranchiseBuildingClass");
 	m_eFranchiseBuildingClass = (BuildingClassTypes) GC.getInfoTypeForString(szTextVal, true);
+
+	// This is not ideal, but Corporations are loaded last, and I want an easy way to tell if a building class is owned by a Corporation
+	// Note: Intellisense LIES! This will compile (declared as friend)
+	CvBuildingClassInfo* pkBuildingInfo = GC.getBuildingClassInfo(m_eHeadquartersBuildingClass);
+	if (pkBuildingInfo)
+	{
+		pkBuildingInfo->m_eCorporationType = (CorporationTypes) GetID();
+	}
+	pkBuildingInfo = GC.getBuildingClassInfo(m_eOfficeBuildingClass);
+	if (pkBuildingInfo)
+	{
+		pkBuildingInfo->m_eCorporationType = (CorporationTypes) GetID();
+	}
+	pkBuildingInfo = GC.getBuildingClassInfo(m_eFranchiseBuildingClass);
+	if (pkBuildingInfo)
+	{
+		pkBuildingInfo->m_eCorporationType = (CorporationTypes) GetID();
+	}
 
 	return true;
 }
@@ -749,6 +767,11 @@ int CvPlayerCorporations::GetMaxNumFranchises() const
 
 	// Add in any "bonus" franchises from policies
 	iReturnValue += GetAdditionalNumFranchises();
+
+	// Corp-TODO: Need to include the policy MOD
+	// int iTemp *= iReturnValue * GetAdditionalNumFranchiseMod();
+	// iTemp /= 100;
+	// iReturnValue += iTemp;
 
 	return iReturnValue;
 }

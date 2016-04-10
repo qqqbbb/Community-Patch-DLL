@@ -52,9 +52,6 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_bPuppetPurchaseOverride(false),
 	m_bAllowsPuppetPurchase(false),
 	m_iGetCooldown(0),
-	m_iFreeBuildingTradeTargetCity(NO_BUILDINGCLASS),
-	m_iCorporationID(0),
-	m_iCorporationHQID(0),
 	m_bTradeRouteInvulnerable(false),
 	m_iTRSpeedBoost(0),
 	m_iTRVisionBoost(0),
@@ -323,7 +320,6 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piCorporationYieldModTrade(NULL),
 	m_piCorporationTradeRouteMod(NULL),
 	m_iCorporationGPChange(0),
-	m_iCorporationMaxFranchises(0),
 	m_piCorporationResourceQuantity(NULL),
 #endif
 	m_paiHurryModifier(NULL),
@@ -751,9 +747,6 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 
 #if defined(MOD_BALANCE_CORE)
 	szTextVal = kResults.GetText("FreeBuildingTradeTargetCity");
-	m_iFreeBuildingTradeTargetCity = GC.getInfoTypeForString(szTextVal, true);
-	m_iCorporationID = kResults.GetInt("CorporationID");
-	m_iCorporationHQID = kResults.GetInt("CorporationHQID");
 	m_bTradeRouteInvulnerable = kResults.GetBool("TradeRouteInvulnerable");
 	m_iTRSpeedBoost = kResults.GetInt("TRSpeedBoost");
 	m_iTRVisionBoost = kResults.GetInt("TRVisionBoost");
@@ -912,7 +905,6 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piCorporationYieldModTrade, "Building_CorporationYieldModTrade", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piCorporationTradeRouteMod, "Building_CorporationTradeRouteMod", "BuildingType", szBuildingType);
 	m_iCorporationGPChange = kResults.GetInt("CorporationGPChange");
-	m_iCorporationMaxFranchises = kResults.GetInt("CorporationMaxFranchises");
 #endif
 	//ResourceYieldChanges
 	{
@@ -1422,21 +1414,6 @@ int CvBuildingEntry::GetFreeBuildingThisCity() const
 	return m_iFreeBuildingThisCity;
 }
 #if defined(MOD_BALANCE_CORE)
-/// Free building in the target city for a trade route
-int CvBuildingEntry::GetFreeBuildingTradeTargetCity() const
-{
-	return m_iFreeBuildingTradeTargetCity;
-}
-/// Corporation ID (for global calcs)
-int CvBuildingEntry::GetCorporationID() const
-{
-	return m_iCorporationID;
-}
-/// Corporation ID (for global calcs)
-int CvBuildingEntry::GetCorporationHQID() const
-{
-	return m_iCorporationHQID;
-}
 /// TRs are invulnerable!
 bool CvBuildingEntry::IsTradeRouteInvulnerable() const
 {
@@ -2964,10 +2941,6 @@ int CvBuildingEntry::GetCorporationGPChange() const
 {
 	return m_iCorporationGPChange;
 }
-int CvBuildingEntry::GetCorporationMaxFranchises() const
-{
-	return m_iCorporationMaxFranchises;
-}
 /// Resources provided once constructed
 int CvBuildingEntry::GetCorporationResourceQuantity(int i) const
 {
@@ -3737,10 +3710,21 @@ bool CvCityBuildings::IsBuildingSellable(const CvBuildingEntry& kBuilding) const
 	{
 		return false;
 	}
-	//Spawns a permanent resource? Can't sell.
-	if(kBuilding.GetCorporationID() > 0)
+	// Is a Corporation building? Can't sell
+	// Check if it's a Corporation headquarters
+	for (int iI = 0; iI < GC.getNumCorporationInfos(); iI++)
 	{
-		return false;
+		CorporationTypes eCorporation = (CorporationTypes)iI;
+		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+		if (pkCorporationInfo)
+		{
+			if (kBuilding.GetBuildingClassType() == pkCorporationInfo->GetHeadquartersBuildingClass() ||
+				kBuilding.GetBuildingClassType() == pkCorporationInfo->GetOfficeBuildingClass() ||
+				kBuilding.GetBuildingClassType() == pkCorporationInfo->GetFranchiseBuildingClass())
+			{
+				return false;
+			}
+		}
 	}
 #endif
 

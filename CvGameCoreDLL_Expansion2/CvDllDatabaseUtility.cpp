@@ -400,6 +400,7 @@ bool CvDllDatabaseUtility::PrefetchGameData()
 #endif
 
 #if defined(MOD_BALANCE_CORE)
+	// Must be after buildings because this calls from Buildings
 	PrefetchCollection(GC.getCorporationInfo(), "Corporations");
 #endif
 

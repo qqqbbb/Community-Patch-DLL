@@ -10135,7 +10135,7 @@ BuildingTypes CvMinorCivAI::GetBestWonderForQuest(PlayerTypes ePlayer)
 			continue;
 		}
 #if defined(MOD_BALANCE_CORE)
-		if(pkBuildingInfo->GetCorporationID() > 0)
+		if(pkBuildingInfo->GetBuildingClassInfo().getCorporationType() != NO_CORPORATION)
 		{
 			continue;
 		}
@@ -10216,7 +10216,7 @@ BuildingTypes CvMinorCivAI::GetBestNationalWonderForQuest(PlayerTypes ePlayer)
 		}
 #endif
 #if defined(MOD_BALANCE_CORE)
-		if(pkBuildingInfo->GetCorporationID() > 0)
+		if(pkBuildingInfo->GetBuildingClassInfo().getCorporationType() != NO_CORPORATION)
 		{
 			continue;
 		}

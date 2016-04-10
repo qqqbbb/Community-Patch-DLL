@@ -491,13 +491,21 @@ protected:
 #endif
 };
 
+#if defined(MOD_BALANCE_CORE)
+// Forward declaration
+class CvCorporationEntry;
+#endif
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  class : CvBuildingClassInfo
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class CvBuildingClassInfo :	public CvBaseInfo
 {
 public:
-
+#if defined(MOD_BALANCE_CORE)
+	// So when we load in Corporations, they can touch this
+	friend class CvCorporationEntry;
+#endif
 	CvBuildingClassInfo();
 	virtual ~CvBuildingClassInfo();
 
@@ -513,6 +521,10 @@ public:
 
 	// Arrays
 	int getVictoryThreshold(int i) const;
+
+#if defined(MOD_BALANCE_CORE)
+	CorporationTypes getCorporationType() const;
+#endif
 
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
@@ -532,6 +544,10 @@ protected:
 private:
 	CvBuildingClassInfo(const CvBuildingClassInfo&);
 	CvBuildingClassInfo& operator=(const CvBuildingClassInfo&);
+
+#if defined(MOD_BALANCE_CORE)
+	CorporationTypes m_eCorporationType;
+#endif
 };
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

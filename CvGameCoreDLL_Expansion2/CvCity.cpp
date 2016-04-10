@@ -6896,10 +6896,6 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 			}
 		}
 	}
-	if(GET_PLAYER(getOwner()).GetCorporations()->HasFoundedCorporation() && pkBuildingInfo->GetCorporationHQID() > 0)
-	{
-		return false;
-	}
 #endif
 	// Holy city requirement
 	if (pkBuildingInfo->IsRequiresHolyCity() && !GetCityReligions()->IsHolyCityAnyReligion())
@@ -7144,31 +7140,43 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 	}
 #endif
 #if defined(MOD_BALANCE_CORE)
-	if(pkBuildingInfo->GetCorporationHQID() > 0)
+	// Check if it's a Corporation headquarters
+	// This is a horrendous method - I don't even know if there's a way around it
+	CorporationTypes eCorporation = pkBuildingInfo->GetBuildingClassInfo().getCorporationType();
+	CvCorporationEntry* pkCorporation = GC.getCorporationInfo(eCorporation);
+	if (pkCorporation)
 	{
-		CvCity* pLoopCity;
-		int iLoop;
-		for(pLoopCity = GET_PLAYER(getOwner()).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(getOwner()).nextCity(&iLoop))
+		if (pkCorporation->GetHeadquartersBuildingClass() == pkBuildingInfo->GetBuildingClassType())
 		{
-			if(pLoopCity != NULL && pLoopCity->GetID() != GetID())
+			CvCity* pLoopCity;
+			int iLoop;
+			for (pLoopCity = GET_PLAYER(getOwner()).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(getOwner()).nextCity(&iLoop))
 			{
-				BuildingTypes eTestBuilding = pLoopCity->getProductionBuilding();
-				if(eTestBuilding != NO_BUILDING)
+				if (pLoopCity != NULL && pLoopCity->GetID() != GetID())
 				{
-					CvBuildingEntry* pkBuildingInfo2 = GC.getBuildingInfo(eTestBuilding);
-					if(pkBuildingInfo2)
+					BuildingTypes eTestBuilding = pLoopCity->getProductionBuilding();
+					if (eTestBuilding != NO_BUILDING)
 					{
-						if(pkBuildingInfo2->GetCorporationHQID() > 0)
+						CvBuildingEntry* pkBuildingInfo2 = GC.getBuildingInfo(eTestBuilding);
+						if (pkBuildingInfo2)
 						{
-							GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_ONE_CORP_ONLY", pkBuildingInfo->GetTextKey(), pkBuildingInfo2->GetDescription());
-							if(toolTipSink == NULL)
-							return false;
+							CorporationTypes eCorporationTwo = pkBuildingInfo->GetBuildingClassInfo().getCorporationType();
+							CvCorporationEntry* pkCorporationTwo = GC.getCorporationInfo(eCorporationTwo);
+							if (pkCorporationTwo)
+							{
+								if (pkCorporationTwo->GetHeadquartersBuildingClass() == pkBuildingInfo2->GetBuildingClassType())
+								{
+									GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_ONE_CORP_ONLY", pkBuildingInfo->GetTextKey(), pkBuildingInfo2->GetDescription());
+									if (toolTipSink == NULL)
+										return false;
+								}
+							}
 						}
 					}
 				}
 			}
 		}
-	}
+	}		
 #endif
 
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
@@ -11831,10 +11839,6 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		if(MOD_BALANCE_CORE && (pBuildingInfo->GetTradeReligionModifier() > 0))
 		{
 			ChangeReligiousTradeModifier(pBuildingInfo->GetTradeReligionModifier() * iChange);
-		}
-		if(MOD_BALANCE_CORE && (pBuildingInfo->GetFreeBuildingTradeTargetCity() >= 0))
-		{
-			SetFreeBuildingTradeTargetCity(pBuildingInfo->GetFreeBuildingTradeTargetCity());
 		}
 		if(MOD_BALANCE_CORE && (pBuildingInfo->GetCorporationGPChange() > 0))
 		{

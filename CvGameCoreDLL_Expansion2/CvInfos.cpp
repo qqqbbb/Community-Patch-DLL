@@ -1725,6 +1725,9 @@ CvBuildingClassInfo::CvBuildingClassInfo() :
 	m_iDefaultBuildingIndex(NO_BUILDING),
 	m_bNoLimit(false),
 	m_bMonument(false),
+#if defined(MOD_BALANCE_CORE)
+	m_eCorporationType(NO_CORPORATION),
+#endif
 	m_piVictoryThreshold(NULL)
 {
 }
@@ -1780,6 +1783,13 @@ int CvBuildingClassInfo::getVictoryThreshold(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piVictoryThreshold ? m_piVictoryThreshold[i] : -1;
 }
+#if defined(MOD_BALANCE_CORE)
+//------------------------------------------------------------------------------
+CorporationTypes CvBuildingClassInfo::getCorporationType() const
+{
+	return m_eCorporationType;
+}
+#endif
 //------------------------------------------------------------------------------
 bool CvBuildingClassInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {

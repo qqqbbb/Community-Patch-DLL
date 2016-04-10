@@ -122,9 +122,6 @@ public:
 	bool IsPuppetPurchaseOverride() const;
 	bool IsAllowsPuppetPurchase() const;
 	int GetCooldown() const;
-	int GetFreeBuildingTradeTargetCity() const;
-	int GetCorporationID() const;
-	int GetCorporationHQID() const;
 	bool IsTradeRouteInvulnerable() const;
 	int GetTRSpeedBoost() const;
 	int GetTRVisionBoost() const;
@@ -461,7 +458,6 @@ public:
 	int GetCorporationYieldChange(int i) const;
 	int* GetCorporationYieldChangeArray() const;
 	int GetCorporationGPChange() const;
-	int GetCorporationMaxFranchises() const;
 	int GetCorporationResourceQuantity(int i) const;
 
 	int GetCorporationYieldModTrade(int i) const;
@@ -545,9 +541,6 @@ private:
 	bool m_bPuppetPurchaseOverride;
 	bool m_bAllowsPuppetPurchase;
 	int m_iGetCooldown;
-	int m_iFreeBuildingTradeTargetCity;
-	int m_iCorporationID;
-	int m_iCorporationHQID;
 	bool m_bTradeRouteInvulnerable;
 	int m_iTRSpeedBoost;
 	int m_iTRVisionBoost;
@@ -846,7 +839,6 @@ private:
 	int* m_piCorporationYieldModTrade;
 	int* m_piCorporationTradeRouteMod;
 	int m_iCorporationGPChange;
-	int m_iCorporationMaxFranchises;
 	int* m_piCorporationResourceQuantity;
 #endif
 	int* m_paiHurryModifier;
