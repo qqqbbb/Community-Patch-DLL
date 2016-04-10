@@ -253,7 +253,6 @@
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_LANDSEA_EXTRACTORS</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_LANDSEA_EXTRACTORS</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_LANDSEA_EXTRACTORS</CorporationTradeRouteBonusHelp>
-			<FreeBuildingThisCity>BUILDINGCLASS_LANDSEA_EXTRACTORS</FreeBuildingThisCity>
 			<NumTradeRouteBonus>2</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
@@ -317,7 +316,6 @@
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_HEXXON_REFINERY</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_HEXXON_REFINERY</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_HEXXON_REFINERY</CorporationTradeRouteBonusHelp>
-			<FreeBuildingThisCity>BUILDINGCLASS_HEXXON_REFINERY</FreeBuildingThisCity>
 			<NumTradeRouteBonus>1</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
@@ -375,7 +373,6 @@
 			<Strategy>TXT_KEY_BUILDING_GIORIO_ARMEIER_HQ_STRATEGY</Strategy>
 			<Help>TXT_KEY_BUILDING_GIORIO_ARMEIER_HQ_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
-			<FreeBuildingThisCity>BUILDINGCLASS_GIORIO_ARMEIER</FreeBuildingThisCity>
 			<MinAreaSize>-1</MinAreaSize>
 			<CorporationHelper>TXT_KEY_CORP_HELPER_GIORIO_ARMEIER</CorporationHelper>
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_GIORIO_ARMEIER</CorporationResourceBonusHelp>
@@ -443,7 +440,6 @@
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_FIRAXITE_MATERIALS</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_FIRAXITE_MATERIALS</CorporationTradeRouteBonusHelp>
 			<TradeRouteInvulnerable>true</TradeRouteInvulnerable>
-			<FreeBuildingThisCity>BUILDINGCLASS_FIRAXITE_MATERIALS</FreeBuildingThisCity>
 			<NumTradeRouteBonus>1</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
@@ -504,7 +500,6 @@
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
 			<TRVisionBoost>1</TRVisionBoost>
-			<FreeBuildingThisCity>BUILDINGCLASS_TWOKAY_FOODS</FreeBuildingThisCity>
 			<NumTradeRouteBonus>1</NumTradeRouteBonus>
 			<CorporationHelper>TXT_KEY_CORP_HELPER_TWOKAY_FOODS</CorporationHelper>
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_TWOKAY_FOODS</CorporationResourceBonusHelp>

@@ -1,3 +1,5 @@
+ALTER TABLE Technologies ADD COLUMN 'CorporationsEnabled' boolean default 'false';
+
 DELETE FROM Technology_PrereqTechs
 WHERE TechType = 'TECH_RADIO' AND PrereqTech = 'TECH_BIOLOGY';
 
@@ -21,6 +23,8 @@ UPDATE Technologies SET GridY = '1' WHERE Type = 'TECH_BIOLOGY';
 UPDATE Technologies SET GridY = '3' WHERE Type = 'TECH_ELECTRICITY';
 UPDATE Technologies SET GridY = '7' WHERE Type = 'TECH_REPLACEABLE_PARTS';
 UPDATE Technologies SET GridY = '9' WHERE Type = 'TECH_COMBUSTION';
+
+UPDATE Technologies SET CorporationsEnabled='true' WHERE Type = 'TECH_CORPORATIONS';
 
 INSERT INTO Technologies
 	(Type, Cost, Description, Civilopedia, Help, Era, Trade, GridX, GridY, Quote, PortraitIndex, IconAtlas)

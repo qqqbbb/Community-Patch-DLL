@@ -720,5 +720,9 @@
 		<Row Tag="TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_CIVILIZED_JEWELERS">
 			<Text>[ICON_INTERNATIONAL_TRADE] Trade Routes to a foreign City with a Civilized Jewelers Franchise grant +10% [ICON_GOLD] Gold in the origin City.</Text>
 		</Row>
+
+		<Row Tag="TXT_KEY_ABLTY_ENABLES_CORPORATIONS">
+			<Text>Enables Corporations to be founded.</Text>
+		</Row>
 	</Language_en_US>
 </GameData>

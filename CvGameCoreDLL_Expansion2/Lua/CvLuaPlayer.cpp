@@ -4273,7 +4273,7 @@ int CvLuaPlayer::lGetCorporationFoundedTurn(lua_State* L)
 	CvPlayerAI* pkPlayer = GetInstance(L);
 
 	CvCorporation* pCorporation = pkPlayer->GetCorporations()->GetCorporation();
-	int iResult = 0;
+	int iResult = -1;
 	if (pCorporation != NULL)
 	{
 		iResult = pCorporation->m_iTurnFounded;
