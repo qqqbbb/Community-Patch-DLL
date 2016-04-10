@@ -41284,6 +41284,9 @@ void CvDiplomacyAI::DoWeMadeVassalageWithSomeone(TeamTypes eMasterTeam, bool bVo
 	{
 		eOtherTeamPlayer = (PlayerTypes) iOtherPlayerLoop;
 		
+		if (!GET_PLAYER(eOtherTeamPlayer).isAlive())
+			continue;
+
 		// OtherPlayer is on eTeam
 		if(GET_PLAYER(eOtherTeamPlayer).getTeam() == eMasterTeam)
 		{
@@ -41383,6 +41386,17 @@ void CvDiplomacyAI::DoWeMadeVassalageWithSomeone(TeamTypes eMasterTeam, bool bVo
 					}
 				}
 			}
+		}
+
+		// These will affect all players, regardless of their status
+
+		// If there a pending operation against a player, then cancel it
+		CvAIOperation* pOperation = GetPlayer()->GetMilitaryAI()->GetSneakAttackOperation(eOtherTeamPlayer);
+		if (pOperation != NULL)
+		{
+			pOperation->Kill(AI_ABORT_NO_TARGET);
+
+			CUSTOMLOG("Aborting sneak attack operation against %s because we are now a vassal.", GET_PLAYER(pOperation->GetEnemy()).getName());
 		}
 	}
 }
