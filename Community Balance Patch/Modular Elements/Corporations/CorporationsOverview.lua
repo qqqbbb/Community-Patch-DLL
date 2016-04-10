@@ -1223,7 +1223,7 @@ function RegisterSortOptions()
 	g_YourOfficesSortFunction = GetSortFunction(g_YourOfficesSortOptions);
 	g_YourFranchisesSortFunction = GetSortFunction(g_YourFranchisesSortOptions);
 	g_WorldCorporationsSortFunction = GetSortFunction(g_WorldCorporationsSortOptions);
-	g_WorldFranchisesSortFunction = GetSortFunction(g_YourFranchisesSortOptions);
+	g_WorldFranchisesSortFunction = GetSortFunction(g_WorldFranchisesSortOptions);
 	g_MonopolyResourcesSortFunction = GetSortFunction(g_MonopolyResourcesSortOptions);
 end
 

@@ -10,6 +10,7 @@
 		<Column name="HeadquartersBuildingClass" type="text" reference="BuildingClasses(Type)"/>
 		<Column name="OfficeBuildingClass" type="text" reference="BuildingClasses(Type)"/>
 		<Column name="FranchiseBuildingClass" type="text" reference="BuildingClasses(Type)"/>
+		<Column name="MaxFranchises" type="integer" default="0"/>
 		<Column name="PortraitIndex" type="integer" default="-1"/>
 		<Column name="IconAtlas" type="text" default="NULL" reference="IconTextureAtlases(Atlas)"/>
 	</Table>
@@ -22,7 +23,19 @@
 			<HeadquartersBuildingClass>BUILDINGCLASS_TRADER_SIDS_HQ</HeadquartersBuildingClass>
 			<OfficeBuildingClass>BUILDINGCLASS_TRADER_SIDS</OfficeBuildingClass>
 			<FranchiseBuildingClass>BUILDINGCLASS_TRADER_SIDS_FRANCHISE</FranchiseBuildingClass>
+			<MaxFranchises>25</MaxFranchises>
 			<PortraitIndex>1</PortraitIndex>
+			<IconAtlas>CORP_ATLAS</IconAtlas>
+		</Row>
+		<Row>
+			<Type>CORPORATION_LANDSEA_EXTRACTORS</Type>
+			<Description>TXT_KEY_CORPORATION_LANDSEA_EXTRACTORS</Description>
+			<Civilopedia>TXT_KEY_CORPORATION_LANDSEA_EXTRACTORS_PEDIA</Civilopedia>
+			<HeadquartersBuildingClass>BUILDINGCLASS_LANDSEA_EXTRACTORS_HQ</HeadquartersBuildingClass>
+			<OfficeBuildingClass>BUILDINGCLASS_LANDSEA_EXTRACTORS</OfficeBuildingClass>
+			<FranchiseBuildingClass>BUILDINGCLASS_LANDSEA_EXTRACTORS_FRANCHISE</FranchiseBuildingClass>
+			<MaxFranchises>25</MaxFranchises>
+			<PortraitIndex>19</PortraitIndex>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
 		</Row>
 	</Corporations>
@@ -171,9 +184,6 @@
 			<Help>TXT_KEY_BUILDING_TRADER_SIDS_HQ_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationMaxFranchises>25</CorporationMaxFranchises>
-			<CorporationHQID>1</CorporationHQID>
-			<CorporationID>1</CorporationID>
 			<CorporationHelper>TXT_KEY_CORP_HELPER_TRADER_SIDS</CorporationHelper>
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_TRADER_SIDS</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_TRADER_SIDS</CorporationOfficeBonusHelp>
@@ -201,8 +211,6 @@
 			<OfficeBenefitHelper>TXT_KEY_BUILDING_TRADER_SIDS_OFFICE_BENEFIT_HELP</OfficeBenefitHelper>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<FreeBuildingTradeTargetCity>BUILDINGCLASS_TRADER_SIDS_FRANCHISE</FreeBuildingTradeTargetCity>
-			<CorporationID>1</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -221,7 +229,6 @@
 			<Help>TXT_KEY_BUILDING_TRADER_SIDS_FRANCHISE_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationID>1</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -239,9 +246,6 @@
 			<Help>TXT_KEY_BUILDING_LANDSEA_EXTRACTORS_HQ_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationHQID>7</CorporationHQID>
-			<CorporationID>7</CorporationID>
-			<CorporationMaxFranchises>25</CorporationMaxFranchises>
 			<CorporationHelper>TXT_KEY_CORP_HELPER_LANDSEA_EXTRACTORS</CorporationHelper>
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_LANDSEA_EXTRACTORS</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_LANDSEA_EXTRACTORS</CorporationOfficeBonusHelp>
@@ -269,8 +273,6 @@
 			<OfficeBenefitHelper>TXT_KEY_BUILDING_LANDSEA_EXTRACTORS_OFFICE_BENEFIT_HELP</OfficeBenefitHelper>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<FreeBuildingTradeTargetCity>BUILDINGCLASS_LANDSEA_EXTRACTORS_FRANCHISE</FreeBuildingTradeTargetCity>
-			<CorporationID>1</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -289,7 +291,6 @@
 			<Help>TXT_KEY_BUILDING_LANDSEA_EXTRACTORS_FRANCHISE_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationID>1</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -308,10 +309,7 @@
 			<Help>TXT_KEY_BUILDING_HEXXON_REFINERY_HQ_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationHQID>4</CorporationHQID>
-			<CorporationID>4</CorporationID>
 			<TRSpeedBoost>2</TRSpeedBoost>
-			<CorporationMaxFranchises>25</CorporationMaxFranchises>
 			<CorporationHelper>TXT_KEY_CORP_HELPER_HEXXON_REFINERY</CorporationHelper>
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_HEXXON_REFINERY</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_HEXXON_REFINERY</CorporationOfficeBonusHelp>
@@ -339,8 +337,6 @@
 			<OfficeBenefitHelper>TXT_KEY_BUILDING_HEXXON_REFINERY_OFFICE_BENEFIT_HELP</OfficeBenefitHelper>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<FreeBuildingTradeTargetCity>BUILDINGCLASS_HEXXON_REFINERY_FRANCHISE</FreeBuildingTradeTargetCity>
-			<CorporationID>4</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -359,7 +355,6 @@
 			<Help>TXT_KEY_BUILDING_HEXXON_REFINERY_FRANCHISE_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationID>4</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -379,13 +374,10 @@
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<FreeBuildingThisCity>BUILDINGCLASS_GIORIO_ARMEIER</FreeBuildingThisCity>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationMaxFranchises>25</CorporationMaxFranchises>
 			<CorporationHelper>TXT_KEY_CORP_HELPER_GIORIO_ARMEIER</CorporationHelper>
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_GIORIO_ARMEIER</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_GIORIO_ARMEIER</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_GIORIO_ARMEIER</CorporationTradeRouteBonusHelp>
-			<CorporationHQID>5</CorporationHQID>
-			<CorporationID>5</CorporationID>
 			<NumTradeRouteBonus>2</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
@@ -408,8 +400,6 @@
 			<OfficeBenefitHelper>TXT_KEY_BUILDING_GIORIO_ARMEIER_OFFICE_BENEFIT_HELP</OfficeBenefitHelper>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<FreeBuildingTradeTargetCity>BUILDINGCLASS_GIORIO_ARMEIER_FRANCHISE</FreeBuildingTradeTargetCity>
-			<CorporationID>5</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -428,7 +418,6 @@
 			<Help>TXT_KEY_BUILDING_GIORIO_ARMEIER_FRANCHISE_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationID>5</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -446,9 +435,6 @@
 			<Help>TXT_KEY_BUILDING_FIRAXITE_MATERIALS_HQ_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationHQID>3</CorporationHQID>
-			<CorporationID>3</CorporationID>
-			<CorporationMaxFranchises>25</CorporationMaxFranchises>
 			<CorporationHelper>TXT_KEY_CORP_HELPER_FIRAXITE_MATERIALS</CorporationHelper>
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_FIRAXITE_MATERIALS</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_FIRAXITE_MATERIALS</CorporationOfficeBonusHelp>
@@ -477,8 +463,6 @@
 			<OfficeBenefitHelper>TXT_KEY_BUILDING_FIRAXITE_MATERIALS_OFFICE_BENEFIT_HELP</OfficeBenefitHelper>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<FreeBuildingTradeTargetCity>BUILDINGCLASS_FIRAXITE_MATERIALS_FRANCHISE</FreeBuildingTradeTargetCity>
-			<CorporationID>3</CorporationID>
 			<BuildingProductionModifier>20</BuildingProductionModifier>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
@@ -498,7 +482,6 @@
 			<Help>TXT_KEY_BUILDING_FIRAXITE_MATERIALS_FRANCHISE_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationID>3</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -517,9 +500,6 @@
 			<Help>TXT_KEY_BUILDING_TWOKAY_FOODS_HQ_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationMaxFranchises>25</CorporationMaxFranchises>
-			<CorporationHQID>2</CorporationHQID>
-			<CorporationID>2</CorporationID>
 			<TRVisionBoost>1</TRVisionBoost>
 			<FreeBuildingThisCity>BUILDINGCLASS_TWOKAY_FOODS</FreeBuildingThisCity>
 			<NumTradeRouteBonus>1</NumTradeRouteBonus>
@@ -548,8 +528,6 @@
 			<OfficeBenefitHelper>TXT_KEY_BUILDING_TWOKAY_FOODS_OFFICE_BENEFIT_HELP</OfficeBenefitHelper>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<FreeBuildingTradeTargetCity>BUILDINGCLASS_TWOKAY_FOODS_FRANCHISE</FreeBuildingTradeTargetCity>
-			<CorporationID>2</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -568,7 +546,6 @@
 			<Help>TXT_KEY_BUILDING_TWOKAY_FOODS_FRANCHISE_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationID>2</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -587,15 +564,11 @@
 			<Help>TXT_KEY_BUILDING_CIVILIZED_JEWELERS_HQ_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationHQID>6</CorporationHQID>
 			<Happiness>3</Happiness>
-			<CorporationMaxFranchises>25</CorporationMaxFranchises>
-			<CorporationID>6</CorporationID>
 			<CorporationHelper>TXT_KEY_CORP_HELPER_CIVILIZED_JEWELERS</CorporationHelper>
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_CIVILIZED_JEWELERS</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_CIVILIZED_JEWELERS</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_CIVILIZED_JEWELERS</CorporationTradeRouteBonusHelp>
-			<FreeBuildingThisCity>BUILDINGCLASS_CIVILIZED_JEWELERS</FreeBuildingThisCity>
 			<TradeRouteRecipientBonus>5</TradeRouteRecipientBonus>
 			<TradeRouteTargetBonus>5</TradeRouteTargetBonus>
 			<NumTradeRouteBonus>1</NumTradeRouteBonus>
@@ -620,8 +593,6 @@
 			<OfficeBenefitHelper>TXT_KEY_BUILDING_CIVILIZED_JEWELERS_OFFICE_BENEFIT_HELP</OfficeBenefitHelper>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<FreeBuildingTradeTargetCity>BUILDINGCLASS_CIVILIZED_JEWELERS_FRANCHISE</FreeBuildingTradeTargetCity>
-			<CorporationID>6</CorporationID>
 			<GreatPeopleRateModifier>5</GreatPeopleRateModifier>
 			<CorporationGPChange>5</CorporationGPChange>
 			<NeverCapture>true</NeverCapture>
@@ -642,7 +613,6 @@
 			<Help>TXT_KEY_BUILDING_CIVILIZED_JEWELERS_FRANCHISE_HELP</Help>
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
-			<CorporationID>6</CorporationID>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
