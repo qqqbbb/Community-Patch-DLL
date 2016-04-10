@@ -149,6 +149,18 @@ CvCorporation::CvCorporation(CorporationTypes eCorporation, PlayerTypes eFounder
 	m_iTurnFounded = GC.getGame().getGameTurn();
 }
 
+bool CvCorporation::IsCorporationBuilding(BuildingClassTypes eBuildingClass)
+{
+	CvBuildingClassInfo* pBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
+	if (pBuildingClassInfo == NULL)
+		return false;
+
+	if (pBuildingClassInfo->getCorporationType() == NO_CORPORATION)
+		return false;
+
+	return pBuildingClassInfo->getCorporationType() == m_eCorporation;
+}
+
 /// Serialization read
 FDataStream& operator>>(FDataStream& loadFrom, CvCorporation& writeTo)
 {
@@ -366,7 +378,7 @@ void CvPlayerCorporations::RecalculateNumOffices()
 	{
 		if (pLoopCity != NULL)
 		{
-			if (pLoopCity->IsHasOffice(eCorporation))
+			if (pLoopCity->IsHasOffice())
 			{
 				iOffices++;
 			}
@@ -399,7 +411,7 @@ void CvPlayerCorporations::RecalculateNumFranchises()
 		{
 			if (pLoopCity != NULL)
 			{
-				if (pLoopCity->IsHasOffice(eCorporation))
+				if (pLoopCity->IsHasOffice())
 				{
 					iFranchises++;
 				}
@@ -420,15 +432,15 @@ void CvPlayerCorporations::RecalculateNumFranchises()
 				{
 					if (pLoopCity != NULL)
 					{
-						if (pLoopCity->IsFranchised(m_pPlayer->GetID()))
+						if (pLoopCity->IsHasFranchise(eCorporation))
 						{
 							iFranchises++;
-						}
 
-						// Infiltration
-						if (bAutocracyCorp && m_pPlayer->GetCulture()->GetInfluenceLevel(ePlayer) >= INFLUENCE_LEVEL_POPULAR)
-						{
-							iFreeFranchises++;
+							// Infiltration will give us double franchises
+							if (bAutocracyCorp && m_pPlayer->GetCulture()->GetInfluenceLevel(ePlayer) >= INFLUENCE_LEVEL_POPULAR)
+							{
+								iFreeFranchises++;
+							}
 						}
 					}
 				}
@@ -496,7 +508,6 @@ void CvPlayerCorporations::BuildFranchiseInCity(CvCity* pOriginCity, CvCity* pDe
 
 	// If we've passed all the checks above, we are ready to go!
 	pDestCity->GetCityBuildings()->SetNumRealBuilding(eFranchise, 1);
-	pDestCity->SetFranchised(pOriginCity->getOwner(), true);
 
 	RecalculateNumFranchises();
 
@@ -621,7 +632,6 @@ void CvPlayerCorporations::BuildRandomFranchiseInCity()
 			if (pBuildingInfo)
 			{
 				pBestCity->GetCityBuildings()->SetNumRealBuilding(eFranchiseBuilding, 1);
-				pBestCity->SetFranchised(m_pPlayer->GetID(), true);
 
 				// send notification to owner player and target player
 				if (m_pPlayer->GetID() == GC.getGame().getActivePlayer())
@@ -789,9 +799,6 @@ void CvPlayerCorporations::ClearCorporationFromCity(CvCity* pCity)
 	CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
 	if (pkCorporationInfo == NULL)
 		return;
-
-	pCity->SetFranchised(m_pPlayer->GetID(), false);
-	pCity->SetHasOffice(false);
 
 	// Explicitly destroy all corporation buildings from this city
 	BuildingTypes eHeadquarters = (BuildingTypes)m_pPlayer->getCivilizationInfo().getCivilizationBuildings(pkCorporationInfo->GetHeadquartersBuildingClass());

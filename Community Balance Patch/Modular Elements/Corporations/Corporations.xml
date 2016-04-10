@@ -7,6 +7,7 @@
 		<Column name="Type" type="text" notnull="true" unique="true"/>
 		<Column name="Description" type="text" reference="Language_en_US(Tag)" default="NULL"/>
 		<Column name="Civilopedia" type="text" reference="Language_en_US(Tag)"/>
+		<Column name="CorporationHelper" type="text" reference="Language_en_US(Tag)" default="NULL"/>
 		<Column name="HeadquartersBuildingClass" type="text" reference="BuildingClasses(Type)"/>
 		<Column name="OfficeBuildingClass" type="text" reference="BuildingClasses(Type)"/>
 		<Column name="FranchiseBuildingClass" type="text" reference="BuildingClasses(Type)"/>
@@ -20,6 +21,7 @@
 			<Type>CORPORATION_TRADER_SIDS</Type>
 			<Description>TXT_KEY_CORPORATION_TRADER_SIDS</Description>
 			<Civilopedia>TXT_KEY_CORPORATION_TRADER_SIDS_PEDIA</Civilopedia>
+			<CorporationHelper>TXT_KEY_CORP_HELPER_TRADER_SIDS</CorporationHelper>
 			<HeadquartersBuildingClass>BUILDINGCLASS_TRADER_SIDS_HQ</HeadquartersBuildingClass>
 			<OfficeBuildingClass>BUILDINGCLASS_TRADER_SIDS</OfficeBuildingClass>
 			<FranchiseBuildingClass>BUILDINGCLASS_TRADER_SIDS_FRANCHISE</FranchiseBuildingClass>
@@ -31,6 +33,7 @@
 			<Type>CORPORATION_LANDSEA_EXTRACTORS</Type>
 			<Description>TXT_KEY_CORPORATION_LANDSEA_EXTRACTORS</Description>
 			<Civilopedia>TXT_KEY_CORPORATION_LANDSEA_EXTRACTORS_PEDIA</Civilopedia>
+			<CorporationHelper>TXT_KEY_CORP_HELPER_TRADER_SIDS</CorporationHelper>
 			<HeadquartersBuildingClass>BUILDINGCLASS_LANDSEA_EXTRACTORS_HQ</HeadquartersBuildingClass>
 			<OfficeBuildingClass>BUILDINGCLASS_LANDSEA_EXTRACTORS</OfficeBuildingClass>
 			<FranchiseBuildingClass>BUILDINGCLASS_LANDSEA_EXTRACTORS_FRANCHISE</FranchiseBuildingClass>

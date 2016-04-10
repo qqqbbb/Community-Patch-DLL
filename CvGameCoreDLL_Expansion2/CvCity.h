@@ -1017,8 +1017,8 @@ public:
 	void ChangeFreeBuildingTradeTargetCity(int iChange);
 	void SetFreeBuildingTradeTargetCity(int iValue);
 
-	bool IsHeadquarters(CorporationTypes eCorporation) const;
-	bool IsHasOffice(CorporationTypes eCorporation) const;
+	bool IsHeadquarters() const;
+	bool IsHasOffice() const;
 	bool IsHasFranchise(CorporationTypes eCorporation) const;
 
 	int GetCorporationYieldChange(YieldTypes eIndex) const;
@@ -1032,12 +1032,6 @@ public:
 	int GetCorporationGPChange() const;
 	void ChangeCorporationGPChange(int iChange);
 	void SetCorporationGPChange(int iValue);
-
-	bool IsFranchised(PlayerTypes ePlayer);
-	void SetFranchised(PlayerTypes ePlayer, bool bValue);
-
-	bool HasOffice();
-	void SetHasOffice(bool bValue);
 
 	int GetCorporationResourceQuantity(ResourceTypes eResource) const;
 	void ChangeCorporationResourceQuantity(ResourceTypes eResource, int iChange);
@@ -1640,9 +1634,7 @@ protected:
 	FAutoVariable<std::vector<bool>, CvCity> m_abEverOwned;
 #if defined(MOD_BALANCE_CORE)
 	FAutoVariable<std::vector<bool>, CvCity> m_abIsPurchased;
-	FAutoVariable<std::vector<bool>, CvCity> m_abFranchised;
 	FAutoVariable<std::vector<bool>, CvCity> m_abTraded;
-	FAutoVariable<bool, CvCity> m_bHasOffice;
 	FAutoVariable<int, CvCity> m_iExtraBuildingMaintenance;
 	FAutoVariable<std::vector<int>, CvCity> m_paiNumTerrainWorked;
 	FAutoVariable<std::vector<int>, CvCity> m_paiNumFeaturelessTerrainWorked;

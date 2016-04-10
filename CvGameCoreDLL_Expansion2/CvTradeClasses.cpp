@@ -3180,9 +3180,9 @@ int CvPlayerTrade::GetTradeConnectionCorporationModifierTimes100(const TradeConn
 		// Corp-TODO: I don't like this. Should consider a rename
 		bool bOrderCorp = GET_PLAYER(pOriginCity->getOwner()).IsOrderCorp();
 
-		bool bValid = pOriginCity->IsHasOffice(eCorporation);
+		bool bValid = pOriginCity->IsHasOffice();
 		// If Nationalized, destination city considers office instead of franchise
-		bValid = bValid && (bOrderCorp ? pDestCity->IsHasOffice(eCorporation) : pDestCity->IsHasFranchise(eCorporation));
+		bValid = bValid && (bOrderCorp ? pDestCity->IsHasOffice() : pDestCity->IsHasFranchise(eCorporation));
 		// If Nationalized, destination city must be part of origin city's empire
 		bValid = bValid && (bOrderCorp ? pOriginCity->getOwner() == pDestCity->getOwner() : true);
 
@@ -5799,7 +5799,7 @@ int CvTradeAI::ScoreInternationalTR (const TradeConnection& kTradeConnection)
 						CvCity* pOriginCity = pPlot2->getPlotCity();
 						if (pDestCity != NULL && pOriginCity != NULL)
 						{
-							if (pOriginCity->IsHasOffice(eCorporation))
+							if (pOriginCity->IsHasOffice())
 							{
 								int iFranchises = m_pPlayer->GetCorporations()->GetNumFranchises();
 								int iMax = m_pPlayer->GetCorporations()->GetMaxNumFranchises();
@@ -5854,7 +5854,7 @@ int CvTradeAI::ScoreInternationalTR (const TradeConnection& kTradeConnection)
 								}
 							}
 							//Foreign city have an office? Let's reduce the score just a little to keep from feeding their corporation.
-							else if (pDestCity->HasOffice() && GET_PLAYER(pDestCity->getOwner()).isMajorCiv())
+							else if (pDestCity->IsHasOffice() && GET_PLAYER(pDestCity->getOwner()).isMajorCiv())
 							{
 								int iFranchises = (GET_PLAYER(pDestCity->getOwner()).GetCorporations()->GetNumFranchises() / 2);
 								//Care less if we like this guy.

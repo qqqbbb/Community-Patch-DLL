@@ -380,9 +380,7 @@ CvCity::CvCity() :
 #endif
 #if defined(MOD_BALANCE_CORE)
 	, m_abIsPurchased("CvCity::m_abIsPurchased", m_syncArchive)
-	, m_abFranchised("CvCity::m_abFranchised", m_syncArchive)
 	, m_abTraded("CvCity::m_abTraded", m_syncArchive)
-	, m_bHasOffice("CvCity::m_bHasOffice", m_syncArchive)
 	, m_iExtraBuildingMaintenance("CvCity::m_iExtraBuildingMaintenance", m_syncArchive)
 	, m_paiNumTerrainWorked("CvCity::m_paiNumTerrainWorked", m_syncArchive)
 	, m_paiNumFeaturelessTerrainWorked("CvCity::m_paiNumFeaturelessTerrainWorked", m_syncArchive)
@@ -1470,7 +1468,6 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iBlockScience = 0;
 	m_iBlockGold = 0;
 	m_iCorporationGPChange = 0;
-	m_bHasOffice = false;
 	m_iExtraBuildingMaintenance = 0;
 	m_iLandTourismBonus = 0;
 	m_iSeaTourismBonus = 0;
@@ -1580,13 +1577,11 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_abIsPurchased.setAt(iI, false);
 	}
 	m_abTraded.resize(REALLY_MAX_PLAYERS);
-	m_abFranchised.resize(REALLY_MAX_PLAYERS);
 #endif
 	for(iI = 0; iI < REALLY_MAX_PLAYERS; iI++)
 	{
 		m_abEverOwned.setAt(iI, false);
 #if defined(MOD_BALANCE_CORE)
-		m_abFranchised.setAt(iI, false);
 		m_abTraded.setAt(iI, false);
 		m_aiNumTimesOwned.setAt(iI, false);
 #endif
@@ -7141,37 +7136,35 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 #endif
 #if defined(MOD_BALANCE_CORE)
 	// Check if it's a Corporation headquarters
-	// This is a horrendous method - I don't even know if there's a way around it
+	// This is a horrendous looking method - I don't even know if there's a way around it
 	CorporationTypes eCorporation = pkBuildingInfo->GetBuildingClassInfo().getCorporationType();
-	CvCorporationEntry* pkCorporation = GC.getCorporationInfo(eCorporation);
-	if (pkCorporation)
+	CvCorporation* pCorporation = GC.getGame().GetGameCorporations()->GetCorporation(eCorporation);
+	if(pCorporation && pCorporation->IsCorporationBuilding((BuildingClassTypes)pkBuildingInfo->GetBuildingClassType()))
 	{
-		if (pkCorporation->GetHeadquartersBuildingClass() == pkBuildingInfo->GetBuildingClassType())
+		CvCity* pLoopCity;
+		int iLoop;
+		for (pLoopCity = GET_PLAYER(getOwner()).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(getOwner()).nextCity(&iLoop))
 		{
-			CvCity* pLoopCity;
-			int iLoop;
-			for (pLoopCity = GET_PLAYER(getOwner()).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(getOwner()).nextCity(&iLoop))
+			if (pLoopCity == NULL)
+				continue;
+
+			// Is this check necessary? When would this be false?
+			if (pLoopCity->GetID() != GetID())
+				continue;
+
+			BuildingTypes eTestBuilding = pLoopCity->getProductionBuilding();
+			if (eTestBuilding != NO_BUILDING)
 			{
-				if (pLoopCity != NULL && pLoopCity->GetID() != GetID())
+				CvBuildingEntry* pkLoopBuildingInfo = GC.getBuildingInfo(eTestBuilding);
+				if (pkLoopBuildingInfo)
 				{
-					BuildingTypes eTestBuilding = pLoopCity->getProductionBuilding();
-					if (eTestBuilding != NO_BUILDING)
+					CorporationTypes eLoopCorporation = pkLoopBuildingInfo->GetBuildingClassInfo().getCorporationType();
+					CvCorporation* pLoopCorporation = GC.getGame().GetGameCorporations()->GetCorporation(eLoopCorporation);
+					if (pLoopCorporation && pLoopCorporation->IsCorporationBuilding((BuildingClassTypes)pkLoopBuildingInfo->GetBuildingClassType()))
 					{
-						CvBuildingEntry* pkBuildingInfo2 = GC.getBuildingInfo(eTestBuilding);
-						if (pkBuildingInfo2)
-						{
-							CorporationTypes eCorporationTwo = pkBuildingInfo->GetBuildingClassInfo().getCorporationType();
-							CvCorporationEntry* pkCorporationTwo = GC.getCorporationInfo(eCorporationTwo);
-							if (pkCorporationTwo)
-							{
-								if (pkCorporationTwo->GetHeadquartersBuildingClass() == pkBuildingInfo2->GetBuildingClassType())
-								{
-									GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_ONE_CORP_ONLY", pkBuildingInfo->GetTextKey(), pkBuildingInfo2->GetDescription());
-									if (toolTipSink == NULL)
-										return false;
-								}
-							}
-						}
+						GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_ONE_CORP_ONLY", pkBuildingInfo->GetTextKey(), pkLoopBuildingInfo->GetDescription());
+						if (toolTipSink == NULL)
+							return false;
 					}
 				}
 			}
@@ -11843,21 +11836,6 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		if(MOD_BALANCE_CORE && (pBuildingInfo->GetCorporationGPChange() > 0))
 		{
 			ChangeCorporationGPChange(pBuildingInfo->GetCorporationGPChange() * iChange);
-		}
-		if(MOD_BALANCE_CORE)
-		{
-			CorporationTypes eCorporation = GET_PLAYER(getOwner()).GetCorporations()->GetFoundedCorporation();
-			if (eCorporation != NO_CORPORATION)
-			{
-				CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
-				if (pkCorporationInfo)
-				{
-					if (pkCorporationInfo->GetOfficeBuildingClass() == pBuildingInfo->GetBuildingClassType())
-					{
-						SetHasOffice(iChange > 0 ? true : false);
-					}
-				}
-			}
 		}
 		if(MOD_BALANCE_CORE && (pBuildingInfo->GetBorderObstacleCity() > 0))
 		{
@@ -20433,7 +20411,7 @@ int CvCity::GetCorporationYieldModChange(YieldTypes eIndex) const
 			{
 				if (pOriginCity->getX() == getX() && pOriginCity->getY() == getY())
 				{
-					if(pDestCity->IsFranchised(getOwner()))
+					if(pDestCity->IsHasFranchise(GET_PLAYER(getOwner()).GetCorporations()->GetFoundedCorporation()))
 					{
 						iMod += m_aiCorporationYieldModChange[eIndex];
 					}
@@ -20448,7 +20426,7 @@ int CvCity::GetCorporationYieldModChange(YieldTypes eIndex) const
 			{
 				if (pOriginCity->getX() == getX() && pOriginCity->getY() == getY())
 				{
-					if(pDestCity->getOwner() == pOriginCity->getOwner() && pDestCity->HasOffice())
+					if(pDestCity->getOwner() == pOriginCity->getOwner() && pDestCity->IsHasOffice())
 					{
 						iMod += m_aiCorporationYieldModChange[eIndex];
 					}
@@ -20497,24 +20475,14 @@ void CvCity::SetCorporationGPChange(int iChange)
 	VALIDATE_OBJECT
 	m_iCorporationGPChange = iChange;
 }
-void CvCity::SetFranchised(PlayerTypes ePlayer, bool bValue)
-{
-	VALIDATE_OBJECT
-	CvAssertMsg(ePlayer >= 0, "eIndex expected to be >= 0");
-	CvAssertMsg(ePlayer < MAX_PLAYERS, "eIndex expected to be < MAX_PLAYERS");
-	m_abFranchised.setAt(ePlayer, bValue);
-}
-bool CvCity::IsFranchised(PlayerTypes ePlayer)
-{
-	VALIDATE_OBJECT
-	CvAssertMsg(ePlayer >= 0, "eIndex expected to be >= 0");
-	CvAssertMsg(ePlayer < MAX_PLAYERS, "eIndex expected to be < MAX_PLAYERS");
-	return m_abFranchised[ePlayer];
-}
 
-bool CvCity::IsHeadquarters(CorporationTypes eCorporation) const
+bool CvCity::IsHeadquarters() const
 {
 	VALIDATE_OBJECT
+
+	CorporationTypes eCorporation = GET_PLAYER(getOwner()).GetCorporations()->GetFoundedCorporation();
+	if (eCorporation == NO_CORPORATION)
+		return false;
 
 	CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
 	if (pkCorporationInfo == NULL)
@@ -20527,11 +20495,15 @@ bool CvCity::IsHeadquarters(CorporationTypes eCorporation) const
 	return HasBuildingClass(eHeadquarters);
 }
 
-bool CvCity::IsHasOffice(CorporationTypes eCorporation) const
+bool CvCity::IsHasOffice() const
 {
 	VALIDATE_OBJECT
 
-		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+	CorporationTypes eCorporation = GET_PLAYER(getOwner()).GetCorporations()->GetFoundedCorporation();
+	if (eCorporation == NO_CORPORATION)
+		return false;
+
+	CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
 	if (pkCorporationInfo == NULL)
 		return false;
 
@@ -20546,7 +20518,7 @@ bool CvCity::IsHasFranchise(CorporationTypes eCorporation) const
 {
 	VALIDATE_OBJECT
 
-		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+	CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
 	if (pkCorporationInfo == NULL)
 		return false;
 
@@ -20555,17 +20527,6 @@ bool CvCity::IsHasFranchise(CorporationTypes eCorporation) const
 		return false;
 
 	return HasBuildingClass(eFranchse);
-}
-
-void CvCity::SetHasOffice(bool bValue)
-{
-	VALIDATE_OBJECT
-	m_bHasOffice = bValue;
-}
-bool CvCity::HasOffice()
-{
-	VALIDATE_OBJECT
-	return m_bHasOffice;
 }
 //	--------------------------------------------------------------------------------
 int CvCity::GetCorporationResourceQuantity(ResourceTypes eResource) const

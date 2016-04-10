@@ -167,32 +167,6 @@ g_MonopolyResourcesSortOptions = {
 		CurrentDirection = "desc",
 	},
 }
-
-local g_Corporations = {};
-local g_NumCorporations = 0;
--- Generate list of Corporations
-for hq in GameInfo.Buildings() do
-	-- Found an HQ
-	if(hq.CorporationHQID > 0) then
-		g_NumCorporations = g_NumCorporations + 1;
-		
-		-- Headquarters provides the Office
-		local OfficeClass = GameInfo.BuildingClasses[hq.FreeBuildingThisCity];
-		local Office = GameInfo.Buildings[OfficeClass.DefaultBuilding];
-		-- Office provides the Franchise
-		local FranchiseClass = GameInfo.BuildingClasses[Office.FreeBuildingTradeTargetCity];
-
-		local instance = {
-			headquartersClass = GameInfo.BuildingClasses[hq.BuildingClass],
-			officeClass = OfficeClass,
-			franchiseClass = FranchiseClass,
-		};
-
-		g_Corporations[hq.CorporationHQID] = instance;
-		print("g_Corporations[" .. hq.CorporationHQID .. "] ");
-	end
-end
-
 -------------------------------------------------
 -- Global Variables
 -------------------------------------------------
@@ -265,18 +239,23 @@ function RefreshWorldCorporations()
 	for iPlayerLoop=0, GameDefines.MAX_MAJOR_CIVS, 1 do
 		local pLoopPlayer = Players[iPlayerLoop];
 		if(pLoopPlayer:IsAlive()) then
-			local ePlayerCorporation = pLoopPlayer:GetCorpID();
-			if(ePlayerCorporation > 0) then
+			local ePlayerCorporation = pLoopPlayer:GetCorporation();
+			if(ePlayerCorporation ~= -1) then
 				print("ePlayerCorporation=" .. ePlayerCorporation);
 
-				local HQClass = g_Corporations[ePlayerCorporation].headquartersClass;
-				local pCorporationBuilding = GameInfo.Buildings[HQClass.DefaultBuilding];
+				local pCorporation = GameInfo.Corporations("ID= '" .. ePlayerCorporation.. "'");
+				if(pCorporation == nil) then
+					print("WARNING: pCorporation is nil! RefreshWorldCorporations()!");
+				end
+
+				local pCorporationHQ = GameInfo.BuildingClasses[pCorporation.HeadquartersBuildingClass];
+				local pCorporationBuilding = GameInfo.Buildings[pCorporationHQ.DefaultBuilding];
 
 				local info = {
 					CivPlayer = iPlayerLoop,	-- int
 					CivName = Locale.ConvertTextKey(GetPlayerCiv(iPlayerLoop).Description),
 					CorpName = Locale.ConvertTextKey(pCorporationBuilding.Description),
-					CorpTooltip = Locale.ConvertTextKey(pCorporationBuilding.CorporationHelper),
+					CorpTooltip = Locale.ConvertTextKey(pCorporation.CorporationHelper),
 					CityName = pLoopPlayer:GetCorporationHeadquarters(),	-- city
 					DateFounded = pLoopPlayer:GetCorporationFoundedTurn(),
 				};

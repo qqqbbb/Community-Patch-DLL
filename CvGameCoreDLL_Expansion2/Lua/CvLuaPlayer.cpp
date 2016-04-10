@@ -1177,7 +1177,7 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetNumberofGlobalFranchises);
 	Method(GetNumberofOffices);
 	Method(GetMaxFranchises);
-	Method(GetCorpID);
+	Method(GetCorporation);
 	Method(GetCorporationFoundedTurn);
 	Method(GetCurrentOfficeBenefit);
 #endif
@@ -4260,7 +4260,7 @@ int CvLuaPlayer::lGetMaxFranchises(lua_State* L)
 	return 1;
 }
 //------------------------------------------------------------------------------
-int CvLuaPlayer::lGetCorpID(lua_State* L)
+int CvLuaPlayer::lGetCorporation(lua_State* L)
 {
 	CvPlayerAI* pkPlayer = GetInstance(L);
 	int iResult = pkPlayer->GetCorporations()->GetFoundedCorporation();

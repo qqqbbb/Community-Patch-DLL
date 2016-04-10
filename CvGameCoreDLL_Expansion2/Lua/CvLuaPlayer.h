@@ -1240,7 +1240,7 @@ protected:
 	static int lGetNumberofGlobalFranchises(lua_State* L);
 	static int lGetNumberofOffices(lua_State* L);
 	static int lGetMaxFranchises(lua_State* L);
-	static int lGetCorpID(lua_State* L);
+	static int lGetCorporation(lua_State* L);
 	static int lGetCorporationFoundedTurn(lua_State* L);
 	static int lGetCurrentOfficeBenefit(lua_State* L);
 #endif

@@ -63,6 +63,8 @@ public:
 	CvCorporation();
 	CvCorporation(CorporationTypes eCorporation, PlayerTypes eFounder, CvCity* pHeadquarters);
 
+	bool IsCorporationBuilding(BuildingClassTypes eBuildingClass);
+
 	// Public data
 	CorporationTypes m_eCorporation;
 	PlayerTypes m_eFounder;

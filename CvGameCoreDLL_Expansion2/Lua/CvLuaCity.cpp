@@ -5001,7 +5001,7 @@ int CvLuaCity::lIsFranchised(lua_State* L)
 	bool bResult = false;
 	CvCity* pkCity = GetInstance(L);
 	const PlayerTypes ePlayer = (PlayerTypes)lua_tointeger(L, 2);
-	bResult = pkCity->IsFranchised(ePlayer);
+	bResult = pkCity->IsHasFranchise(GET_PLAYER(ePlayer).GetCorporations()->GetFoundedCorporation());
 	lua_pushboolean(L, bResult);
 	return 1;
 }
@@ -5009,7 +5009,7 @@ int CvLuaCity::lHasOffice(lua_State* L)
 {
 	bool bResult = false;
 	CvCity* pkCity = GetInstance(L);
-	bResult = pkCity->HasOffice();
+	bResult = pkCity->IsHasOffice();
 	lua_pushboolean(L, bResult);
 	return 1;
 }
