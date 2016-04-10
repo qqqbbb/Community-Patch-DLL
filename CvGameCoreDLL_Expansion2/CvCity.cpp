@@ -6855,39 +6855,38 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 #endif
 #if defined(MOD_BALANCE_CORE)
 	// Corporation building?
-	for(iI = 0; iI < GC.getNumCorporationInfos(); iI++)
+	if (pkBuildingInfo->GetBuildingClassInfo().getCorporationType() != NO_CORPORATION)
 	{
-		CorporationTypes eCorporation = (CorporationTypes) iI;
-		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
-		if(pkCorporationInfo)
+		// Must have Corporations tech
+		if (!GET_TEAM(GET_PLAYER(getOwner()).getTeam()).IsCorporationsEnabled())
 		{
-			// This building is a franchise - cannot construct EVER
-			if(pkBuildingInfo->GetBuildingClassType() == pkCorporationInfo->GetFranchiseBuildingClass())
+			return false;
+		}
+
+		// This building is a franchise - cannot construct EVER
+		if (pkBuildingInfo->GetBuildingClassInfo().IsFranchise())
+		{
+			return false;
+		}
+		// Corporation HQ
+		if (pkBuildingInfo->GetBuildingClassInfo().IsHeadquarters())
+		{
+			CvPlayerCorporations* pPlayerCorporation = GET_PLAYER(getOwner()).GetCorporations();
+			// Cannot construct if corporation exists or we've founded a corporation already
+			if (pPlayerCorporation->HasFoundedCorporation() ||
+				GC.getGame().GetGameCorporations()->IsCorporationFounded(pkBuildingInfo->GetBuildingClassInfo().getCorporationType()))
 			{
 				return false;
 			}
-
+		}
+		// Corporation Office
+		if (pkBuildingInfo->GetBuildingClassInfo().IsOffice())
+		{
 			CvPlayerCorporations* pPlayerCorporation = GET_PLAYER(getOwner()).GetCorporations();
-			
-			// Corporation HQ
-			if(pkBuildingInfo->GetBuildingClassType() == pkCorporationInfo->GetHeadquartersBuildingClass())
+			// Cannot construct if we do not have this corporation
+			if (pPlayerCorporation->GetFoundedCorporation() != pkBuildingInfo->GetBuildingClassInfo().getCorporationType())
 			{
-				// Cannot construct if corporation exists or we've founded a corporation already
-				if(pPlayerCorporation->HasFoundedCorporation() ||
-					GC.getGame().GetGameCorporations()->IsCorporationFounded(eCorporation))
-				{
-					return false;
-				}
-			}
-			
-			// Corporation Office
-			if(pkBuildingInfo->GetBuildingClassType() == pkCorporationInfo->GetOfficeBuildingClass())
-			{
-				// Cannot construct if we do not have this corporation
-				if(pPlayerCorporation->GetFoundedCorporation() != eCorporation)
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 	}
@@ -7136,10 +7135,7 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 #endif
 #if defined(MOD_BALANCE_CORE)
 	// Check if it's a Corporation headquarters
-	// This is a horrendous looking method - I don't even know if there's a way around it
-	CorporationTypes eCorporation = pkBuildingInfo->GetBuildingClassInfo().getCorporationType();
-	CvCorporation* pCorporation = GC.getGame().GetGameCorporations()->GetCorporation(eCorporation);
-	if(pCorporation && pCorporation->IsCorporationBuilding((BuildingClassTypes)pkBuildingInfo->GetBuildingClassType()))
+	if(pkBuildingInfo->GetBuildingClassInfo().IsHeadquarters())
 	{
 		CvCity* pLoopCity;
 		int iLoop;
@@ -7156,16 +7152,11 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 			if (eTestBuilding != NO_BUILDING)
 			{
 				CvBuildingEntry* pkLoopBuildingInfo = GC.getBuildingInfo(eTestBuilding);
-				if (pkLoopBuildingInfo)
+				if (pkLoopBuildingInfo && pkLoopBuildingInfo->GetBuildingClassInfo().IsHeadquarters())
 				{
-					CorporationTypes eLoopCorporation = pkLoopBuildingInfo->GetBuildingClassInfo().getCorporationType();
-					CvCorporation* pLoopCorporation = GC.getGame().GetGameCorporations()->GetCorporation(eLoopCorporation);
-					if (pLoopCorporation && pLoopCorporation->IsCorporationBuilding((BuildingClassTypes)pkLoopBuildingInfo->GetBuildingClassType()))
-					{
-						GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_ONE_CORP_ONLY", pkBuildingInfo->GetTextKey(), pkLoopBuildingInfo->GetDescription());
-						if (toolTipSink == NULL)
-							return false;
-					}
+					GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_ONE_CORP_ONLY", pkBuildingInfo->GetTextKey(), pkLoopBuildingInfo->GetDescription());
+					if (toolTipSink == NULL)
+						return false;
 				}
 			}
 		}
@@ -7839,7 +7830,7 @@ bool CvCity::IsBuildingResourceMonopolyValid(BuildingTypes eBuilding, CvString* 
 	VALIDATE_OBJECT
 
 	int iResourceLoop;
-	ResourceTypes eResource;
+	ResourceTypes eResource = NO_RESOURCE;
 
 	CvBuildingEntry* pkBuildingInfo = GC.getBuildingInfo(eBuilding);
 	if(pkBuildingInfo == NULL)
@@ -7848,7 +7839,23 @@ bool CvCity::IsBuildingResourceMonopolyValid(BuildingTypes eBuilding, CvString* 
 	// ANDs: City must have ALL of these nearby
 	for(iResourceLoop = 0; iResourceLoop < GC.getNumResourceInfos(); iResourceLoop++)
 	{
-		eResource = (ResourceTypes) pkBuildingInfo->GetResourceMonopolyAnd(iResourceLoop);
+		// If this is a corporation HQ, consider it's corporation resource ANDs instead!
+		// Still want to support Buildings
+		const CvBuildingClassInfo& kBuildingClass = pkBuildingInfo->GetBuildingClassInfo();
+		CorporationTypes eCorporation = kBuildingClass.getCorporationType();
+		if (kBuildingClass.IsHeadquarters() && eCorporation != NO_CORPORATION)
+		{
+
+			CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+			if (pkCorporationInfo)
+			{
+				eResource = (ResourceTypes)pkCorporationInfo->GetResourceMonopolyAnd(iResourceLoop);
+			}
+		}
+		else
+		{
+			eResource = (ResourceTypes)pkBuildingInfo->GetResourceMonopolyAnd(iResourceLoop);
+		}
 
 		// Doesn't require a resource in this AND slot
 		if(eResource == NO_RESOURCE)
@@ -7884,7 +7891,25 @@ bool CvCity::IsBuildingResourceMonopolyValid(BuildingTypes eBuilding, CvString* 
 	// ORs: City must have ONE of these nearby
 	for(iResourceLoop = 0; iResourceLoop < GC.getNumResourceInfos(); iResourceLoop++)
 	{
-		eResource = (ResourceTypes) pkBuildingInfo->GetResourceMonopolyOr(iResourceLoop);
+		eResource = NO_RESOURCE;
+
+		// If this is a corporation HQ, consider it's corporation resource ORs instead!
+		// Still want to support Buildings
+		const CvBuildingClassInfo& kBuildingClass =  pkBuildingInfo->GetBuildingClassInfo();
+		CorporationTypes eCorporation = kBuildingClass.getCorporationType();
+		if (kBuildingClass.IsHeadquarters() && eCorporation != NO_CORPORATION)
+		{
+			
+			CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+			if (pkCorporationInfo)
+			{
+				eResource = (ResourceTypes)pkCorporationInfo->GetResourceMonopolyOr(iResourceLoop);
+			}
+		}
+		else
+		{
+			eResource = (ResourceTypes)pkBuildingInfo->GetResourceMonopolyOr(iResourceLoop);
+		}
 
 		// Doesn't require a resource in this AND slot
 		if(eResource == NO_RESOURCE)

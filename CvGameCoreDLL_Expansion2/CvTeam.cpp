@@ -271,6 +271,7 @@ void CvTeam::uninit()
 	m_members.clear();
 	m_bIsMinorTeam = false;
 	m_bIsObserverTeam = false;
+	m_iCorporationsEnabledCount = 0;
 #endif
 
 #if defined(MOD_DIPLOMACY_CIV4_FEATURES)
@@ -1181,6 +1182,19 @@ bool CvTeam::canChangeWarPeace(TeamTypes eTeam) const
 void CvTeam::ClearWarDeclarationCache()
 {
 	m_cacheCanDeclareWar.clear();
+}
+int CvTeam::getCorporationsEnabledCount() const
+{
+	return m_iCorporationsEnabledCount;
+}
+bool CvTeam::IsCorporationsEnabled() const
+{
+	return m_iCorporationsEnabledCount > 0;
+}
+void CvTeam::changeCorporationsEnabledCount(int iChange)
+{
+	m_iCorporationsEnabledCount = m_iCorporationsEnabledCount + iChange;
+	CvAssert(getCorporationsEnabledCount() >= 0);
 }
 #endif
 
@@ -7634,6 +7648,13 @@ void CvTeam::processTech(TechTypes eTech, int iChange)
 	}
 #endif
 
+#if defined(MOD_BALANCE_CORE)
+	if (pTech->IsCorporationsEnabled())
+	{
+		changeCorporationsEnabledCount(iChange);
+	}
+#endif
+
 	if(pTech->IsAllowEmbassyTradingAllowed())
 	{
 		changeAllowEmbassyTradingAllowedCount(iChange);
@@ -9000,6 +9021,10 @@ void CvTeam::Read(FDataStream& kStream)
 	MOD_SERIALIZE_READ_ARRAY(37, kStream, &m_aiVassalTax[0], int, MAX_MAJOR_CIVS, 0);
 #endif
 
+#if defined(MOD_BALANCE_CORE)
+	MOD_SERIALIZE_READ(79, kStream, m_iCorporationsEnabledCount, false);
+#endif
+
 	// Fix bad 'at war' flags where we are at war with ourselves.  Not a good thing.
 	if(m_eID >= 0 && m_eID < MAX_TEAMS)
 	{
@@ -9168,6 +9193,10 @@ void CvTeam::Write(FDataStream& kStream) const
 	MOD_SERIALIZE_WRITE_CONSTARRAY(kStream, &m_aiNumTurnsSinceVassalEnded[0], int, MAX_TEAMS);
 	MOD_SERIALIZE_WRITE_CONSTARRAY(kStream, &m_aiNumTurnsSinceVassalTaxSet[0], int, MAX_MAJOR_CIVS);
 	MOD_SERIALIZE_WRITE_CONSTARRAY(kStream, &m_aiVassalTax[0], int, MAX_MAJOR_CIVS);
+#endif
+
+#if defined(MOD_BALANCE_CORE)
+	MOD_SERIALIZE_WRITE(kStream, m_iCorporationsEnabledCount);
 #endif
 }
 

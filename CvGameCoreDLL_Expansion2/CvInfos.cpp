@@ -1789,6 +1789,18 @@ CorporationTypes CvBuildingClassInfo::getCorporationType() const
 {
 	return m_eCorporationType;
 }
+bool CvBuildingClassInfo::IsHeadquarters() const
+{
+	return m_bIsHeadquarters;
+}
+bool CvBuildingClassInfo::IsOffice() const
+{
+	return m_bIsOffice;
+}
+bool CvBuildingClassInfo::IsFranchise() const
+{
+	return m_bIsFranchise;
+}
 #endif
 //------------------------------------------------------------------------------
 bool CvBuildingClassInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)

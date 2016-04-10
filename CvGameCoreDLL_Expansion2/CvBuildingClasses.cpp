@@ -3710,21 +3710,10 @@ bool CvCityBuildings::IsBuildingSellable(const CvBuildingEntry& kBuilding) const
 	{
 		return false;
 	}
-	// Is a Corporation building? Can't sell
-	// Check if it's a Corporation headquarters
-	for (int iI = 0; iI < GC.getNumCorporationInfos(); iI++)
+	// Is a Corporation building?
+	if (kBuilding.GetBuildingClassInfo().getCorporationType() != NO_CORPORATION)
 	{
-		CorporationTypes eCorporation = (CorporationTypes)iI;
-		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
-		if (pkCorporationInfo)
-		{
-			if (kBuilding.GetBuildingClassType() == pkCorporationInfo->GetHeadquartersBuildingClass() ||
-				kBuilding.GetBuildingClassType() == pkCorporationInfo->GetOfficeBuildingClass() ||
-				kBuilding.GetBuildingClassType() == pkCorporationInfo->GetFranchiseBuildingClass())
-			{
-				return false;
-			}
-		}
+		return false;
 	}
 #endif
 

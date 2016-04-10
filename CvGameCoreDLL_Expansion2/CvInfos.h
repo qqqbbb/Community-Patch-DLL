@@ -524,6 +524,9 @@ public:
 
 #if defined(MOD_BALANCE_CORE)
 	CorporationTypes getCorporationType() const;
+	bool IsHeadquarters() const;
+	bool IsOffice() const;
+	bool IsFranchise() const;
 #endif
 
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
@@ -541,13 +544,16 @@ protected:
 	// Arrays
 	int* m_piVictoryThreshold;
 
+#if defined(MOD_BALANCE_CORE)
+	CorporationTypes m_eCorporationType;
+	bool m_bIsHeadquarters;
+	bool m_bIsOffice;
+	bool m_bIsFranchise;
+#endif
+
 private:
 	CvBuildingClassInfo(const CvBuildingClassInfo&);
 	CvBuildingClassInfo& operator=(const CvBuildingClassInfo&);
-
-#if defined(MOD_BALANCE_CORE)
-	CorporationTypes m_eCorporationType;
-#endif
 };
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

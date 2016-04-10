@@ -10,12 +10,18 @@
 
 #if defined(MOD_BALANCE_CORE)
 
-CvCorporationEntry::CvCorporationEntry(void)
+CvCorporationEntry::CvCorporationEntry(void):
+	m_iMaxFranchises(0),
+	m_eHeadquartersBuildingClass(NO_BUILDINGCLASS),
+	m_eOfficeBuildingClass(NO_BUILDINGCLASS),
+	m_eFranchiseBuildingClass(NO_BUILDINGCLASS),
+	m_piResourceMonopolyOrs(NULL)
 {
 }
 
 CvCorporationEntry::~CvCorporationEntry(void)
 {
+	SAFE_DELETE_ARRAY(m_piResourceMonopolyOrs);
 }
 
 int CvCorporationEntry::GetMaxFranchises() const
@@ -38,6 +44,21 @@ BuildingClassTypes CvCorporationEntry::GetFranchiseBuildingClass() const
 	return m_eFranchiseBuildingClass;
 }
 
+int CvCorporationEntry::GetResourceMonopolyAnd(int i) const
+{
+	CvAssertMsg(i < GC.getNUM_BUILDING_RESOURCE_PREREQS(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piResourceMonopolyAnd ? m_piResourceMonopolyAnd[i] : -1;
+}
+
+/// Prerequisite resources with OR
+int CvCorporationEntry::GetResourceMonopolyOr(int i) const
+{
+	CvAssertMsg(i < GC.getNUM_BUILDING_RESOURCE_PREREQS(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piResourceMonopolyOrs ? m_piResourceMonopolyOrs[i] : -1;
+}
+
 bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
 	if(!CvBaseInfo::CacheResults(kResults, kUtility))
@@ -56,23 +77,35 @@ bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	szTextVal = kResults.GetText("FranchiseBuildingClass");
 	m_eFranchiseBuildingClass = (BuildingClassTypes) GC.getInfoTypeForString(szTextVal, true);
 
+	CUSTOMLOG("HQ class: %d", m_eHeadquartersBuildingClass);
+	CUSTOMLOG("Office class: %d", m_eOfficeBuildingClass);
+	CUSTOMLOG("Franchise class: %d", m_eFranchiseBuildingClass);
+
 	// This is not ideal, but Corporations are loaded last, and I want an easy way to tell if a building class is owned by a Corporation
-	// Note: Intellisense LIES! This will compile (declared as friend)
+	// Note: Intellisense may lie here! This will compile (declared as friend)
 	CvBuildingClassInfo* pkBuildingInfo = GC.getBuildingClassInfo(m_eHeadquartersBuildingClass);
 	if (pkBuildingInfo)
 	{
 		pkBuildingInfo->m_eCorporationType = (CorporationTypes) GetID();
+		pkBuildingInfo->m_bIsHeadquarters = true;
 	}
 	pkBuildingInfo = GC.getBuildingClassInfo(m_eOfficeBuildingClass);
 	if (pkBuildingInfo)
 	{
 		pkBuildingInfo->m_eCorporationType = (CorporationTypes) GetID();
+		pkBuildingInfo->m_bIsOffice = true;
 	}
 	pkBuildingInfo = GC.getBuildingClassInfo(m_eFranchiseBuildingClass);
 	if (pkBuildingInfo)
 	{
 		pkBuildingInfo->m_eCorporationType = (CorporationTypes) GetID();
+		pkBuildingInfo->m_bIsFranchise = true;
 	}
+
+	const char* szCorporationType = GetType();
+
+	kUtility.PopulateArrayByExistence(m_piResourceMonopolyAnd, "Resources", "Corporation_ResourceMonopolyAnds", "ResourceType", "CorporationType", szCorporationType);
+	kUtility.PopulateArrayByExistence(m_piResourceMonopolyOrs, "Resources", "Corporation_ResourceMonopolyOrs", "ResourceType", "CorporationType", szCorporationType);
 
 	return true;
 }
