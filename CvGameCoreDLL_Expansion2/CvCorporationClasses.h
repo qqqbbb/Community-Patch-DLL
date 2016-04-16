@@ -19,16 +19,25 @@ public:
 	BuildingClassTypes GetHeadquartersBuildingClass() const;
 	BuildingClassTypes GetOfficeBuildingClass() const;
 	BuildingClassTypes GetFranchiseBuildingClass() const;
+
+	int GetTradeRouteSpeedModifier() const;
+	int GetNumFreeTradeRoutes() const;
+
 	int GetResourceMonopolyAnd(int i) const;
 	int GetResourceMonopolyOr(int i) const;
+	int GetNumFreeResource(int i) const;
 protected:
 	BuildingClassTypes m_eHeadquartersBuildingClass;
 	BuildingClassTypes m_eOfficeBuildingClass;
 	BuildingClassTypes m_eFranchiseBuildingClass;
 
+	int m_iTradeRouteSpeedModifier;
+	int m_iNumFreeTradeRoutes;
 	int m_iMaxFranchises;
+
 	int* m_piResourceMonopolyAnd;
 	int* m_piResourceMonopolyOrs;
+	int* m_piNumFreeResource;
 
 private:
 	CvCorporationEntry(const CvCorporationEntry&);

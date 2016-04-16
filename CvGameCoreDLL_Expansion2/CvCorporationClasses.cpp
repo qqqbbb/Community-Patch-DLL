@@ -44,6 +44,16 @@ BuildingClassTypes CvCorporationEntry::GetFranchiseBuildingClass() const
 	return m_eFranchiseBuildingClass;
 }
 
+int CvCorporationEntry::GetTradeRouteSpeedModifier() const
+{
+	return m_iTradeRouteSpeedModifier;
+}
+
+int CvCorporationEntry::GetNumFreeTradeRoutes() const
+{
+	return m_iNumFreeTradeRoutes;
+}
+
 int CvCorporationEntry::GetResourceMonopolyAnd(int i) const
 {
 	CvAssertMsg(i < GC.getNUM_BUILDING_RESOURCE_PREREQS(), "Index out of bounds");
@@ -59,12 +69,21 @@ int CvCorporationEntry::GetResourceMonopolyOr(int i) const
 	return m_piResourceMonopolyOrs ? m_piResourceMonopolyOrs[i] : -1;
 }
 
+int CvCorporationEntry::GetNumFreeResource(int i) const
+{
+	CvAssertMsg(i < GC.getNUM_BUILDING_RESOURCE_PREREQS(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piNumFreeResource ? m_piNumFreeResource[i] : -1;
+}
+
 bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
 	if(!CvBaseInfo::CacheResults(kResults, kUtility))
 		return false;
 
 	m_iMaxFranchises = kResults.GetInt("MaxFranchises");
+	m_iNumFreeTradeRoutes = kResults.GetInt("NumFreeTradeRoutes");
+	m_iTradeRouteSpeedModifier = kResults.GetInt("TradeRouteSpeedModifier");
 
 	//References
 	const char* szTextVal = NULL;
@@ -106,6 +125,7 @@ bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 	kUtility.PopulateArrayByExistence(m_piResourceMonopolyAnd, "Resources", "Corporation_ResourceMonopolyAnds", "ResourceType", "CorporationType", szCorporationType);
 	kUtility.PopulateArrayByExistence(m_piResourceMonopolyOrs, "Resources", "Corporation_ResourceMonopolyOrs", "ResourceType", "CorporationType", szCorporationType);
+	kUtility.PopulateArrayByValue(m_piNumFreeResource, "Resources", "Corporation_NumFreeResource", "ResourceType", "CorporationType", szCorporationType, "NumResource");
 
 	return true;
 }

@@ -30891,6 +30891,23 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 		}
 	}
 
+#if defined(MOD_BALANCE_CORE)
+	// Additional resources from Corporation
+	CorporationTypes eCorporation = GetCorporations()->GetFoundedCorporation();
+	if (eCorporation != NO_CORPORATION)
+	{
+		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+		if (pkCorporationInfo)
+		{
+			int iFreeResource = pkCorporationInfo->GetNumFreeResource(eIndex);
+			if (iFreeResource > 0)
+			{
+				iTotalNumResource += iFreeResource;
+			}
+		}
+	}
+#endif
+
 	if(bIncludeImport)
 	{
 		iTotalNumResource += getResourceImport(eIndex);

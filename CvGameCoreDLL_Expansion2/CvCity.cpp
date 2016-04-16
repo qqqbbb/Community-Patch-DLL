@@ -7117,6 +7117,38 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 		}
 	}
 
+#if defined(MOD_BALANCE_CORE)
+	if (!bTestVisible) // Test visible check here is so that the buildings will show up in the build list, but can't be selected (for every other city!)
+	{
+		// Check if it's a Corporation headquarters
+		if (pkBuildingInfo->GetBuildingClassInfo().IsHeadquarters())
+		{
+			CvCity* pLoopCity;
+			int iLoop;
+			for (pLoopCity = GET_PLAYER(getOwner()).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(getOwner()).nextCity(&iLoop))
+			{
+				if (pLoopCity == NULL)
+					continue;
+
+				if (pLoopCity->GetID() == GetID())
+					continue;
+
+				BuildingTypes eTestBuilding = pLoopCity->getProductionBuilding();
+				if (eTestBuilding != NO_BUILDING)
+				{
+					CvBuildingEntry* pkLoopBuildingInfo = GC.getBuildingInfo(eTestBuilding);
+					if (pkLoopBuildingInfo && pkLoopBuildingInfo->GetBuildingClassInfo().IsHeadquarters())
+					{
+						GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_ONE_CORP_ONLY", pkBuildingInfo->GetTextKey(), pkLoopBuildingInfo->GetDescription());
+						if (toolTipSink == NULL)
+							return false;
+					}
+				}
+			}
+		}
+	}
+#endif
+
 #if defined(MOD_BALANCE_CORE_POP_REQ_BUILDINGS)
 	//Requires a certain population size, either nationally or locally.
 	if(MOD_BALANCE_CORE_POP_REQ_BUILDINGS)
@@ -7132,35 +7164,6 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 			}
 		}
 	}
-#endif
-#if defined(MOD_BALANCE_CORE)
-	// Check if it's a Corporation headquarters
-	if(pkBuildingInfo->GetBuildingClassInfo().IsHeadquarters())
-	{
-		CvCity* pLoopCity;
-		int iLoop;
-		for (pLoopCity = GET_PLAYER(getOwner()).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(getOwner()).nextCity(&iLoop))
-		{
-			if (pLoopCity == NULL)
-				continue;
-
-			// Is this check necessary? When would this be false?
-			if (pLoopCity->GetID() != GetID())
-				continue;
-
-			BuildingTypes eTestBuilding = pLoopCity->getProductionBuilding();
-			if (eTestBuilding != NO_BUILDING)
-			{
-				CvBuildingEntry* pkLoopBuildingInfo = GC.getBuildingInfo(eTestBuilding);
-				if (pkLoopBuildingInfo && pkLoopBuildingInfo->GetBuildingClassInfo().IsHeadquarters())
-				{
-					GC.getGame().BuildCannotPerformActionHelpText(toolTipSink, "TXT_KEY_NO_ACTION_BUILDING_ONE_CORP_ONLY", pkBuildingInfo->GetTextKey(), pkLoopBuildingInfo->GetDescription());
-					if (toolTipSink == NULL)
-						return false;
-				}
-			}
-		}
-	}		
 #endif
 
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
@@ -11972,7 +11975,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				owningPlayer.changeNumResourceTotal(eResource, iNumResource);
 			}
 
-#if defined(MOD_BALANCE_CORE)
+#if defined(MOD_BALANCE_CORE)			
 			if(MOD_BALANCE_CORE && (pBuildingInfo->GetCorporationResourceQuantity(iResourceLoop) > 0))
 			{
 				ChangeCorporationResourceQuantity(eResource, pBuildingInfo->GetCorporationResourceQuantity(iResourceLoop) * iChange);

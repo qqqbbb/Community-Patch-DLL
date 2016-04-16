@@ -12,6 +12,8 @@
 		<Column name="OfficeBuildingClass" type="text" reference="BuildingClasses(Type)"/>
 		<Column name="FranchiseBuildingClass" type="text" reference="BuildingClasses(Type)"/>
 		<Column name="MaxFranchises" type="integer" default="0"/>
+		<Column name="NumFreeTradeRoutes" type="integer" default="0"/>
+		<Column name="TradeRouteSpeedModifier" type="integer" default="100"/>
 		<Column name="PortraitIndex" type="integer" default="-1"/>
 		<Column name="IconAtlas" type="text" default="NULL" reference="IconTextureAtlases(Atlas)"/>
 	</Table>
@@ -22,6 +24,11 @@
 	<Table name="Corporation_ResourceMonopolyOrs">
 		<Column name="CorporationType" type="text" notnull="true" reference="Corporations(Type)"/>
 		<Column name="ResourceType" type="text" reference="Resources(Type)"/>
+	</Table>
+	<Table name="Corporation_NumFreeResource">
+		<Column name="CorporationType" type="text" notnull="true" reference="Corporations(Type)"/>
+		<Column name="ResourceType" type="text" reference="Resources(Type)"/>
+		<Column name="NumResource" type="integer" default="0"/>
 	</Table>
 	<Corporations>
 		<Row>
@@ -34,6 +41,7 @@
 			<OfficeBuildingClass>BUILDINGCLASS_TRADER_SIDS</OfficeBuildingClass>
 			<FranchiseBuildingClass>BUILDINGCLASS_TRADER_SIDS_FRANCHISE</FranchiseBuildingClass>
 			<MaxFranchises>25</MaxFranchises>
+			<NumFreeTradeRoutes>2</NumFreeTradeRoutes>
 			<PortraitIndex>1</PortraitIndex>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
 		</Row>
@@ -46,6 +54,7 @@
 			<OfficeBuildingClass>BUILDINGCLASS_LANDSEA_EXTRACTORS</OfficeBuildingClass>
 			<FranchiseBuildingClass>BUILDINGCLASS_LANDSEA_EXTRACTORS_FRANCHISE</FranchiseBuildingClass>
 			<MaxFranchises>25</MaxFranchises>
+			<NumFreeTradeRoutes>2</NumFreeTradeRoutes>
 			<PortraitIndex>19</PortraitIndex>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
 		</Row>
@@ -58,6 +67,8 @@
 			<OfficeBuildingClass>BUILDINGCLASS_HEXXON_REFINERY</OfficeBuildingClass>
 			<FranchiseBuildingClass>BUILDINGCLASS_HEXXON_REFINERY_FRANCHISE</FranchiseBuildingClass>
 			<MaxFranchises>25</MaxFranchises>
+			<NumFreeTradeRoutes>1</NumFreeTradeRoutes>
+			<TradeRouteSpeedModifier>200</TradeRouteSpeedModifier>
 			<PortraitIndex>7</PortraitIndex>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
 		</Row>
@@ -70,6 +81,7 @@
 			<OfficeBuildingClass>BUILDINGCLASS_GIORIO_ARMEIER</OfficeBuildingClass>
 			<FranchiseBuildingClass>BUILDINGCLASS_GIORIO_ARMEIER_FRANCHISE</FranchiseBuildingClass>
 			<MaxFranchises>25</MaxFranchises>
+			<NumFreeTradeRoutes>2</NumFreeTradeRoutes>
 			<PortraitIndex>16</PortraitIndex>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
 		</Row>
@@ -82,6 +94,7 @@
 			<OfficeBuildingClass>BUILDINGCLASS_FIRAXITE_MATERIALS</OfficeBuildingClass>
 			<FranchiseBuildingClass>BUILDINGCLASS_FIRAXITE_MATERIALS_FRANCHISE</FranchiseBuildingClass>
 			<MaxFranchises>25</MaxFranchises>
+			<NumFreeTradeRoutes>1</NumFreeTradeRoutes>
 			<PortraitIndex>10</PortraitIndex>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
 		</Row>
@@ -94,6 +107,7 @@
 			<OfficeBuildingClass>BUILDINGCLASS_TWOKAY_FOODS</OfficeBuildingClass>
 			<FranchiseBuildingClass>BUILDINGCLASS_TWOKAY_FOODS_FRANCHISE</FranchiseBuildingClass>
 			<MaxFranchises>25</MaxFranchises>
+			<NumFreeTradeRoutes>1</NumFreeTradeRoutes>
 			<PortraitIndex>13</PortraitIndex>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
 		</Row>
@@ -106,6 +120,7 @@
 			<OfficeBuildingClass>BUILDINGCLASS_CIVILIZED_JEWELERS</OfficeBuildingClass>
 			<FranchiseBuildingClass>BUILDINGCLASS_CIVILIZED_JEWELERS_FRANCHISE</FranchiseBuildingClass>
 			<MaxFranchises>25</MaxFranchises>
+			<NumFreeTradeRoutes>1</NumFreeTradeRoutes>
 			<PortraitIndex>4</PortraitIndex>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
 		</Row>
@@ -242,6 +257,23 @@
 			<ResourceType>RESOURCE_JEWELRY</ResourceType>
 		</Row>
 	</Corporation_ResourceMonopolyOrs>
+	<Corporation_NumFreeResource>
+		<Row>
+			<CorporationType>CORPORATION_HEXXON_REFINERY</CorporationType>
+			<ResourceType>RESOURCE_COAL</ResourceType>
+			<NumResource>3</NumResource>
+		</Row>
+		<Row>
+			<CorporationType>CORPORATION_HEXXON_REFINERY</CorporationType>
+			<ResourceType>RESOURCE_OIL</ResourceType>
+			<NumResource>3</NumResource>
+		</Row>
+		<Row>
+			<CorporationType>CORPORATION_HEXXON_REFINERY</CorporationType>
+			<ResourceType>RESOURCE_URANIUM</ResourceType>
+			<NumResource>3</NumResource>
+		</Row>
+	</Corporation_NumFreeResource>
 	
 	<!-- Old -->
 	
@@ -391,7 +423,6 @@
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_TRADER_SIDS</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_TRADER_SIDS</CorporationTradeRouteBonusHelp>
 			<TradeRouteLandDistanceModifier>100</TradeRouteLandDistanceModifier>
-			<NumTradeRouteBonus>2</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -449,7 +480,6 @@
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_LANDSEA_EXTRACTORS</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_LANDSEA_EXTRACTORS</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_LANDSEA_EXTRACTORS</CorporationTradeRouteBonusHelp>
-			<NumTradeRouteBonus>2</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -509,7 +539,6 @@
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_HEXXON_REFINERY</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_HEXXON_REFINERY</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_HEXXON_REFINERY</CorporationTradeRouteBonusHelp>
-			<NumTradeRouteBonus>1</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -568,7 +597,6 @@
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_GIORIO_ARMEIER</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_GIORIO_ARMEIER</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_GIORIO_ARMEIER</CorporationTradeRouteBonusHelp>
-			<NumTradeRouteBonus>2</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -627,7 +655,6 @@
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_FIRAXITE_MATERIALS</CorporationOfficeBonusHelp>
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_FIRAXITE_MATERIALS</CorporationTradeRouteBonusHelp>
 			<TradeRouteInvulnerable>true</TradeRouteInvulnerable>
-			<NumTradeRouteBonus>1</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
@@ -684,7 +711,6 @@
 			<ArtDefineTag>ART_DEF_BUILDING_GARDEN</ArtDefineTag>
 			<MinAreaSize>-1</MinAreaSize>
 			<TRVisionBoost>1</TRVisionBoost>
-			<NumTradeRouteBonus>1</NumTradeRouteBonus>
 			<CorporationHelper>TXT_KEY_CORP_HELPER_TWOKAY_FOODS</CorporationHelper>
 			<CorporationResourceBonusHelp>TXT_KEY_CORP_HELP_RESOURCE_BONUS_TWOKAY_FOODS</CorporationResourceBonusHelp>
 			<CorporationOfficeBonusHelp>TXT_KEY_CORP_HELP_OFFICE_BONUS_TWOKAY_FOODS</CorporationOfficeBonusHelp>
@@ -750,7 +776,6 @@
 			<CorporationTradeRouteBonusHelp>TXT_KEY_CORP_HELP_TRADE_ROUTE_BONUS_CIVILIZED_JEWELERS</CorporationTradeRouteBonusHelp>
 			<TradeRouteRecipientBonus>5</TradeRouteRecipientBonus>
 			<TradeRouteTargetBonus>5</TradeRouteTargetBonus>
-			<NumTradeRouteBonus>1</NumTradeRouteBonus>
 			<NeverCapture>true</NeverCapture>
 			<HurryCostModifier>25</HurryCostModifier>
 			<IconAtlas>CORP_ATLAS</IconAtlas>

@@ -4680,9 +4680,21 @@ int CvPlayerTrade::GetTradeRouteSpeed (DomainTypes eDomain)
 	if (pkUnitInfo) {
 #if defined(MOD_BALANCE_CORE)
 		int iMoves = pkUnitInfo->GetMoves();
-		if(m_pPlayer->GetTRSpeedBoost() > 0)
+		if (m_pPlayer->GetTRSpeedBoost() > 0)
 		{
 			iMoves *= m_pPlayer->GetTRSpeedBoost();
+		}
+
+		// Corporation trade route modifier
+		CorporationTypes ePlayerCorporation = m_pPlayer->GetCorporations()->GetFoundedCorporation();
+		if (ePlayerCorporation != NO_CORPORATION)
+		{
+			CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(ePlayerCorporation);
+			if (pkCorporationInfo && pkCorporationInfo->GetTradeRouteSpeedModifier() > 0)
+			{
+				iMoves *= pkCorporationInfo->GetTradeRouteSpeedModifier();
+				iMoves /= 100;
+			}
 		}
 		return iMoves;
 #else
@@ -4773,6 +4785,21 @@ uint CvPlayerTrade::GetNumTradeRoutesPossible (void)
 			}
 		}
 	}
+#if defined(MOD_BALANCE_CORE)
+	CorporationTypes eCorporation = m_pPlayer->GetCorporations()->GetFoundedCorporation();
+	if (eCorporation != NO_CORPORATION)
+	{
+		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+		if (pkCorporationInfo)
+		{
+			int iNumTradeRouteBonus = pkCorporationInfo->GetNumFreeTradeRoutes();
+			if (iNumTradeRouteBonus)
+			{
+				iNumRoutes += iNumTradeRouteBonus;
+			}
+		}
+	}
+#endif
 #if defined(MOD_BALANCE_CORE_POLICIES)
 	if(m_pPlayer->GetFreeTradeRoute() > 0)
 	{
