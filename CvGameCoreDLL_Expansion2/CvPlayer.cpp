@@ -480,9 +480,6 @@ CvPlayer::CvPlayer() :
 #if defined(MOD_BALANCE_CORE_POLICIES)
 	, m_iHappinessPerXPopulationGlobal("CvPlayer::m_iHappinessPerXPopulationGlobal", m_syncArchive)
 	, m_iIdeologyPoint("CvPlayer::m_iIdeologyPoint", m_syncArchive)
-	, m_bOrderCorp("CvPlayer::m_bOrderCorp", m_syncArchive)
-	, m_bAutocracyCorp("CvPlayer::m_bAutocracyCorp", m_syncArchive)
-	, m_bFreedomCorp("CvPlayer::m_bFreedomCorp", m_syncArchive)
 #endif
 #if defined(MOD_RELIGION_CONVERSION_MODIFIERS)
 	, m_iConversionModifier("CvPlayer::m_iConversionModifier", m_syncArchive)
@@ -1278,9 +1275,6 @@ void CvPlayer::uninit()
 #if defined(MOD_BALANCE_CORE_POLICIES)
 	m_iHappinessPerXPopulationGlobal = 0;
 	m_iIdeologyPoint = 0;
-	m_bOrderCorp = 0;
-	m_bAutocracyCorp = 0;
-	m_bFreedomCorp = 0;
 #endif
 	m_iHappinessFromLeagues = 0;
 	m_iEspionageModifier = 0;
@@ -8807,8 +8801,7 @@ void CvPlayer::doTurn()
 		SetGlobalTourismAlreadyReceived((MinorCivQuestTypes)iQuestLoop, 0);
 	}
 
-	// Corp-TODO: Update corporation
-	DoFreedomCorp();
+	GetCorporations()->DoTurn();
 	
 	//Reset for reevaluation of citystrategy AI
 	countCitiesFeatureSurrounded(true);
@@ -14096,10 +14089,6 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	if(pBuildingInfo->IsSecondaryPantheon())
 	{
 		ChangeSecondReligionPantheonCount((pBuildingInfo->IsSecondaryPantheon()) ? iChange : 0);
-	}
-	if(pBuildingInfo->IsTradeRouteInvulnerable())
-	{
-		SetTradeRoutesInvulnerable(true);
 	}
 	if(pBuildingInfo->GetTRSpeedBoost() != 0)
 	{
@@ -19830,40 +19819,6 @@ void CvPlayer::SetIdeologyPoint(int iValue)
 void CvPlayer::ChangeIdeologyPoint(int iChange)
 {
 	SetIdeologyPoint(m_iIdeologyPoint + iChange);
-}
-
-void CvPlayer::SetOrderCorp(bool bValue)
-{
-	if(m_bOrderCorp != bValue)
-	{
-		m_bOrderCorp = bValue;
-	}
-}
-void CvPlayer::SetAutocracyCorp(bool bValue)
-{
-	if(m_bAutocracyCorp != bValue)
-	{
-		m_bAutocracyCorp = bValue;
-	}
-}
-void CvPlayer::SetFreedomCorp(bool bValue)
-{
-	if(m_bFreedomCorp != bValue)
-	{
-		m_bFreedomCorp = bValue;
-	}
-}
-bool CvPlayer::IsOrderCorp()
-{
-	return m_bOrderCorp;
-}
-bool CvPlayer::IsAutocracyCorp()
-{
-	 return m_bAutocracyCorp; 
-}
-bool CvPlayer::IsFreedomCorp()
-{
-	return m_bFreedomCorp;
 }
 #endif
 //	--------------------------------------------------------------------------------
@@ -25664,29 +25619,6 @@ void CvPlayer::ChangeAbleToMarryCityStatesCount(int iChange)
 {
 	m_iAbleToMarryCityStatesCount += iChange;
 }
-//CORPORATIONS
-void CvPlayer::DoFreedomCorp()
-{
-	// Corp-TODO: Fix this
-
-	//Are you free enough?!
-	if(!IsFreedomCorp())
-	{
-		return;
-	}
-
-	GetCorporations()->BuildRandomFranchiseInCity();
-}
-//	--------------------------------------------------------------------------------
-bool CvPlayer::AreTradeRoutesInvulnerable() const
-{
-	return m_bTradeRoutesInvulnerable;
-}
-//	--------------------------------------------------------------------------------
-void CvPlayer::SetTradeRoutesInvulnerable(bool bValue)
-{
-	m_bTradeRoutesInvulnerable = bValue;
-}
 //	--------------------------------------------------------------------------------
 void CvPlayer::ChangeTRSpeedBoost(int iChange)
 {
@@ -30872,13 +30804,12 @@ int CvPlayer::getNumResourceTotal(ResourceTypes eIndex, bool bIncludeImport) con
 		{
 			if(pLoopCity != NULL)
 			{
-				if(pLoopCity->GetCorporationResourceQuantity(eIndex) > 0)
+				if(pLoopCity->GetResourceQuantityPerXFranchises(eIndex) > 0)
 				{
-					// Corp-TODO: Investigate this
 					int iFranchises = GetCorporations()->GetNumFranchises();
 					if(iFranchises > 0)
 					{
-						iTotalNumResource += (iFranchises / pLoopCity->GetCorporationResourceQuantity(eIndex));
+						iTotalNumResource += (iFranchises / pLoopCity->GetResourceQuantityPerXFranchises(eIndex));
 					}
 				}
 			}
@@ -35374,24 +35305,24 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeEventTourismCS(pPolicy->GetEventTourismCS() * iChange);
 	ChangeMonopolyModFlat(pPolicy->GetMonopolyModFlat() * iChange);
 	ChangeMonopolyModPercent(pPolicy->GetMonopolyModPercent() * iChange);
-	//ChangeCorporationMaxFranchises(pPolicy->GetMaxCorps() * iChange);	// Corp-TODO: investigate
-	if(pPolicy->IsOrderCorp())
+	if(pPolicy->IsCorporationOfficesAsFranchises())
 	{
-		// CORP-TODO: Investigate this
-		SetOrderCorp(true);
+		GetCorporations()->SetCorporationOfficesAsFranchises(true);
 		GetCorporations()->RecalculateNumFranchises();
 	}
-	if(pPolicy->IsAutocracyCorp())
+	if(pPolicy->IsCorporationRandomForeignFranchise())
 	{
-		// CORP-TODO: Investigate this
-		SetAutocracyCorp(true);
+		GetCorporations()->SetCorporationRandomForeignFranchise(true);
 		GetCorporations()->RecalculateNumFranchises();
 	}
-	if(pPolicy->IsFreedomCorp())
+	if(pPolicy->IsCorporationFreeFranchiseAbovePopular())
 	{
-		// CORP-TODO: Investigate this
-		SetFreedomCorp(true);
+		GetCorporations()->SetCorporationFreeFranchiseAbovePopular(true);
 		GetCorporations()->RecalculateNumFranchises();
+	}
+	if (pPolicy->GetAdditionalNumFranchisesMod() > 0)
+	{
+		GetCorporations()->ChangeAdditionalNumFranchisesMod(pPolicy->GetAdditionalNumFranchisesMod() * iChange);
 	}
 	if(pPolicy->IsUpgradeCSTerritory())
 	{

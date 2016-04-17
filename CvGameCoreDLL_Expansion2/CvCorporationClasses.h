@@ -22,10 +22,14 @@ public:
 
 	int GetTradeRouteSpeedModifier() const;
 	int GetNumFreeTradeRoutes() const;
+	bool IsTradeRoutesInvulnerable() const;
+	int GetTradeRouteVisionBoost() const;
 
 	int GetResourceMonopolyAnd(int i) const;
 	int GetResourceMonopolyOr(int i) const;
 	int GetNumFreeResource(int i) const;
+
+	int GetTradeRouteMod(int i) const;
 protected:
 	BuildingClassTypes m_eHeadquartersBuildingClass;
 	BuildingClassTypes m_eOfficeBuildingClass;
@@ -34,11 +38,14 @@ protected:
 	int m_iTradeRouteSpeedModifier;
 	int m_iNumFreeTradeRoutes;
 	int m_iMaxFranchises;
+	int m_bTradeRoutesInvulnerable;
+	int m_iTradeRouteVisionBoost;
 
 	int* m_piResourceMonopolyAnd;
 	int* m_piResourceMonopolyOrs;
 	int* m_piNumFreeResource;
 
+	int* m_piTradeRouteMod;
 private:
 	CvCorporationEntry(const CvCorporationEntry&);
 	CvCorporationEntry& operator=(const CvCorporationEntry&);
@@ -115,8 +122,13 @@ public:
 
 	CvCity* GetHeadquarters() const;
 
+	void DoTurn();
+
 	int GetAdditionalNumFranchises() const;
 	void ChangeAdditionalNumFranchises(int iChange);
+
+	int GetAdditionalNumFranchisesMod() const;
+	void ChangeAdditionalNumFranchisesMod(int iChange);
 
 	int GetMaxNumFranchises() const;
 	int GetNumFranchises() const;
@@ -137,6 +149,16 @@ public:
 	CorporationTypes GetFoundedCorporation() const;
 	void SetFoundedCorporation(CorporationTypes eCorporation);
 	void DestroyCorporation();
+
+	bool IsCorporationOfficesAsFranchises() const;
+	void SetCorporationOfficesAsFranchises(bool bValue);
+
+	bool IsCorporationRandomForeignFranchise() const;
+	void SetCorporationRandomForeignFranchise(bool bValue);
+
+	bool IsCorporationFreeFranchiseAbovePopular() const;
+	void SetCorporationFreeFranchiseAbovePopular(bool bValue);
+
 private:
 	CvPlayer* m_pPlayer;
 	CorporationTypes m_eFoundedCorporation;
@@ -144,6 +166,11 @@ private:
 	int m_iNumOffices;
 	int m_iNumFranchises;
 	int m_iAdditionalNumFranchises;
+	int m_iAdditionalNumFranchisesMod;
+
+	bool m_bCorporationOfficesAsFranchises;
+	bool m_bCorporationRandomForeignFranchise;
+	bool m_bCorporationFreeFranchiseAbovePopular;
 };
 
 typedef FStaticVector<CvCorporation, 16, false, c_eCiv5GameplayDLL > CorporationList;

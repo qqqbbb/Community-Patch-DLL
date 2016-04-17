@@ -8959,9 +8959,14 @@ bool CvUnit::canPlunderTradeRoute(const CvPlot* pPlot, bool bOnlyTestVisibility)
 					// invalid TradeUnit
 					continue;
 				}
-				if(GET_PLAYER(eTradeUnitOwner).AreTradeRoutesInvulnerable())
+				CorporationTypes eCorporation = GET_PLAYER(eTradeUnitOwner).GetCorporations()->GetFoundedCorporation();
+				if (eCorporation != NO_CORPORATION)
 				{
-					continue;
+					CvCorporationEntry* pkCorporation = GC.getCorporationInfo(eCorporation);
+					if (pkCorporation && pkCorporation->IsTradeRoutesInvulnerable())
+					{
+						continue;
+					}
 				}
 				TeamTypes eTeam = GET_PLAYER(eTradeUnitOwner).getTeam();
 				if (GET_TEAM(GET_PLAYER(m_eOwner).getTeam()).isAtWar(eTeam))
@@ -8987,9 +8992,14 @@ bool CvUnit::canPlunderTradeRoute(const CvPlot* pPlot, bool bOnlyTestVisibility)
 				return false;
 			}
 #if defined(MOD_BALANCE_CORE)
-			if(GET_PLAYER(eTradeUnitOwner).AreTradeRoutesInvulnerable())
+			CorporationTypes eCorporation = GET_PLAYER(eTradeUnitOwner).GetCorporations()->GetFoundedCorporation();
+			if (eCorporation != NO_CORPORATION)
 			{
-				return false;
+				CvCorporationEntry* pkCorporation = GC.getCorporationInfo(eCorporation);
+				if (pkCorporation && pkCorporation->IsTradeRoutesInvulnerable())
+				{
+					continue;
+				}
 			}
 #endif
 #endif
@@ -9033,9 +9043,14 @@ bool CvUnit::plunderTradeRoute()
 			// invalid TradeUnit
 			continue;
 		}
-		if(GET_PLAYER(eTradeUnitOwner).AreTradeRoutesInvulnerable())
+		CorporationTypes eCorporation = GET_PLAYER(eTradeUnitOwner).GetCorporations()->GetFoundedCorporation();
+		if (eCorporation != NO_CORPORATION)
 		{
-			continue;
+			CvCorporationEntry* pkCorporation = GC.getCorporationInfo(eCorporation);
+			if (pkCorporation && pkCorporation->IsTradeRoutesInvulnerable())
+			{
+				continue;
+			}
 		}
 		TeamTypes eTeam = GET_PLAYER(eTradeUnitOwner).getTeam();
 		if (GET_TEAM(GET_PLAYER(m_eOwner).getTeam()).isAtWar(eTeam))

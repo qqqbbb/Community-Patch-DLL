@@ -458,13 +458,13 @@ public:
 	int GetCorporationYieldChange(int i) const;
 	int* GetCorporationYieldChangeArray() const;
 	int GetCorporationGPChange() const;
-	int GetCorporationResourceQuantity(int i) const;
+	int GetResourceQuantityPerXFranchises(int i) const;
 
 	int GetCorporationYieldModTrade(int i) const;
 	int* GetCorporationYieldModTradeArray() const;
 
-	int GetCorporationTradeRouteMod(int i) const;
-	int* GetCorporationTradeRouteModArray() const;
+	int GetFranchiseTradeRouteYieldMod(int i) const;
+	int* GetFranchiseTradeRouteYieldModArray() const;
 #endif
 	int GetHurryModifier(int i) const;
 	bool IsBuildingClassNeededInCity(int i) const;
@@ -836,10 +836,10 @@ private:
 	int* m_piResourceMonopolyAnds;
 	int* m_piResourceMonopolyOrs;
 	int* m_piCorporationYield;
-	int* m_piCorporationYieldModTrade;
-	int* m_piCorporationTradeRouteMod;
+	int* m_piFranchiseTradeRouteCityYieldMod;
+	int* m_piFranchiseTradeRouteYieldMod;
 	int m_iCorporationGPChange;
-	int* m_piCorporationResourceQuantity;
+	int* m_piResourceQuantityPerXFranchises;
 #endif
 	int* m_paiHurryModifier;
 

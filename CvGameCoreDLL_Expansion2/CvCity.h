@@ -1033,9 +1033,9 @@ public:
 	void ChangeCorporationGPChange(int iChange);
 	void SetCorporationGPChange(int iValue);
 
-	int GetCorporationResourceQuantity(ResourceTypes eResource) const;
-	void ChangeCorporationResourceQuantity(ResourceTypes eResource, int iChange);
-	void SetCorporationResourceQuantity(ResourceTypes eResource, int iValue);
+	int GetResourceQuantityPerXFranchises(ResourceTypes eResource) const;
+	void ChangeResourceQuantityPerXFranchises(ResourceTypes eResource, int iChange);
+	void SetResourceQuantityPerXFranchises(ResourceTypes eResource, int iValue);
 
 	int GetLandTourismBonus() const;
 	void ChangeLandTourismBonus(int iChange);
@@ -1615,7 +1615,7 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_aiCorporationYieldChange;
 	FAutoVariable<std::vector<int>, CvCity> m_aiCorporationYieldModChange;
 	FAutoVariable<int, CvCity> m_iCorporationGPChange;
-	FAutoVariable<std::vector<int>, CvCity> m_aiCorporationResourceQuantity;
+	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityPerXFranchises;
 	FAutoVariable<int, CvCity> m_iLandTourismBonus;
 	FAutoVariable<int, CvCity> m_iSeaTourismBonus;
 	FAutoVariable<int, CvCity> m_iAlwaysHeal;

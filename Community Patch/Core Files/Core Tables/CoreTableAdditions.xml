@@ -511,32 +511,32 @@
 		<Column name="BuildingClassType" type="text" reference="BuildingClasses(Type)"/>
 	</Table>
 
-	<!-- BUILDING: Allows you to define a building to grant a yield based on # of corporate franchises in unowned major cities-->
-	<Table name="Building_CorporationYield">
+	<!-- BUILDING: Allows you to define a building to grant a yield based on # of corporate franchises in unowned major cities -->
+	<Table name="Building_YieldPerFranchise">
 		<Column name="BuildingType" type="text" reference="Buildings(Type)"/>
 		<Column name="YieldType" type="integer" reference="Yields(Type)"/>
 		<Column name="Yield" type="integer" default="0"/>
 	</Table>
 
-	<!-- BUILDING: Allows you to define a building to grant a yield based on # of corporate franchises in unowned major cities-->
-	<Table name="Building_CorporationYieldModTrade">
+	<!-- BUILDING: Allows you to define a building to a modifer to City yields when we have a Trade Route to a city with our Franchise-->
+	<Table name="Building_FranchiseTradeRouteCityYieldMod">
 		<Column name="BuildingType" type="text" reference="Buildings(Type)"/>
 		<Column name="YieldType" type="integer" reference="Yields(Type)"/>
 		<Column name="Yield" type="integer" default="0"/>
 	</Table>
 
-	<!-- BUILDING: Allows you to define a building to grant a yield based on # of corporate franchises in unowned major cities-->
-	<Table name="Building_CorporationTradeRouteMod">
+	<!-- BUILDING: Allows you to define a building to add a modifier to Trade Route yields toward cities with our Franchise -->
+	<Table name="Building_FranchiseTradeRouteYieldMod">
 		<Column name="BuildingType" type="text" reference="Buildings(Type)"/>
 		<Column name="YieldType" type="integer" reference="Yields(Type)"/>
 		<Column name="Yield" type="integer" default="0"/>
 	</Table>
 
 	<!-- BUILDING: Allows you to define a building to grant a resource based on # of franchies in world -->
-	<Table name="Building_CorporationResourceQuantity">
+	<Table name="Building_ResourceQuantityPerXFranchises">
 		<Column name="BuildingType" type="text" reference="Buildings(Type)"/>
 		<Column name="ResourceType" type="text" reference="Resources(Type)"/>
-		<Column name="Quantity" type="integer"/>
+		<Column name="NumFranchises" type="integer"/>
 	</Table>
 
 

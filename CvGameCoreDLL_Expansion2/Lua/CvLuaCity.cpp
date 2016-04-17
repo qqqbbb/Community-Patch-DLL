@@ -573,7 +573,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetBaseYieldRateFromCSAlliance);
 	Method(GetCorporationYieldChange);
 	Method(GetCorporationYieldModChange);
-	Method(GetCorporationResourceQuantity);
+	Method(GetResourceQuantityPerXFranchises);
 	Method(GetCorporationGPChange);
 	Method(IsFranchised);
 	Method(HasOffice);
@@ -4972,12 +4972,12 @@ int CvLuaCity::lGetCorporationYieldModChange(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
-int CvLuaCity::lGetCorporationResourceQuantity(lua_State* L)
+int CvLuaCity::lGetResourceQuantityPerXFranchises(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
 	const int iResource = lua_tointeger(L, 2);
 	int iFranchises = GET_PLAYER(pkCity->getOwner()).GetCorporations()->GetNumFranchises();
-	int iCorpResource = pkCity->GetCorporationResourceQuantity((ResourceTypes)iResource);
+	int iCorpResource = pkCity->GetResourceQuantityPerXFranchises((ResourceTypes)iResource);
 	int iResult = 0;
 	if(iCorpResource > 0)
 	{

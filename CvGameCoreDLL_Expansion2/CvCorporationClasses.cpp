@@ -11,17 +11,27 @@
 #if defined(MOD_BALANCE_CORE)
 
 CvCorporationEntry::CvCorporationEntry(void):
-	m_iMaxFranchises(0),
 	m_eHeadquartersBuildingClass(NO_BUILDINGCLASS),
 	m_eOfficeBuildingClass(NO_BUILDINGCLASS),
 	m_eFranchiseBuildingClass(NO_BUILDINGCLASS),
-	m_piResourceMonopolyOrs(NULL)
+	m_iTradeRouteSpeedModifier(0),
+	m_iTradeRouteVisionBoost(0),
+	m_iNumFreeTradeRoutes(0),
+	m_iMaxFranchises(0),
+	m_bTradeRoutesInvulnerable(false),
+	m_piResourceMonopolyAnd(NULL),
+	m_piResourceMonopolyOrs(NULL),
+	m_piNumFreeResource(NULL),
+	m_piTradeRouteMod(NULL)
 {
 }
 
 CvCorporationEntry::~CvCorporationEntry(void)
 {
+	SAFE_DELETE_ARRAY(m_piResourceMonopolyAnd);
 	SAFE_DELETE_ARRAY(m_piResourceMonopolyOrs);
+	SAFE_DELETE_ARRAY(m_piNumFreeResource);
+	SAFE_DELETE_ARRAY(m_piTradeRouteMod);
 }
 
 int CvCorporationEntry::GetMaxFranchises() const
@@ -54,6 +64,16 @@ int CvCorporationEntry::GetNumFreeTradeRoutes() const
 	return m_iNumFreeTradeRoutes;
 }
 
+int CvCorporationEntry::GetTradeRouteVisionBoost() const
+{
+	return m_iTradeRouteVisionBoost;
+}
+
+bool CvCorporationEntry::IsTradeRoutesInvulnerable() const
+{
+	return m_bTradeRoutesInvulnerable;
+}
+
 int CvCorporationEntry::GetResourceMonopolyAnd(int i) const
 {
 	CvAssertMsg(i < GC.getNUM_BUILDING_RESOURCE_PREREQS(), "Index out of bounds");
@@ -76,6 +96,14 @@ int CvCorporationEntry::GetNumFreeResource(int i) const
 	return m_piNumFreeResource ? m_piNumFreeResource[i] : -1;
 }
 
+/// Yield Modifier for Trade Routes to cities from an office to cities with a Franchise
+int CvCorporationEntry::GetTradeRouteMod(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piTradeRouteMod ? m_piTradeRouteMod[i] : -1;
+}
+
 bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
 	if(!CvBaseInfo::CacheResults(kResults, kUtility))
@@ -84,6 +112,8 @@ bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	m_iMaxFranchises = kResults.GetInt("MaxFranchises");
 	m_iNumFreeTradeRoutes = kResults.GetInt("NumFreeTradeRoutes");
 	m_iTradeRouteSpeedModifier = kResults.GetInt("TradeRouteSpeedModifier");
+	m_iTradeRouteVisionBoost = kResults.GetInt("TradeRouteVisionBoost");
+	m_bTradeRoutesInvulnerable = kResults.GetBool("TradeRoutesInvulnerable");
 
 	//References
 	const char* szTextVal = NULL;
@@ -126,6 +156,7 @@ bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	kUtility.PopulateArrayByExistence(m_piResourceMonopolyAnd, "Resources", "Corporation_ResourceMonopolyAnds", "ResourceType", "CorporationType", szCorporationType);
 	kUtility.PopulateArrayByExistence(m_piResourceMonopolyOrs, "Resources", "Corporation_ResourceMonopolyOrs", "ResourceType", "CorporationType", szCorporationType);
 	kUtility.PopulateArrayByValue(m_piNumFreeResource, "Resources", "Corporation_NumFreeResource", "ResourceType", "CorporationType", szCorporationType, "NumResource");
+	kUtility.SetYields(m_piTradeRouteMod, "Building_FranchiseTradeRouteYieldMod", "CorporationType", szCorporationType);
 
 	return true;
 }
@@ -268,8 +299,13 @@ FDataStream& operator>>(FDataStream& loadFrom, CorporationTypes& writeTo)
 CvPlayerCorporations::CvPlayerCorporations(void):
 	m_pPlayer(NULL),
 	m_eFoundedCorporation(NO_CORPORATION),
+	m_iNumOffices(0),
 	m_iNumFranchises(0),
-	m_iAdditionalNumFranchises(0)
+	m_iAdditionalNumFranchises(0),
+	m_iAdditionalNumFranchisesMod(0),
+	m_bCorporationOfficesAsFranchises(false),
+	m_bCorporationRandomForeignFranchise(false),
+	m_bCorporationFreeFranchiseAbovePopular(false)
 {
 }
 
@@ -292,6 +328,13 @@ void CvPlayerCorporations::Uninit()
 {
 	SetFoundedCorporation(NO_CORPORATION);
 	m_iNumFranchises = 0;
+	m_iNumOffices = 0;
+	m_iNumFranchises = 0;
+	m_iAdditionalNumFranchises = 0;
+	m_iAdditionalNumFranchisesMod = 0;
+	m_bCorporationOfficesAsFranchises = false;
+	m_bCorporationRandomForeignFranchise = false;
+	m_bCorporationFreeFranchiseAbovePopular = false;
 }
 
 /// Reset
@@ -306,6 +349,17 @@ void CvPlayerCorporations::Read(FDataStream& kStream)
 	uint uiVersion;
 	kStream >> uiVersion;
 	MOD_SERIALIZE_INIT_READ(kStream);
+
+	MOD_SERIALIZE_READ(79, kStream, m_eFoundedCorporation, NO_CORPORATION);
+
+	MOD_SERIALIZE_READ(79, kStream, m_iNumOffices, 0);
+	MOD_SERIALIZE_READ(79, kStream, m_iNumFranchises, 0);
+	MOD_SERIALIZE_READ(79, kStream, m_iAdditionalNumFranchises, 0);
+	MOD_SERIALIZE_READ(79, kStream, m_iAdditionalNumFranchisesMod, 0);
+
+	MOD_SERIALIZE_READ(79, kStream, m_bCorporationOfficesAsFranchises, false);
+	MOD_SERIALIZE_READ(79, kStream, m_bCorporationRandomForeignFranchise, false);
+	MOD_SERIALIZE_READ(79, kStream, m_bCorporationFreeFranchiseAbovePopular, false);
 }
 
 /// Serialization write
@@ -315,6 +369,17 @@ void CvPlayerCorporations::Write(FDataStream& kStream)
 	uint uiVersion = 1;
 	kStream << uiVersion;
 	MOD_SERIALIZE_INIT_WRITE(kStream);
+
+	MOD_SERIALIZE_WRITE(kStream, m_eFoundedCorporation);
+
+	MOD_SERIALIZE_WRITE(kStream, m_iNumOffices);
+	MOD_SERIALIZE_WRITE(kStream, m_iNumFranchises);
+	MOD_SERIALIZE_WRITE(kStream, m_iAdditionalNumFranchises);
+	MOD_SERIALIZE_WRITE(kStream, m_iAdditionalNumFranchisesMod);
+
+	MOD_SERIALIZE_WRITE(kStream, m_bCorporationOfficesAsFranchises);
+	MOD_SERIALIZE_WRITE(kStream, m_bCorporationRandomForeignFranchise);
+	MOD_SERIALIZE_WRITE(kStream, m_bCorporationFreeFranchiseAbovePopular);
 }
 
 CvCorporation * CvPlayerCorporations::GetCorporation() const
@@ -399,6 +464,39 @@ void CvPlayerCorporations::DestroyCorporation()
 	Uninit();
 }
 
+bool CvPlayerCorporations::IsCorporationOfficesAsFranchises() const
+{
+	return m_bCorporationOfficesAsFranchises;
+}
+
+void CvPlayerCorporations::SetCorporationOfficesAsFranchises(bool bValue)
+{
+	if(bValue != m_bCorporationOfficesAsFranchises)
+		m_bCorporationOfficesAsFranchises = bValue;
+}
+
+bool CvPlayerCorporations::IsCorporationRandomForeignFranchise() const
+{
+	return m_bCorporationRandomForeignFranchise;
+}
+
+void CvPlayerCorporations::SetCorporationRandomForeignFranchise(bool bValue)
+{
+	if (bValue != m_bCorporationRandomForeignFranchise)
+		m_bCorporationRandomForeignFranchise = bValue;
+}
+
+bool CvPlayerCorporations::IsCorporationFreeFranchiseAbovePopular() const
+{
+	return m_bCorporationFreeFranchiseAbovePopular;
+}
+
+void CvPlayerCorporations::SetCorporationFreeFranchiseAbovePopular(bool bValue)
+{
+	if(bValue != m_bCorporationFreeFranchiseAbovePopular)
+		m_bCorporationFreeFranchiseAbovePopular = bValue;
+}
+
 // Get our headquarters
 CvCity* CvPlayerCorporations::GetHeadquarters() const
 {
@@ -416,6 +514,16 @@ CvCity* CvPlayerCorporations::GetHeadquarters() const
 	}
 
 	return NULL;
+}
+
+void CvPlayerCorporations::DoTurn()
+{
+	if (!HasFoundedCorporation())
+		return;
+
+	// Are you free enough?
+	if (IsCorporationRandomForeignFranchise())
+		BuildRandomFranchiseInCity();
 }
 
 void CvPlayerCorporations::RecalculateNumOffices()
@@ -449,51 +557,30 @@ void CvPlayerCorporations::RecalculateNumFranchises()
 		return;
 
 	// TODO: figure out a better way to get this
-	bool bOrderCorp = m_pPlayer->IsOrderCorp();
-	bool bAutocracyCorp = m_pPlayer->IsAutocracyCorp();
 	int iFranchises = 0;
 	int iMaxFranchises = GetMaxNumFranchises();
 	int iFreeFranchises = 0; // From Infiltration
 
-	// Nationalization: Offices count as franchises instead of franchises
-	if (bOrderCorp)
+	// Search all players for Franchises
+	for (int iLoopPlayer = 0; iLoopPlayer < MAX_CIV_PLAYERS; iLoopPlayer++)
 	{
-		CvCity* pLoopCity;
-		int iLoop;
-		for (pLoopCity = m_pPlayer->firstCity(&iLoop); pLoopCity != NULL; pLoopCity = m_pPlayer->nextCity(&iLoop))
+		PlayerTypes ePlayer = (PlayerTypes)iLoopPlayer;
+		if (ePlayer != NO_PLAYER && GET_PLAYER(ePlayer).isAlive() && !GET_PLAYER(ePlayer).isBarbarian())
 		{
-			if (pLoopCity != NULL)
+			CvCity* pLoopCity;
+			int iLoop;
+			for (pLoopCity = GET_PLAYER(ePlayer).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(ePlayer).nextCity(&iLoop))
 			{
-				if (pLoopCity->IsHasOffice())
+				if (pLoopCity != NULL)
 				{
-					iFranchises++;
-				}
-			}
-		}
-	}
-	// Look for franchises in other players
-	else
-	{
-		for (int iLoopPlayer = 0; iLoopPlayer < MAX_CIV_PLAYERS; iLoopPlayer++)
-		{
-			PlayerTypes ePlayer = (PlayerTypes)iLoopPlayer;
-			if (ePlayer != NO_PLAYER && GET_PLAYER(ePlayer).isAlive() && !GET_PLAYER(ePlayer).isBarbarian() && GET_PLAYER(ePlayer).GetID() != m_pPlayer->GetID())
-			{
-				CvCity* pLoopCity;
-				int iLoop;
-				for (pLoopCity = GET_PLAYER(ePlayer).firstCity(&iLoop); pLoopCity != NULL; pLoopCity = GET_PLAYER(ePlayer).nextCity(&iLoop))
-				{
-					if (pLoopCity != NULL)
+					if (pLoopCity->IsHasFranchise(eCorporation))
 					{
-						if (pLoopCity->IsHasFranchise(eCorporation))
-						{
-							iFranchises++;
+						iFranchises++;
 
-							// Infiltration will give us double franchises
-							if (bAutocracyCorp && m_pPlayer->GetCulture()->GetInfluenceLevel(ePlayer) >= INFLUENCE_LEVEL_POPULAR)
-							{
-								iFreeFranchises++;
-							}
+						// Free franchise above Popular?
+						if (IsCorporationFreeFranchiseAbovePopular() && m_pPlayer->GetCulture()->GetInfluenceLevel(ePlayer) >= INFLUENCE_LEVEL_POPULAR)
+						{
+							iFreeFranchises++;
 						}
 					}
 				}
@@ -774,9 +861,9 @@ CvString CvPlayerCorporations::GetCurrentOfficeBenefit()
 			for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
 			{
 				ResourceTypes eResource = (ResourceTypes)iI;
-				if (pkOfficeInfo->GetCorporationResourceQuantity(eResource) > 0)
+				if (pkOfficeInfo->GetResourceQuantityPerXFranchises(eResource) > 0)
 				{
-					iCurrentValue = iNumFranchises / pkOfficeInfo->GetCorporationResourceQuantity(eResource);
+					iCurrentValue = iNumFranchises / pkOfficeInfo->GetResourceQuantityPerXFranchises(eResource);
 					bFoundOne = true;
 					break;
 				}
@@ -831,12 +918,12 @@ int CvPlayerCorporations::GetMaxNumFranchises() const
 	// Add in any "bonus" franchises from policies
 	iReturnValue += GetAdditionalNumFranchises();
 
-	// Corp-TODO: Need to include the policy MOD
-	// int iTemp *= iReturnValue * GetAdditionalNumFranchiseMod();
-	// iTemp /= 100;
-	// iReturnValue += iTemp;
+	int iModifier = 100 + GetAdditionalNumFranchisesMod();
+	
+	iReturnValue *= iModifier;
+	iReturnValue /= 100;
 
-	return iReturnValue;
+	return std::max(0, iReturnValue);
 }
 
 // Clear our Corporation from pCity
@@ -889,6 +976,19 @@ void CvPlayerCorporations::ClearCorporationFromCity(CvCity* pCity)
 int CvPlayerCorporations::GetAdditionalNumFranchises() const
 {
 	return m_iAdditionalNumFranchises;
+}
+
+int CvPlayerCorporations::GetAdditionalNumFranchisesMod() const
+{
+	return m_iAdditionalNumFranchisesMod;
+}
+
+void CvPlayerCorporations::ChangeAdditionalNumFranchisesMod(int iChange)
+{
+	if (iChange != 0)
+	{
+		m_iAdditionalNumFranchisesMod = m_iAdditionalNumFranchisesMod + iChange;
+	}
 }
 
 void CvPlayerCorporations::ChangeAdditionalNumFranchises(int iChange)
@@ -1154,7 +1254,7 @@ FDataStream& operator>>(FDataStream& loadFrom, CvGameCorporations& writeTo)
 /// Serialization write
 FDataStream& operator<<(FDataStream& saveTo, const CvGameCorporations& readFrom)
 {
-	uint uiVersion = 4;
+	uint uiVersion = 0;
 	saveTo << uiVersion;
 	MOD_SERIALIZE_INIT_WRITE(saveTo);
 

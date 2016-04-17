@@ -571,7 +571,7 @@ protected:
 	LUAAPIEXTN(GetBaseYieldRateFromCSAlliance, int);
 	LUAAPIEXTN(GetCorporationYieldChange, int);
 	LUAAPIEXTN(GetCorporationYieldModChange, int);
-	LUAAPIEXTN(GetCorporationResourceQuantity, int);
+	LUAAPIEXTN(GetResourceQuantityPerXFranchises, int);
 	LUAAPIEXTN(GetCorporationGPChange, int);
 	LUAAPIEXTN(HasOffice, bool);
 	LUAAPIEXTN(IsFranchised, bool);

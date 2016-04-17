@@ -356,7 +356,7 @@ CvCity::CvCity() :
 	, m_aiBaseYieldRateFromCSAlliance("CvCity::m_aiBaseYieldRateFromCSAlliance", m_syncArchive)
 	, m_aiCorporationYieldChange("CvCity::m_aiCorporationYieldChange", m_syncArchive)
 	, m_aiCorporationYieldModChange("CvCity::m_aiCorporationYieldModChange", m_syncArchive)
-	, m_aiCorporationResourceQuantity("CvCity::m_aiCorporationResourceQuantity", m_syncArchive)
+	, m_aiResourceQuantityPerXFranchises("CvCity::m_aiResourceQuantityPerXFranchises", m_syncArchive)
 	, m_iCorporationGPChange("CvCity::m_iCorporationGPChange", m_syncArchive)
 	, m_iLandTourismBonus("CvCity::m_iLandTourismBonus", m_syncArchive)
 	, m_iSeaTourismBonus("CvCity::m_iSeaTourismBonus", m_syncArchive)
@@ -1643,8 +1643,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_paiNumResourcesLocal.clear();
 		m_paiNumResourcesLocal.resize(iNumResources);
 #if defined(MOD_BALANCE_CORE)
-		m_aiCorporationResourceQuantity.clear();
-		m_aiCorporationResourceQuantity.resize(iNumResources);
+		m_aiResourceQuantityPerXFranchises.clear();
+		m_aiResourceQuantityPerXFranchises.resize(iNumResources);
 #endif
 		for(iI = 0; iI < iNumResources; iI++)
 		{
@@ -1652,7 +1652,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 			m_paiFreeResource.setAt(iI, 0);
 			m_paiNumResourcesLocal.setAt(iI, 0);
 #if defined(MOD_BALANCE_CORE)
-			m_aiCorporationResourceQuantity.setAt(iI, 0);
+			m_aiResourceQuantityPerXFranchises.setAt(iI, 0);
 #endif
 		}
 
@@ -11976,9 +11976,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			}
 
 #if defined(MOD_BALANCE_CORE)			
-			if(MOD_BALANCE_CORE && (pBuildingInfo->GetCorporationResourceQuantity(iResourceLoop) > 0))
+			if(MOD_BALANCE_CORE && (pBuildingInfo->GetResourceQuantityPerXFranchises(iResourceLoop) > 0))
 			{
-				ChangeCorporationResourceQuantity(eResource, pBuildingInfo->GetCorporationResourceQuantity(iResourceLoop) * iChange);
+				ChangeResourceQuantityPerXFranchises(eResource, pBuildingInfo->GetResourceQuantityPerXFranchises(iResourceLoop) * iChange);
 			}
 #endif
 
@@ -20446,7 +20446,7 @@ int CvCity::GetCorporationYieldModChange(YieldTypes eIndex) const
 				}
 			}
 		}
-		else if (GET_PLAYER(getOwner()).IsOrderCorp() && (pGameTrade->GetTradeConnection(ui).m_eConnectionType == TRADE_CONNECTION_FOOD || pGameTrade->GetTradeConnection(ui).m_eConnectionType == TRADE_CONNECTION_PRODUCTION))
+		else if (GET_PLAYER(getOwner()).GetCorporations()->IsCorporationOfficesAsFranchises() && (pGameTrade->GetTradeConnection(ui).m_eConnectionType == TRADE_CONNECTION_FOOD || pGameTrade->GetTradeConnection(ui).m_eConnectionType == TRADE_CONNECTION_PRODUCTION))
 		{
 			CvCity* pOriginCity = CvGameTrade::GetOriginCity(pGameTrade->GetTradeConnection(ui));
 			CvCity* pDestCity = CvGameTrade::GetDestCity(pGameTrade->GetTradeConnection(ui));
@@ -20546,26 +20546,42 @@ bool CvCity::IsHasFranchise(CorporationTypes eCorporation) const
 {
 	VALIDATE_OBJECT
 
+	if (eCorporation == NO_CORPORATION)
+		return false;
+
 	CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
 	if (pkCorporationInfo == NULL)
 		return false;
 
-	BuildingClassTypes eFranchse = pkCorporationInfo->GetFranchiseBuildingClass();
-	if (eFranchse == NO_BUILDINGCLASS)
+	// Evaluate offices as franchises if we count Offices as Franchises
+	bool bOfficesAsFranchises = GetPlayer()->GetCorporations()->IsCorporationOfficesAsFranchises();
+	BuildingClassTypes eFranchise = bOfficesAsFranchises ? pkCorporationInfo->GetOfficeBuildingClass() : pkCorporationInfo->GetFranchiseBuildingClass();
+	if (eFranchise == NO_BUILDINGCLASS)
 		return false;
 
-	return HasBuildingClass(eFranchse);
+	// If nationalized, then the City owner and the corporation owner must be equal
+	if (bOfficesAsFranchises)
+	{
+		CvCorporation* pCorporation = GC.getGame().GetGameCorporations()->GetCorporation(eCorporation);
+		if (pCorporation)
+		{
+			if (getOwner() != pCorporation->m_eFounder)
+				return false;
+		}
+	}
+
+	return HasBuildingClass(eFranchise);
 }
 //	--------------------------------------------------------------------------------
-int CvCity::GetCorporationResourceQuantity(ResourceTypes eResource) const
+int CvCity::GetResourceQuantityPerXFranchises(ResourceTypes eResource) const
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(eResource >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eResource < GC.getNumResourceInfos(), "eIndex expected to be < GC.getNumResourceInfos()");
-	return m_aiCorporationResourceQuantity[eResource];
+	return m_aiResourceQuantityPerXFranchises[eResource];
 }
 //	--------------------------------------------------------------------------------
-void CvCity::ChangeCorporationResourceQuantity(ResourceTypes eResource, int iChange)
+void CvCity::ChangeResourceQuantityPerXFranchises(ResourceTypes eResource, int iChange)
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
@@ -20573,15 +20589,15 @@ void CvCity::ChangeCorporationResourceQuantity(ResourceTypes eResource, int iCha
 
 	if(iChange != 0)
 	{
-		m_aiCorporationResourceQuantity.setAt(eResource, m_aiCorporationResourceQuantity[eResource] + iChange);
+		m_aiResourceQuantityPerXFranchises.setAt(eResource, m_aiResourceQuantityPerXFranchises[eResource] + iChange);
 		CvAssert(GetCorporationResourceQuantity(eResource) >= 0); 
 	}
 }
-void CvCity::SetCorporationResourceQuantity(ResourceTypes eResource, int iValue)
+void CvCity::SetResourceQuantityPerXFranchises(ResourceTypes eResource, int iValue)
 {
-	if(GetCorporationResourceQuantity(eResource) != iValue)
+	if(GetResourceQuantityPerXFranchises(eResource) != iValue)
 	{
-		m_aiCorporationResourceQuantity.setAt(eResource, iValue);
+		m_aiResourceQuantityPerXFranchises.setAt(eResource, iValue);
 	}
 }
 //	--------------------------------------------------------------------------------
