@@ -50,7 +50,8 @@ local CategoryResources = 13;
 local CategoryImprovements = 14;
 local CategoryBeliefs = 15;
 local CategoryWorldCongress = 16;
-local numCategories = 16;
+local CategoryCorporations = 17;
+local numCategories = 17;
 
 local selectedCategory = CategoryHomePage;
 local CivilopediaCategory = {};
@@ -193,6 +194,7 @@ CivilopediaCategory[CategoryResources].buttonTexture = "Assets/UI/Art/Civilopedi
 CivilopediaCategory[CategoryImprovements].buttonTexture = "Assets/UI/Art/Civilopedia/CivilopediaTopButtonsImprovements.dds";
 CivilopediaCategory[CategoryBeliefs].buttonTexture = "CivilopediaTopButtonsReligion.dds";
 CivilopediaCategory[CategoryWorldCongress].buttonTexture = "CivilopediaTopButtonsWorldCongress.dds";
+CivilopediaCategory[CategoryCorporations].buttonTexture = "CivilopediaTopButtonsWorldCongress.dds";
 
 CivilopediaCategory[CategoryHomePage].labelString = Locale.ConvertTextKey( "TXT_KEY_PEDIA_CATEGORY_1_LABEL" );
 CivilopediaCategory[CategoryGameConcepts].labelString = Locale.ConvertTextKey( "TXT_KEY_PEDIA_CATEGORY_2_LABEL" );
@@ -210,6 +212,7 @@ CivilopediaCategory[CategoryResources].labelString = Locale.ConvertTextKey( "TXT
 CivilopediaCategory[CategoryImprovements].labelString = Locale.ConvertTextKey( "TXT_KEY_PEDIA_CATEGORY_14_LABEL" );
 CivilopediaCategory[CategoryBeliefs].labelString = Locale.Lookup("TXT_KEY_PEDIA_CATEGORY_15_LABEL");
 CivilopediaCategory[CategoryWorldCongress].labelString = Locale.Lookup("TXT_KEY_PEDIA_CATEGORY_16_LABEL");
+CivilopediaCategory[CategoryCorporations].labelString = Locale.Lookup("TXT_KEY_PEDIA_CATEGORY_17_LABEL");
 
 CivilopediaCategory[CategoryHomePage].PopulateList = function()
 	sortedList[CategoryHomePage] = {};
@@ -1427,6 +1430,35 @@ CivilopediaCategory[CategoryWorldCongress].PopulateList = function()
 	end
 end
 
+CivilopediaCategory[CategoryCorporations].PopulateList = function()
+
+	sortedList[CategoryCorporations] = {};
+	
+	do
+		local section = {};
+		for corporation in GameInfo.Corporations() do
+			-- add a corporation entry to a list (localized name, tag, etc.)
+			local article = {};
+			local name = Locale.ConvertTextKey(corporation.Description);
+			article.entryName = name;
+			article.entryID = {"Corporations", corporation.ID};
+			article.entryCategory = CategoryCorporations;
+			
+			table.insert(section, article);
+			
+			-- index by various keys
+			searchableList[Locale.ToLower(name)] = article;
+			searchableTextKeyList[corporation] = article;
+			categorizedList[(CategoryCorporations * absurdlyLargeNumTopicsInCategory) + corporation.ID] = article;
+		end
+		
+		-- sort this list alphabetically by localized name
+		table.sort(section, Alphabetically);
+		table.insert(sortedList[CategoryCorporations], section);
+	end
+
+end
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
@@ -1934,7 +1966,29 @@ CivilopediaCategory[CategoryWorldCongress].DisplayHomePage = function()
 	ResizeEtc();
 end;
 
-
+CivilopediaCategory[CategoryCorporations].DisplayHomePage = function()
+	ClearArticle();
+	Controls.ArticleID:SetText( Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_PAGE_LABEL" ));	
+	
+	Controls.Portrait:SetTexture("WorldCongressPortrait256_EXP2.dds");
+	Controls.Portrait:SetTextureOffsetVal(0,0);
+	Controls.Portrait:SetHide(false);
+	
+	Controls.PortraitFrame:SetHide(false);
+	
+	UpdateTextBlock( Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_HOMEPAGE_BLURB" ), Controls.HomePageBlurbLabel, Controls.HomePageBlurbInnerFrame, Controls.HomePageBlurbFrame );
+	
+	g_BBTextManager:ResetInstances();
+			
+	--Basic Sectional Infos	
+	local thisBBTextInstance = g_BBTextManager:GetInstance();
+	if thisBBTextInstance then
+		thisBBTextInstance.BBTextHeader:SetText( Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_HOMEPAGE_LABEL1" ));
+		UpdateSuperWideTextBlock( Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_HOMEPAGE_TEXT1" ), thisBBTextInstance.BBTextLabel, thisBBTextInstance.BBTextInnerFrame, thisBBTextInstance.BBTextFrame );
+	end	
+	Controls.BBTextStack:SetHide( false );
+	ResizeEtc();
+end;
 
 --------------------------------------------------------------------------------------------------------
 -- a few handy-dandy helper functions
@@ -2105,6 +2159,11 @@ CivilopediaCategory[CategoryHomePage].SelectArticle = function( pageID, shouldAd
 		end
 		CivilopediaCategory[pageID].DisplayHomePage();
 	elseif pageID == CategoryWorldCongress then
+		if selectedCategory ~= pageID then
+			SetSelectedCategory(pageID);
+		end
+		CivilopediaCategory[pageID].DisplayHomePage();
+	elseif pageID == CategoryCorporations then
 		if selectedCategory ~= pageID then
 			SetSelectedCategory(pageID);
 		end
@@ -5383,6 +5442,54 @@ function GetLeagueProjectPediaText(iLeagueProjectID)
 	return s;
 end
 
+CivilopediaCategory[CategoryCorporations].SelectArticle = function(entryID, shouldAddToList)
+	if selectedCategory ~= CategoryCorporations then
+		SetSelectedCategory(CategoryCorporations);
+	end
+	
+	ClearArticle();
+	
+	local offset = 0;	
+	offset = offset + entryID[2];
+	
+	if shouldAddToList == addToList then
+		currentTopic = currentTopic + 1;
+		listOfTopicsViewed[currentTopic] = categorizedList[(CategoryCorporations * absurdlyLargeNumTopicsInCategory) + offset];
+		for i = currentTopic + 1, endTopic, 1 do
+			listOfTopicsViewed[i] = nil;
+		end
+		endTopic = currentTopic;
+	end
+	
+	if (entryID ~= nil) then
+	
+		local t = entryID[1];
+		local id = entryID[2];
+		
+		if(t == "Corporations") then
+		
+			local thisCorporation = GameInfo[t][id];
+		
+			if (thisCorporation ~= nil) then
+			
+				Controls.Portrait:SetTexture("WorldCongressPortrait256_EXP2.dds");
+				Controls.Portrait:SetTextureOffsetVal(0,0);
+				Controls.PortraitFrame:SetHide(false);
+				
+				-- update the name	
+				Controls.ArticleID:LocalizeAndSetText(thisCorporation.Description);
+				
+				-- update the summary
+				--if (thisCorporation.Help ~= nil) then
+				--	UpdateTextBlock( Locale.ConvertTextKey( thisCorporation.Help ), Controls.SummaryLabel, Controls.SummaryInnerFrame, Controls.SummaryFrame );
+				--end		
+			end
+		end
+	end	
+
+	ResizeEtc();
+end
+
 ---------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 
@@ -6333,6 +6440,67 @@ CivilopediaCategory[CategoryWorldCongress].SelectHeading = function( selectedSec
 		
 end
 
+CivilopediaCategory[CategoryCorporations].SelectHeading = function( selectedSectionID, dummy )
+	g_ListHeadingManager:ResetInstances();
+	g_ListItemManager:ResetInstances();
+
+	sortedList[CategoryCorporations][selectedSectionID].headingOpen = not sortedList[CategoryCorporations][selectedSectionID].headingOpen; -- ain't lua great
+	
+	local sortOrder = 0;
+	otherSortedList = {};
+
+	-- put in a home page before the first section
+	local thisListInstance = g_ListItemManager:GetInstance();
+	if thisListInstance then
+		sortOrder = sortOrder + 1;
+		thisListInstance.ListItemLabel:SetText( Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_PAGE_LABEL" ));
+		thisListInstance.ListItemButton:SetVoids( homePageOfCategoryID, addToList );
+		thisListInstance.ListItemButton:RegisterCallback( Mouse.eLClick, CivilopediaCategory[CategoryCorporations].buttonClicked );
+		thisListInstance.ListItemButton:SetToolTipCallback( TipHandler );
+		otherSortedList[tostring( thisListInstance.ListItemButton )] = sortOrder;
+	end
+	
+	for section = 1, 1, 1 do
+
+		-- add a section header
+		local thisHeaderInstance = g_ListHeadingManager:GetInstance();
+		if thisHeaderInstance then
+			sortOrder = sortOrder + 1;
+			if sortedList[CategoryCorporations][section].headingOpen then
+				local textString = "TXT_KEY_PEDIA_CORPORATIONS_CATEGORY_"..tostring( section );
+				local localizedLabel = "[ICON_MINUS] "..Locale.ConvertTextKey( textString );
+				thisHeaderInstance.ListHeadingLabel:SetText( localizedLabel );
+			else
+				local textString = "TXT_KEY_PEDIA_CORPORATIONS_CATEGORY_"..tostring( section );
+				local localizedLabel = "[ICON_PLUS] "..Locale.ConvertTextKey( textString );
+				thisHeaderInstance.ListHeadingLabel:SetText( localizedLabel );
+			end
+			thisHeaderInstance.ListHeadingButton:SetVoids( section, 0 );
+			thisHeaderInstance.ListHeadingButton:RegisterCallback( Mouse.eLClick, CivilopediaCategory[CategoryCorporations].SelectHeading );
+			otherSortedList[tostring( thisHeaderInstance.ListHeadingButton )] = sortOrder;
+		end	
+			
+		-- for each element of the sorted list		
+		if sortedList[CategoryCorporations][section].headingOpen then
+			for i, v in ipairs(sortedList[CategoryCorporations][section]) do
+				local thisListInstance = g_ListItemManager:GetInstance();
+				if thisListInstance then
+					sortOrder = sortOrder + 1;
+					thisListInstance.ListItemLabel:SetText( v.entryName );
+					thisListInstance.ListItemButton:SetVoids(0, addToList );
+					thisListInstance.ListItemButton:RegisterCallback( Mouse.eLClick, function(dummy, shouldAddToList) CivilopediaCategory[CategoryCorporations].SelectArticle(v.entryID, shouldAddToList); end);
+					thisListInstance.ListItemButton:SetToolTipCallback( TipHandler )
+					otherSortedList[tostring( thisListInstance.ListItemButton )] = sortOrder;
+				end
+			end
+		end
+	end
+	
+	Controls.ListOfArticles:SortChildren( SortFunction );
+	ResizeEtc();
+		
+end
+
 
 ----------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------------
@@ -7190,6 +7358,58 @@ CivilopediaCategory[CategoryWorldCongress].DisplayList = function()
 				thisListInstance.ListItemLabel:SetText( v.entryName );
 				thisListInstance.ListItemButton:SetVoids( v.entryID[2], addToList );
 				thisListInstance.ListItemButton:RegisterCallback( Mouse.eLClick, function(dummy, shouldAddToList) CivilopediaCategory[CategoryWorldCongress].SelectArticle(v.entryID, shouldAddToList); end);
+				thisListInstance.ListItemButton:SetToolTipCallback( TipHandler )
+				otherSortedList[tostring( thisListInstance.ListItemButton )] = sortOrder;
+			end
+		end
+	end
+	
+	Controls.ListOfArticles:SortChildren( SortFunction );
+	ResizeEtc();
+
+end
+
+CivilopediaCategory[CategoryCorporations].DisplayList = function()
+	g_ListHeadingManager:ResetInstances();
+	g_ListItemManager:ResetInstances();
+
+	local sortOrder = 0;
+	otherSortedList = {};
+	
+	-- put in a home page before the first section
+	local thisListInstance = g_ListItemManager:GetInstance();
+	if thisListInstance then
+		sortOrder = sortOrder + 1;
+		thisListInstance.ListItemLabel:SetText( Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_PAGE_LABEL" ));
+		thisListInstance.ListItemButton:SetVoids( homePageOfCategoryID, addToList );
+		thisListInstance.ListItemButton:RegisterCallback( Mouse.eLClick, CivilopediaCategory[CategoryCorporations].buttonClicked );
+		thisListInstance.ListItemButton:SetToolTipCallback( TipHandler );
+		otherSortedList[tostring( thisListInstance.ListItemButton )] = sortOrder;
+	end
+
+	for section = 1, 1, 1 do
+
+		local thisHeaderInstance = g_ListHeadingManager:GetInstance();
+		if thisHeaderInstance then
+			sortedList[CategoryCorporations][section].headingOpen = true; -- ain't lua great
+			sortOrder = sortOrder + 1;
+			local textString = "TXT_KEY_PEDIA_CORPORATIONS_CATEGORY_"..tostring( section );
+			local localizedLabel = "[ICON_MINUS] "..Locale.ConvertTextKey( textString );
+			thisHeaderInstance.ListHeadingLabel:SetText( localizedLabel );
+			thisHeaderInstance.ListHeadingButton:SetVoids( section, 0 );
+			thisHeaderInstance.ListHeadingButton:RegisterCallback( Mouse.eLClick, CivilopediaCategory[CategoryCorporations].SelectHeading );
+			otherSortedList[tostring( thisHeaderInstance.ListHeadingButton )] = sortOrder;
+		end	
+		
+		-- for each element of the sorted list		
+		for i, v in ipairs(sortedList[CategoryCorporations][section]) do
+			-- add a unit entry
+			local thisListInstance = g_ListItemManager:GetInstance();
+			if thisListInstance then
+				sortOrder = sortOrder + 1;
+				thisListInstance.ListItemLabel:SetText( v.entryName );
+				thisListInstance.ListItemButton:SetVoids( v.entryID[2], addToList );
+				thisListInstance.ListItemButton:RegisterCallback( Mouse.eLClick, function(dummy, shouldAddToList) CivilopediaCategory[CategoryCorporations].SelectArticle(v.entryID, shouldAddToList); end);
 				thisListInstance.ListItemButton:SetToolTipCallback( TipHandler )
 				otherSortedList[tostring( thisListInstance.ListItemButton )] = sortOrder;
 			end
