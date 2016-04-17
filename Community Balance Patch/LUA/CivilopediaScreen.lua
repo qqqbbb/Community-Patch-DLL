@@ -96,6 +96,9 @@ local g_RequiredBuildingsManager = InstanceManager:new( "RequiredBuildingInstanc
 --CBP
 local g_LeadsToBuildingsManager = InstanceManager:new( "LeadsToBuildingInstance", "LeadsToBuildingButton", Controls.LeadsToBuildingsInnerFrame );
 local g_MonopolyResourcesManager = InstanceManager:new( "MonopolyResourceInstance", "MonopolyResourceButton", Controls.MonopolyResourcesInnerFrame );
+local g_CorpHeadquartersManager = InstanceManager:new( "CorporationBuildingInstance", "CorporationBuildingButton", Controls.CorpHeadquartersInnerFrame );
+local g_CorpOfficeManager = InstanceManager:new( "CorporationBuildingInstance", "CorporationBuildingButton", Controls.CorpOfficeInnerFrame );
+local g_CorpFranchiseManager = InstanceManager:new( "CorporationBuildingInstance", "CorporationBuildingButton", Controls.CorpFranchiseInnerFrame );
 --END
 local g_LocalResourcesManager = InstanceManager:new( "LocalResourceInstance", "LocalResourceButton", Controls.LocalResourcesInnerFrame );
 local g_RequiredPromotionsManager = InstanceManager:new( "RequiredPromotionInstance", "RequiredPromotionButton", Controls.RequiredPromotionsInnerFrame );
@@ -5451,6 +5454,7 @@ CivilopediaCategory[CategoryCorporations].SelectArticle = function(entryID, shou
 	
 	local offset = 0;	
 	offset = offset + entryID[2];
+	local buttonAdded = 0;
 	
 	if shouldAddToList == addToList then
 		currentTopic = currentTopic + 1;
@@ -5472,17 +5476,133 @@ CivilopediaCategory[CategoryCorporations].SelectArticle = function(entryID, shou
 		
 			if (thisCorporation ~= nil) then
 			
-				Controls.Portrait:SetTexture("WorldCongressPortrait256_EXP2.dds");
-				Controls.Portrait:SetTextureOffsetVal(0,0);
-				Controls.PortraitFrame:SetHide(false);
+				if IconHookup( thisCorporation.PortraitIndex, portraitSize, thisCorporation.IconAtlas, Controls.Portrait ) then
+					Controls.PortraitFrame:SetHide( false );
+				else
+					Controls.PortraitFrame:SetHide( true );
+				end
 				
 				-- update the name	
 				Controls.ArticleID:LocalizeAndSetText(thisCorporation.Description);
 				
 				-- update the summary
-				--if (thisCorporation.Help ~= nil) then
-				--	UpdateTextBlock( Locale.ConvertTextKey( thisCorporation.Help ), Controls.SummaryLabel, Controls.SummaryInnerFrame, Controls.SummaryFrame );
-				--end		
+				if (thisCorporation.Help ~= nil) then
+					UpdateTextBlock( Locale.ConvertTextKey( thisCorporation.Help ), Controls.SummaryLabel, Controls.SummaryInnerFrame, Controls.SummaryFrame );
+				end	
+				
+				-- update free trade routes
+				local freeTRs = thisCorporation.NumFreeTradeRoutes;
+				if(freeTRs > 0) then
+					Controls.FreeTRFrame:SetHide(false);
+					Controls.FreeTRLabel:SetText(freeTRs .. " [ICON_INTERNATIONAL_TRADE]");
+				end
+				
+				g_MonopolyResourcesManager:ResetInstances();
+				buttonAdded = 0;
+
+				local condition = "CorporationType = '" .. thisCorporation.Type .. "'";
+				for row in GameInfo.Corporation_ResourceMonopolyOrs( condition ) do
+					local requiredResource = GameInfo.Resources[row.ResourceType];
+					if requiredResource then
+						local thisLocalResourceInstance = g_MonopolyResourcesManager:GetInstance();
+						if thisLocalResourceInstance then
+							local textureOffset, textureSheet = IconLookup( requiredResource.PortraitIndex, buttonSize, requiredResource.IconAtlas );				
+							if textureOffset == nil then
+								textureSheet = defaultErrorTextureSheet;
+								textureOffset = nullOffset;
+							end				
+							UpdateSmallButton( buttonAdded, thisLocalResourceInstance.MonopolyResourceImage, thisLocalResourceInstance.MonopolyResourceButton, textureSheet, textureOffset, CategoryResources, Locale.ConvertTextKey( requiredResource.Description ), requiredResource.ID );
+							buttonAdded = buttonAdded + 1;
+						end
+					end		
+				end
+				UpdateButtonFrame( buttonAdded, Controls.MonopolyResourcesInnerFrame, Controls.MonopolyResourcesFrame );
+				
+				g_CorpHeadquartersManager:ResetInstances();
+				g_CorpOfficeManager:ResetInstances();
+				g_CorpFranchiseManager:ResetInstances();
+				
+				local headquarters = GameInfo.BuildingClasses[thisCorporation.HeadquartersBuildingClass];
+				if(headquarters) then
+					local buildingInfo = GameInfo.Buildings[headquarters.DefaultBuilding];
+					if(buildingInfo) then
+						local instance = g_CorpHeadquartersManager:GetInstance();
+						if instance then
+							if not IconHookup( buildingInfo.PortraitIndex, buttonSize, buildingInfo.IconAtlas, instance.CorporationBuildingImage ) then
+								instance.CorporationBuildingImage:SetTexture( defaultErrorTextureSheet );
+								instance.CorporationBuildingImage:SetTextureOffset( nullOffset );
+							end
+							
+							--move this button
+							instance.CorporationBuildingButton:SetOffsetVal( buttonPadding, buttonPadding );
+							
+							instance.CorporationBuildingButton:SetToolTipString( Locale.ConvertTextKey( buildingInfo.Description ) );
+							instance.CorporationBuildingButton:SetVoids( buildingInfo.ID, addToList );
+							
+							if headquarters.MaxGlobalInstances > 0 or (headquarters.MaxPlayerInstances == 1 and headquarters.SpecialistCount == 0) or headquarters.MaxTeamInstances > 0 then
+								instance.CorporationBuildingButton:RegisterCallback( Mouse.eLClick, CivilopediaCategory[CategoryWonders].SelectArticle );
+							else
+								instance.CorporationBuildingButton:RegisterCallback( Mouse.eLClick, CivilopediaCategory[CategoryBuildings].SelectArticle );
+							end
+						end
+					end
+				end
+				
+				local office = GameInfo.BuildingClasses[thisCorporation.OfficeBuildingClass];
+				if(office ~= nil) then
+					local buildingInfo = GameInfo.Buildings[office.DefaultBuilding];
+					if(buildingInfo) then
+						local instance = g_CorpOfficeManager:GetInstance();
+						if instance then
+							if not IconHookup( buildingInfo.PortraitIndex, buttonSize, buildingInfo.IconAtlas, instance.CorporationBuildingImage ) then
+								instance.CorporationBuildingImage:SetTexture( defaultErrorTextureSheet );
+								instance.CorporationBuildingImage:SetTextureOffset( nullOffset );
+							end
+								
+							--move this button
+							instance.CorporationBuildingButton:SetOffsetVal( buttonPadding, buttonPadding );
+							
+							instance.CorporationBuildingButton:SetToolTipString( Locale.ConvertTextKey( buildingInfo.Description ) );
+							instance.CorporationBuildingButton:SetVoids( buildingInfo.ID, addToList );
+							
+							if office.MaxGlobalInstances > 0 or (office.MaxPlayerInstances == 1 and office.SpecialistCount == 0) or office.MaxTeamInstances > 0 then
+								instance.CorporationBuildingButton:RegisterCallback( Mouse.eLClick, CivilopediaCategory[CategoryWonders].SelectArticle );
+							else
+								instance.CorporationBuildingButton:RegisterCallback( Mouse.eLClick, CivilopediaCategory[CategoryBuildings].SelectArticle );
+							end
+						end
+					end
+				end
+				
+				local franchise = GameInfo.BuildingClasses[thisCorporation.FranchiseBuildingClass];
+				if(franchise ~= nil) then
+					local buildingInfo = GameInfo.Buildings[franchise.DefaultBuilding];
+					if(buildingInfo) then
+						local instance = g_CorpFranchiseManager:GetInstance();
+						if instance then
+							if not IconHookup( buildingInfo.PortraitIndex, buttonSize, buildingInfo.IconAtlas, instance.CorporationBuildingImage ) then
+								instance.CorporationBuildingImage:SetTexture( defaultErrorTextureSheet );
+								instance.CorporationBuildingImage:SetTextureOffset( nullOffset );
+							end
+								
+							--move this button
+							instance.CorporationBuildingButton:SetOffsetVal( buttonPadding, buttonPadding );
+							
+							instance.CorporationBuildingButton:SetToolTipString( Locale.ConvertTextKey( buildingInfo.Description ) );
+							instance.CorporationBuildingButton:SetVoids( buildingInfo.ID, addToList );
+							
+							if franchise.MaxGlobalInstances > 0 or (franchise.MaxPlayerInstances == 1 and franchise.SpecialistCount == 0) or franchise.MaxTeamInstances > 0 then
+								instance.CorporationBuildingButton:RegisterCallback( Mouse.eLClick, CivilopediaCategory[CategoryWonders].SelectArticle );
+							else
+								instance.CorporationBuildingButton:RegisterCallback( Mouse.eLClick, CivilopediaCategory[CategoryBuildings].SelectArticle );
+							end
+						end
+					end
+				end
+
+				UpdateButtonFrame( 1, Controls.CorpHeadquartersInnerFrame, Controls.CorpHeadquartersFrame );
+				UpdateButtonFrame( 1, Controls.CorpOfficeInnerFrame, Controls.CorpOfficeFrame );
+				UpdateButtonFrame( 1, Controls.CorpFranchiseInnerFrame, Controls.CorpFranchiseFrame );
 			end
 		end
 	end	
@@ -7457,6 +7577,10 @@ function ClearArticle()
 	-- CBP
 	Controls.LeadsToBuildingsFrame:SetHide( true );	
 	Controls.MonopolyResourcesFrame:SetHide( true );
+	Controls.CorpHeadquartersFrame:SetHide( true );
+	Controls.CorpOfficeFrame:SetHide( true );
+	Controls.CorpFranchiseFrame:SetHide( true );
+	Controls.FreeTRFrame:SetHide( true );
 	-- End
 	Controls.RevealedResourcesFrame:SetHide( true );
 	Controls.RequiredResourcesFrame:SetHide( true );
