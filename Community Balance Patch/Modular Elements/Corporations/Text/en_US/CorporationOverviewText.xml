@@ -81,7 +81,7 @@
 			<Text>Rival Franchises</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CPO_OFFICE_TRADE_ROUTES_SORT_TT">
-			<Text>Number of foreign Trade Routes from this city. After the Trade Route ends, a {1_CorpName} Franchise will be built in that city if it does not already contain a {1_CorpName} Franchise.</Text>
+			<Text>Number of foreign Trade Routes from this city. After the Trade Route ends, a {1_CorpName} will be built in that city if it does not already contain a {1_CorpName} Franchise.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CPO_OFFICE_TRADE_ROUTES_TT">
 			<Text>Your city has a Trade Route with the following foreign cities:</Text>

@@ -5485,10 +5485,64 @@ CivilopediaCategory[CategoryCorporations].SelectArticle = function(entryID, shou
 				-- update the name	
 				Controls.ArticleID:LocalizeAndSetText(thisCorporation.Description);
 				
+				local helpStr = "";
+				if(thisCorporation.Help ~= nil) then
+					helpStr = helpStr .. Locale.ConvertTextKey(thisCorporation.Help);
+				end
+				
+				local numFreeResources = 0;
+				local condition = "CorporationType = '" .. thisCorporation.Type .. "'";
+				for row in GameInfo.Corporation_NumFreeResource( condition ) do	
+					local freeResource = GameInfo.Resources[row.ResourceType];
+					if freeResource then	
+						if(numFreeResources == 0) then
+							helpStr = helpStr .. "[NEWLINE]";
+						end	
+						helpStr = helpStr .. "[NEWLINE]" .. Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_FREE_RESOURCE", row.NumResource, freeResource.IconString, freeResource.Description );
+						numFreeResources = numFreeResources + 1;
+					end
+				end
+				
+				local numYields = 0;
+				bFirstTime = true;
+				for row in GameInfo.Corporation_TradeRouteYieldMod( condition ) do
+					local yield = GameInfo.Yields[row.YieldType];
+					if yield then
+						if(numYields == 0) then
+							helpStr = helpStr .. "[NEWLINE]";
+						end
+						helpStr = helpStr .. "[NEWLINE]" .. Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_TR_YIELD", row.YieldMod, yield.IconString, yield.Description );
+						numYields = numYields + 0;
+					end
+				end
+				
+				if(thisCorporation.TradeRouteLandDistanceModifier ~= 0 or thisCorporation.TradeRouteSeaDistanceModifier ~= 0) then
+					helpStr = helpStr .. "[NEWLINE]";
+					if(thisCorporation.TradeRouteLandDistanceModifier ~= 0) then
+						helpStr = helpStr .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_PEDIA_CORPORATIONS_TR_LAND_RANGE", thisCorporation.TradeRouteLandDistanceModifier);
+					end
+					
+					if(thisCorporation.TradeRouteSeaDistanceModifier ~= 0) then
+						helpStr = helpStr .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_PEDIA_CORPORATIONS_TR_SEA_RANGE", thisCorporation.TradeRouteSeaDistanceModifier);
+					end
+				end
+				
 				-- update the summary
-				if (thisCorporation.Help ~= nil) then
-					UpdateTextBlock( Locale.ConvertTextKey( thisCorporation.Help ), Controls.SummaryLabel, Controls.SummaryInnerFrame, Controls.SummaryFrame );
-				end	
+				if (helpStr ~= nil) then
+					UpdateTextBlock( helpStr, Controls.SummaryLabel, Controls.SummaryInnerFrame, Controls.SummaryFrame );
+				end
+				
+				if(thisCorporation.ResourceBonusHelp ~= nil) then
+					UpdateTextBlock( Locale.ConvertTextKey( thisCorporation.ResourceBonusHelp ), Controls.CorporationResourceBonusLabel, Controls.CorpResourceBonusInnerFrame, Controls.CorporationResourceBonusFrame );
+				end
+				
+				if(thisCorporation.OfficeBonusHelp ~= nil) then
+					UpdateTextBlock( Locale.ConvertTextKey( thisCorporation.OfficeBonusHelp ), Controls.CorporationOfficeBonusLabel, Controls.CorpOfficeBonusInnerFrame, Controls.CorporationOfficeBonusFrame);
+				end
+				
+				if(thisCorporation.TradeRouteBonusHelp ~= nil) then
+					UpdateTextBlock( Locale.ConvertTextKey( thisCorporation.TradeRouteBonusHelp ), Controls.CorporationTRBonusLabel, Controls.CorporationTRBonusInnerFrame, Controls.CorporationTRBonusFrame);
+				end
 				
 				-- update free trade routes
 				local freeTRs = thisCorporation.NumFreeTradeRoutes;
@@ -7616,6 +7670,9 @@ function ClearArticle()
 	Controls.YieldFrame:SetHide( true );
 	Controls.MountainYieldFrame:SetHide( true );
 	--CBP
+	Controls.CorporationResourceBonusFrame:SetHide( true );
+	Controls.CorporationOfficeBonusFrame:SetHide( true );
+	Controls.CorporationTRBonusFrame:SetHide( true );
 	Controls.TradeRouteYieldFrame:SetHide( true );
 	Controls.AdjacentYieldFrame:SetHide( true );
 	Controls.AdjacentTerrainYieldFrame:SetHide( true );	

@@ -20,6 +20,8 @@ public:
 	BuildingClassTypes GetOfficeBuildingClass() const;
 	BuildingClassTypes GetFranchiseBuildingClass() const;
 
+	int GetTradeRouteSeaDistanceModifier() const;
+	int GetTradeRouteLandDistanceModifier() const;
 	int GetTradeRouteSpeedModifier() const;
 	int GetNumFreeTradeRoutes() const;
 	bool IsTradeRoutesInvulnerable() const;
@@ -35,6 +37,8 @@ protected:
 	BuildingClassTypes m_eOfficeBuildingClass;
 	BuildingClassTypes m_eFranchiseBuildingClass;
 
+	int m_iTradeRouteSeaDistanceModifier;
+	int m_iTradeRouteLandDistanceModifier;
 	int m_iTradeRouteSpeedModifier;
 	int m_iNumFreeTradeRoutes;
 	int m_iMaxFranchises;
@@ -196,6 +200,7 @@ public:
 
 	CvCorporation* GetCorporation(CorporationTypes eCorporation);
 	int GetNumActiveCorporations() const;
+	int GetNumAvailableCorporations() const;
 
 	void DestroyCorporation(CorporationTypes eCorporation);
 	void FoundCorporation(PlayerTypes ePlayer, CorporationTypes eCorporation, CvCity* pHeadquarters);

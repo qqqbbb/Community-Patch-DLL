@@ -323,7 +323,9 @@ protected:
 	static int lGetBuildingCorporateGPChange(lua_State* L);
 	static int lGetPromiseDuration(lua_State* L);
 	static int lGetCorporationFounder(lua_State* L);
+	static int lGetCorporationHeadquarters(lua_State* L);
 	static int lGetNumCorporationsFounded(lua_State* L);
+	static int lGetNumAvailableCorporations(lua_State* L);
 #if defined(MOD_BALANCE_CORE_RESOURCE_MONOPOLIES)
 	static int lGetGreatestPlayerResourceMonopoly(lua_State* L);
 #endif

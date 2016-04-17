@@ -4675,6 +4675,25 @@ int CvPlayerTrade::GetTradeRouteRange (DomainTypes eDomain, CvCity* pOriginCity)
 		}
 	}
 
+#if defined(MOD_BALANCE_CORE)
+	CorporationTypes eCorporation = m_pPlayer->GetCorporations()->GetFoundedCorporation();
+	if (eCorporation != NO_CORPORATION)
+	{
+		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+		if (pkCorporationInfo)
+		{
+			if (eDomain == DOMAIN_LAND && pkCorporationInfo->GetTradeRouteLandDistanceModifier() != 0)
+			{
+				iRangeModifier += pkCorporationInfo->GetTradeRouteLandDistanceModifier();
+			}
+			else if (eDomain == DOMAIN_SEA && pkCorporationInfo->GetTradeRouteSeaDistanceModifier() != 0)
+			{
+				iRangeModifier += pkCorporationInfo->GetTradeRouteSeaDistanceModifier();
+			}
+		}
+	}
+#endif
+
 	iRange = iBaseRange;
 	iRange += iTraitRange;
 	iRange += iExtendedRange;

@@ -14,6 +14,8 @@ CvCorporationEntry::CvCorporationEntry(void):
 	m_eHeadquartersBuildingClass(NO_BUILDINGCLASS),
 	m_eOfficeBuildingClass(NO_BUILDINGCLASS),
 	m_eFranchiseBuildingClass(NO_BUILDINGCLASS),
+	m_iTradeRouteSeaDistanceModifier(0),
+	m_iTradeRouteLandDistanceModifier(0),
 	m_iTradeRouteSpeedModifier(0),
 	m_iTradeRouteVisionBoost(0),
 	m_iNumFreeTradeRoutes(0),
@@ -52,6 +54,16 @@ BuildingClassTypes CvCorporationEntry::GetOfficeBuildingClass() const
 BuildingClassTypes CvCorporationEntry::GetFranchiseBuildingClass() const
 {
 	return m_eFranchiseBuildingClass;
+}
+
+int CvCorporationEntry::GetTradeRouteLandDistanceModifier() const
+{
+	return m_iTradeRouteLandDistanceModifier;
+}
+
+int CvCorporationEntry::GetTradeRouteSeaDistanceModifier() const
+{
+	return m_iTradeRouteSeaDistanceModifier;
 }
 
 int CvCorporationEntry::GetTradeRouteSpeedModifier() const
@@ -111,6 +123,8 @@ bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 
 	m_iMaxFranchises = kResults.GetInt("MaxFranchises");
 	m_iNumFreeTradeRoutes = kResults.GetInt("NumFreeTradeRoutes");
+	m_iTradeRouteLandDistanceModifier = kResults.GetInt("TradeRouteLandDistanceModifier");
+	m_iTradeRouteSeaDistanceModifier = kResults.GetInt("TradeRouteSeaDistanceModifier");
 	m_iTradeRouteSpeedModifier = kResults.GetInt("TradeRouteSpeedModifier");
 	m_iTradeRouteVisionBoost = kResults.GetInt("TradeRouteVisionBoost");
 	m_bTradeRoutesInvulnerable = kResults.GetBool("TradeRoutesInvulnerable");
@@ -901,6 +915,9 @@ int CvPlayerCorporations::GetMaxNumFranchises() const
 	if (pkCorporationInfo == NULL)
 		return 0;
 
+	if (IsCorporationOfficesAsFranchises())
+		return m_pPlayer->getNumCities();
+
 	int iReturnValue = 0;
 
 	// We cannot have more franchises than twice the number of trade routes we can establish
@@ -1067,6 +1084,11 @@ CvCorporation* CvGameCorporations::GetCorporation(CorporationTypes eCorporation)
 int CvGameCorporations::GetNumActiveCorporations() const
 {
 	return m_ActiveCorporations.size();
+}
+
+int CvGameCorporations::GetNumAvailableCorporations() const
+{
+	return GC.getNumCorporationInfos() - GetNumActiveCorporations();
 }
 
 // Destroy eCorporation
