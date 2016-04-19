@@ -197,7 +197,7 @@ CivilopediaCategory[CategoryResources].buttonTexture = "Assets/UI/Art/Civilopedi
 CivilopediaCategory[CategoryImprovements].buttonTexture = "Assets/UI/Art/Civilopedia/CivilopediaTopButtonsImprovements.dds";
 CivilopediaCategory[CategoryBeliefs].buttonTexture = "CivilopediaTopButtonsReligion.dds";
 CivilopediaCategory[CategoryWorldCongress].buttonTexture = "CivilopediaTopButtonsWorldCongress.dds";
-CivilopediaCategory[CategoryCorporations].buttonTexture = "CivilopediaTopButtonsWorldCongress.dds";
+CivilopediaCategory[CategoryCorporations].buttonTexture = "civilopediatopbuttonscorporations.dds";
 
 CivilopediaCategory[CategoryHomePage].labelString = Locale.ConvertTextKey( "TXT_KEY_PEDIA_CATEGORY_1_LABEL" );
 CivilopediaCategory[CategoryGameConcepts].labelString = Locale.ConvertTextKey( "TXT_KEY_PEDIA_CATEGORY_2_LABEL" );
@@ -1973,11 +1973,19 @@ CivilopediaCategory[CategoryCorporations].DisplayHomePage = function()
 	ClearArticle();
 	Controls.ArticleID:SetText( Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_PAGE_LABEL" ));	
 	
-	Controls.Portrait:SetTexture("WorldCongressPortrait256_EXP2.dds");
-	Controls.Portrait:SetTextureOffsetVal(0,0);
-	Controls.Portrait:SetHide(false);
+	local portraitIndex = 6;
+	local portraitAtlas = "CORP_ATLAS";
+		
+	for row in DB.Query("SELECT PortraitIndex, IconAtlas from Corporations ORDER By Random() LIMIT 1") do
+		portraitIndex = row.PortraitIndex;
+		portraitAtlas = row.IconAtlas;
+	end	
 	
-	Controls.PortraitFrame:SetHide(false);
+	if IconHookup( portraitIndex, portraitSize, portraitAtlas, Controls.Portrait ) then
+		Controls.PortraitFrame:SetHide( false );
+	else
+		Controls.PortraitFrame:SetHide( true );
+	end
 	
 	UpdateTextBlock( Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_HOMEPAGE_BLURB" ), Controls.HomePageBlurbLabel, Controls.HomePageBlurbInnerFrame, Controls.HomePageBlurbFrame );
 	

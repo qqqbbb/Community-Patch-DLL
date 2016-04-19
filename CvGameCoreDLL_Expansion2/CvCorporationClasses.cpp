@@ -423,7 +423,7 @@ void CvPlayerCorporations::DestroyCorporation()
 
 	int iLoop = 0;
 	// Destroy our headquarters and offices
-	for(CvCity* pCity = m_pPlayer->firstCity(&iLoop); pCity != NULL; m_pPlayer->nextCity(&iLoop))
+	for(CvCity* pCity = m_pPlayer->firstCity(&iLoop); pCity != NULL; pCity = m_pPlayer->nextCity(&iLoop))
 	{
 		// City has headquarters?
 		if(pCity->HasBuilding(eHeadquarters))
@@ -445,7 +445,7 @@ void CvPlayerCorporations::DestroyCorporation()
 		if(!GET_PLAYER(eLoopPlayer).isAlive()) continue;
 		
 		iLoop = 0;
-		for(CvCity* pCity = GET_PLAYER(eLoopPlayer).firstCity(&iLoop); pCity != NULL; GET_PLAYER(eLoopPlayer).nextCity(&iLoop))
+		for(CvCity* pCity = GET_PLAYER(eLoopPlayer).firstCity(&iLoop); pCity != NULL; pCity = GET_PLAYER(eLoopPlayer).nextCity(&iLoop))
 		{
 			if(pCity->HasBuilding(eFranchise))
 			{
@@ -487,6 +487,9 @@ void CvPlayerCorporations::SetCorporationOfficesAsFranchises(bool bValue)
 {
 	if(bValue != m_bCorporationOfficesAsFranchises)
 		m_bCorporationOfficesAsFranchises = bValue;
+
+	if (m_bCorporationOfficesAsFranchises)
+		RecalculateNumFranchises();
 }
 
 bool CvPlayerCorporations::IsCorporationRandomForeignFranchise() const
@@ -498,6 +501,9 @@ void CvPlayerCorporations::SetCorporationRandomForeignFranchise(bool bValue)
 {
 	if (bValue != m_bCorporationRandomForeignFranchise)
 		m_bCorporationRandomForeignFranchise = bValue;
+
+	if (m_bCorporationRandomForeignFranchise)
+		RecalculateNumFranchises();
 }
 
 bool CvPlayerCorporations::IsCorporationFreeFranchiseAbovePopular() const
@@ -509,6 +515,9 @@ void CvPlayerCorporations::SetCorporationFreeFranchiseAbovePopular(bool bValue)
 {
 	if(bValue != m_bCorporationFreeFranchiseAbovePopular)
 		m_bCorporationFreeFranchiseAbovePopular = bValue;
+
+	if (m_bCorporationFreeFranchiseAbovePopular)
+		RecalculateNumFranchises();
 }
 
 // Get our headquarters
@@ -538,6 +547,9 @@ void CvPlayerCorporations::DoTurn()
 	// Are you free enough?
 	if (IsCorporationRandomForeignFranchise())
 		BuildRandomFranchiseInCity();
+
+	RecalculateNumOffices();
+	RecalculateNumFranchises();
 }
 
 void CvPlayerCorporations::RecalculateNumOffices()
@@ -1107,6 +1119,7 @@ void CvGameCorporations::DestroyCorporation(CorporationTypes eCorporation)
 			kPlayer.GetCorporations()->DestroyCorporation();
 
 			m_ActiveCorporations.erase(it);
+			break;
 		}
 	}
 }
