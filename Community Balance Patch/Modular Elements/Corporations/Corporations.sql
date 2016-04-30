@@ -1,5 +1,6 @@
 ALTER TABLE Technologies ADD COLUMN 'CorporationsEnabled' boolean default 0;
 
+-- Update the tech tree to allow Corporations
 DELETE FROM Technology_PrereqTechs
 WHERE TechType = 'TECH_RADIO' AND PrereqTech = 'TECH_BIOLOGY';
 

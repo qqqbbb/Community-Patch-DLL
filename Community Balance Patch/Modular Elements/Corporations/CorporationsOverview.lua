@@ -242,7 +242,7 @@ function RefreshWorldCorporations()
 					CivPlayer = iPlayerLoop,	-- int
 					CivName = Locale.ConvertTextKey(GetPlayerCiv(iPlayerLoop).Description),
 					CorpName = Locale.ConvertTextKey(pCorporation.Description),
-					CorpTooltip = Locale.ConvertTextKey(pCorporation.CorporationHelper),
+					CorpTooltip = Locale.ConvertTextKey(pCorporation.Help),
 					CityName = Game.GetCorporationHeadquarters(ePlayerCorporation),	-- city
 					DateFounded = pLoopPlayer:GetCorporationFoundedTurn(),
 				};

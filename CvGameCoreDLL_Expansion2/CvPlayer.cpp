@@ -31037,107 +31037,86 @@ void CvPlayer::CheckForMonopoly(ResourceTypes eResource)
 	{
 		if(pkResourceInfo->isMonopoly())
 		{
-			int iOwnedNumResource = getNumResourceTotal(eResource, false) + getResourceExport(eResource);
-			int iTotalNumResource = GC.getMap().getNumResources(eResource);
 			bool bGainingBonus = false;
 			bool bGainingStrategicBonus = false;
 			bool bLosingBonus = false;
 			bool bLosingStrategicBonus = false;
-			if(iTotalNumResource > 0)
+			
+			int iMonopolyPercent = GetMonopolyPercent(eResource);
+
+			// Global monopoly?
+			if (iMonopolyPercent > GC.getGLOBAL_RESOURCE_MONOPOLY_THRESHOLD())
 			{
-				if(pkResourceInfo->getResourceUsage() == RESOURCEUSAGE_LUXURY)
+				if (!HasGlobalMonopoly(eResource))
 				{
-					//Do we have +50% of this resource under our control?
-					if(((iOwnedNumResource * 100) / iTotalNumResource) > GC.getGLOBAL_RESOURCE_MONOPOLY_THRESHOLD())
-					{
-						if(m_pabHasGlobalMonopoly[eResource] == false)
-						{
-							bGainingBonus = true;
-						}
-						SetHasGlobalMonopoly(eResource, true);
-					}
-					else
-					{
-						if(m_pabHasGlobalMonopoly[eResource] == true)
-						{
-							bLosingBonus = true;
-						}
-						SetHasGlobalMonopoly(eResource, false);
-					}
+					bGainingBonus = true;
 				}
-				else if(pkResourceInfo->getResourceUsage() == RESOURCEUSAGE_STRATEGIC)
+				SetHasGlobalMonopoly(eResource, true);
+			}
+			else
+			{
+				if (HasGlobalMonopoly(eResource))
 				{
-					//Do we have +25% of this resource under our control?
-					if(((iOwnedNumResource * 100) / iTotalNumResource) > GC.getSTRATEGIC_RESOURCE_MONOPOLY_THRESHOLD())
-					{
-						if(m_pabHasStrategicMonopoly[eResource] == false)
-						{
-							bGainingStrategicBonus = true;
-						}
-						SetHasStrategicMonopoly(eResource, true);
-					}
-					else
-					{
-						if(m_pabHasStrategicMonopoly[eResource] == true)
-						{
-							bLosingStrategicBonus = true;
-						}
-						SetHasStrategicMonopoly(eResource, false);
-					}
-					//Do we also have 50% of this resource under our control?
-					if(((iOwnedNumResource * 100) / iTotalNumResource) > 50)
-					{
-						if(m_pabHasGlobalMonopoly[eResource] == false)
-						{
-							bGainingBonus = true;
-						}
-						SetHasGlobalMonopoly(eResource, true);
-					}
-					else
-					{
-						if(m_pabHasGlobalMonopoly[eResource] == true)
-						{
-							bLosingBonus = true;
-						}
-						SetHasGlobalMonopoly(eResource, false);
-					}
+					bLosingBonus = true;
 				}
-				CvLeague* pLeague = GC.getGame().GetGameLeagues()->GetActiveLeague();
-				if(pLeague != NULL)
+				SetHasGlobalMonopoly(eResource, false);
+			}
+
+			// Strategic resources also factor in a strategic monopoly
+			if (pkResourceInfo->getResourceUsage() == RESOURCEUSAGE_STRATEGIC)
+			{
+				if (iMonopolyPercent > GC.getSTRATEGIC_RESOURCE_MONOPOLY_THRESHOLD())
 				{
-					if (GC.getGame().GetGameLeagues()->IsLuxuryHappinessBanned(GetID(), eResource))
+					if (!HasStrategicMonopoly(eResource))
 					{
-						if(m_pabHasGlobalMonopoly[eResource] == true)
-						{
-							bLosingBonus = true;
-						}
-						SetHasGlobalMonopoly(eResource, false);
+						bGainingStrategicBonus = true;
 					}
+					SetHasStrategicMonopoly(eResource, true);
+				}
+				else
+				{
+					if (HasStrategicMonopoly(eResource))
+					{
+						bLosingStrategicBonus = true;
+					}
+					SetHasStrategicMonopoly(eResource, false);
 				}
 			}
+
+			CvLeague* pLeague = GC.getGame().GetGameLeagues()->GetActiveLeague();
+			if(pLeague != NULL)
+			{
+				if (GC.getGame().GetGameLeagues()->IsLuxuryHappinessBanned(GetID(), eResource))
+				{
+					if(HasGlobalMonopoly(eResource))
+					{
+						bLosingBonus = true;
+					}
+					SetHasGlobalMonopoly(eResource, false);
+				}
+			}
+
 			CvNotifications* pNotifications = GetNotifications();
-			if(pNotifications && MOD_BALANCE_CORE_RESOURCE_MONOPOLIES)
+			if (pNotifications && MOD_BALANCE_CORE_RESOURCE_MONOPOLIES)
 			{
 				const char* strResourceHelp = pkResourceInfo->GetHelp();
 
 				// Adding Resources
-				if(bGainingBonus)
+				if (bGainingBonus)
 				{
 					Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_MONOPOLY_GAINED");
 					strMessage << pkResourceInfo->GetTextKey();
 					strMessage << strResourceHelp;
 					Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_MONOPOLY_GAINED");
 					strSummary << pkResourceInfo->GetTextKey();
-					int iX = -1;
-					int iY = -1;
 
-					pNotifications->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), iX, iY, eResource);
+					pNotifications->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, eResource);
 					updateYield();
-					for(int iPlayer = 0; iPlayer < MAX_PLAYERS; ++iPlayer)
+					for (int iPlayer = 0; iPlayer < MAX_PLAYERS; ++iPlayer)
 					{
 						//Notify human players of this, as they'll care.
 						CvPlayer& kLoopPlayer = GET_PLAYER((PlayerTypes)iPlayer);
-						if(GET_TEAM(kLoopPlayer.getTeam()).isHasMet(getTeam()) && kLoopPlayer.isHuman() && (kLoopPlayer.GetID() != GetID()))
+						if (GET_TEAM(kLoopPlayer.getTeam()).isHasMet(getTeam()) && kLoopPlayer.isHuman() && (kLoopPlayer.GetID() != GetID()))
 						{
 							Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_OTHER_PLAYER_MONOPOLY_GAINED");
 							strMessage << pkResourceInfo->GetTextKey();
@@ -31146,45 +31125,39 @@ void CvPlayer::CheckForMonopoly(ResourceTypes eResource)
 							Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_OTHER_PLAYER_MONOPOLY_GAINED");
 							strSummary << pkResourceInfo->GetTextKey();
 							strSummary << getCivilizationInfo().getShortDescriptionKey();
-							int iX = -1;
-							int iY = -1;
 
-							kLoopPlayer.GetNotifications()->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), iX, iY, eResource);
+							kLoopPlayer.GetNotifications()->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, eResource);
 						}
 					}
 				}
 				// Lost Resources
-				else if(bLosingBonus && MOD_BALANCE_CORE_RESOURCE_MONOPOLIES)
+				else if (bLosingBonus && MOD_BALANCE_CORE_RESOURCE_MONOPOLIES)
 				{
 					Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_MONOPOLY_LOST");
 					strMessage << pkResourceInfo->GetTextKey();
 					strMessage << strResourceHelp;
 					Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_MONOPOLY_LOST");
 					strSummary << pkResourceInfo->GetTextKey();
-					int iX = -1;
-					int iY = -1;
 
-					pNotifications->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), iX, iY, eResource);
+					pNotifications->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, eResource);
 					updateYield();
 				}
 				// Adding Resources
-				if(bGainingStrategicBonus && MOD_BALANCE_CORE_RESOURCE_MONOPOLIES_STRATEGIC)
+				if (bGainingStrategicBonus && MOD_BALANCE_CORE_RESOURCE_MONOPOLIES_STRATEGIC)
 				{
 					Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_STRATEGIC_MONOPOLY_GAINED");
 					strMessage << pkResourceInfo->GetTextKey();
 					strMessage << strResourceHelp;
 					Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_STRATEGIC_MONOPOLY_GAINED");
 					strSummary << pkResourceInfo->GetTextKey();
-					int iX = -1;
-					int iY = -1;
 
-					pNotifications->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), iX, iY, eResource);
+					pNotifications->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, eResource);
 					updateYield();
-					for(int iPlayer = 0; iPlayer < MAX_PLAYERS; ++iPlayer)
+					for (int iPlayer = 0; iPlayer < MAX_PLAYERS; ++iPlayer)
 					{
 						//Notify human players of this, as they'll care.
 						CvPlayer& kLoopPlayer = GET_PLAYER((PlayerTypes)iPlayer);
-						if(GET_TEAM(kLoopPlayer.getTeam()).isHasMet(getTeam()) && kLoopPlayer.isHuman() && (kLoopPlayer.GetID() != GetID()))
+						if (GET_TEAM(kLoopPlayer.getTeam()).isHasMet(getTeam()) && kLoopPlayer.isHuman() && (kLoopPlayer.GetID() != GetID()))
 						{
 							Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_OTHER_PLAYER_STRATEGIC_MONOPOLY_GAINED");
 							strMessage << pkResourceInfo->GetTextKey();
@@ -31193,29 +31166,25 @@ void CvPlayer::CheckForMonopoly(ResourceTypes eResource)
 							Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_OTHER_PLAYER_STRATEGIC_MONOPOLY_GAINED");
 							strSummary << pkResourceInfo->GetTextKey();
 							strSummary << getCivilizationInfo().getShortDescriptionKey();
-							int iX = -1;
-							int iY = -1;
 
-							kLoopPlayer.GetNotifications()->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), iX, iY, eResource);
+							kLoopPlayer.GetNotifications()->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, eResource);
 						}
 					}
 				}
 				// Lost Resources
-				else if(bLosingStrategicBonus && MOD_BALANCE_CORE_RESOURCE_MONOPOLIES_STRATEGIC)
+				else if (bLosingStrategicBonus && MOD_BALANCE_CORE_RESOURCE_MONOPOLIES_STRATEGIC)
 				{
 					Localization::String strMessage = Localization::Lookup("TXT_KEY_NOTIFICATION_STRATEGIC_MONOPOLY_LOST");
 					strMessage << pkResourceInfo->GetTextKey();
 					strMessage << strResourceHelp;
 					Localization::String strSummary = Localization::Lookup("TXT_KEY_NOTIFICATION_SUMMARY_STRATEGIC_MONOPOLY_LOST");
 					strSummary << pkResourceInfo->GetTextKey();
-					int iX = -1;
-					int iY = -1;
 
-					pNotifications->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), iX, iY, eResource);
+					pNotifications->Add(NOTIFICATION_DISCOVERED_BONUS_RESOURCE, strMessage.toUTF8(), strSummary.toUTF8(), -1, -1, eResource);
 					updateYield();
 				}
 			}
-		}
+		}		
 	}
 }
 #endif
@@ -31226,10 +31195,11 @@ int CvPlayer::GetMonopolyPercent(ResourceTypes eResource) const
 	int iOwnedNumResource = getNumResourceTotal(eResource, false) + getResourceExport(eResource);
 	int iTotalNumResource = GC.getMap().getNumResources(eResource);
 
-	CvAssertMsg(iTotalNumResource > 0, "iTotalNumResource should be greater than zero!");
-
-	if(iTotalNumResource == 0)
-		return 0;
+	if (iTotalNumResource <= 0)
+	{
+		// if we own a resource, but it's not on the map at all, it is 100%
+		return iOwnedNumResource > 0 ? 100 : 0;
+	}
 
 	return (iOwnedNumResource * 100) / iTotalNumResource;
 }

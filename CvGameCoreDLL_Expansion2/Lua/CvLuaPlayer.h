@@ -56,6 +56,8 @@ protected:
 #if defined(MOD_BALANCE_CORE_RESOURCE_MONOPOLIES)
 	static int lGetResourceMonopolyPlayer(lua_State* L);
 	static int lGetMonopolyPercent(lua_State* L);
+	static int lHasGlobalMonopoly(lua_State* L);
+	static int lHasStrategicMonopoly(lua_State* L);
 #endif
 	static int lDisbandUnit(lua_State* L);
 	static int lAddFreeUnit(lua_State* L);

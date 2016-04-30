@@ -63,6 +63,8 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 #if defined(MOD_BALANCE_CORE_RESOURCE_MONOPOLIES)
 	Method(GetResourceMonopolyPlayer);
 	Method(GetMonopolyPercent);
+	Method(HasGlobalMonopoly);
+	Method(HasStrategicMonopoly);
 #endif
 	Method(DisbandUnit);
 	Method(AddFreeUnit);
@@ -1556,6 +1558,26 @@ int CvLuaPlayer::lGetMonopolyPercent(lua_State* L)
 	const ResourceTypes eResource = (ResourceTypes)lua_tointeger(L, 2);
 	const int iResult = pkPlayer->GetMonopolyPercent(eResource);
 	lua_pushinteger(L, iResult);
+	return 1;
+}
+// -----------------------------------------------------------------------------
+// int CvPlayer::HasGlobalMonopoly(ResourceTypes eResource)
+int CvLuaPlayer::lHasGlobalMonopoly(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const ResourceTypes eResource = (ResourceTypes)lua_tointeger(L, 2);
+	const bool bResult = pkPlayer->HasGlobalMonopoly(eResource);
+	lua_pushboolean(L, bResult);
+	return 1;
+}
+// -----------------------------------------------------------------------------
+// int CvPlayer::GetMonopolyPercent(ResourceTypes eResource)
+int CvLuaPlayer::lHasStrategicMonopoly(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	const ResourceTypes eResource = (ResourceTypes)lua_tointeger(L, 2);
+	const int bResult = pkPlayer->HasStrategicMonopoly(eResource);
+	lua_pushinteger(L, bResult);
 	return 1;
 }
 #endif

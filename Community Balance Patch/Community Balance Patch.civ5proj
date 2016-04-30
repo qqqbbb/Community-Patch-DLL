@@ -596,6 +596,11 @@
         <Type>UpdateDatabase</Type>
         <FileName>Modular Elements/Corporations/Text/en_US/CorporationOverviewText.xml</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>Modular Elements/Corporations/CorporationsCivilopedia.xml</FileName>
+      </Action>
     </ModActions>
     <Homepage>
     </Homepage>
@@ -2135,6 +2140,10 @@
       <ImportIntoVFS>True</ImportIntoVFS>
     </Content>
     <Content Include="Modular Elements\Corporations\Corporations.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="Modular Elements\Corporations\CorporationsCivilopedia.xml">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
