@@ -33,6 +33,9 @@
 
 !*.db
 
+# exclude isn't working. This really shouldn't be a file we track in this file, it's local on Putmalk's machine only. I may make them generic and share them with the rest of the community, though
+/scripts/
+
 /Build/
 /Packages/
 /Civilization IV Diplomatic Features - CP/Build
