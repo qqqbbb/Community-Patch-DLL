@@ -33,6 +33,9 @@
 
 !*.db
 
+/Build/
+/Civilization IV Diplomatic Features - CP/Build
+/Civilization IV Diplomatic Features - CBP/Build
 BuildOutput/
 BuildTemp/
 Mod/
