@@ -132,6 +132,9 @@ public:
 	void SetBestMilitaryCityDomain(int iValue, DomainTypes eDomain);
 	void SetBestMilitaryCityCombatClass(int iValue, UnitCombatTypes eUnitCombat);
 	CvCity* GetBestMilitaryCity(UnitCombatTypes eUnitCombat = NO_UNITCOMBAT, DomainTypes eDomain = NO_DOMAIN);
+
+	// Declared public because CvPlayerCorporations needs to access this. Maybe want to use a friend
+	void processCorporations(CorporationTypes eCorporation, int iChange);
 #endif
 #if defined(MOD_BALANCE_CORE_EVENTS)
 	void DoEvents();

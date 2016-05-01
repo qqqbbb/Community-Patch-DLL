@@ -221,7 +221,7 @@ function DisplayWorldCorporations()
 end
 
 function RefreshWorldCorporations()
-	print("RefreshWorldCorporations()");
+	--print("RefreshWorldCorporations()");
 
 	g_WorldCorporationsIM:ResetInstances();
 
@@ -231,22 +231,22 @@ function RefreshWorldCorporations()
 		if(pLoopPlayer:IsAlive()) then
 			local ePlayerCorporation = pLoopPlayer:GetCorporation();
 			if(ePlayerCorporation ~= -1) then
-				print("ePlayerCorporation=" .. ePlayerCorporation);
+				--print("ePlayerCorporation=" .. ePlayerCorporation);
 
 				local pCorporation = GameInfo.Corporations[ePlayerCorporation];
-				if(pCorporation == nil) then
+				if(pCorporation ~= nil) then
+					local info = {
+						CivPlayer = iPlayerLoop,	-- int
+						CivName = Locale.ConvertTextKey(GetPlayerCiv(iPlayerLoop).Description),
+						CorpName = Locale.ConvertTextKey(pCorporation.Description),
+						CorpTooltip = Locale.ConvertTextKey(pCorporation.Help),
+						CityName = Game.GetCorporationHeadquarters(ePlayerCorporation),	-- city
+						DateFounded = pLoopPlayer:GetCorporationFoundedTurn(),
+					};
+					table.insert(instances, info);
+				else
 					print("WARNING: pCorporation is nil! RefreshWorldCorporations()!");
 				end
-
-				local info = {
-					CivPlayer = iPlayerLoop,	-- int
-					CivName = Locale.ConvertTextKey(GetPlayerCiv(iPlayerLoop).Description),
-					CorpName = Locale.ConvertTextKey(pCorporation.Description),
-					CorpTooltip = Locale.ConvertTextKey(pCorporation.Help),
-					CityName = Game.GetCorporationHeadquarters(ePlayerCorporation),	-- city
-					DateFounded = pLoopPlayer:GetCorporationFoundedTurn(),
-				};
-				table.insert(instances, info);
 			end
 		end
 	end
@@ -277,7 +277,7 @@ function InsertCorporation(info)
 end
 
 function RefreshWorldFranchises()
-	print("RefreshWorldFranchises()");
+	--print("RefreshWorldFranchises()");
 
 	g_WorldFranchisesIM:ResetInstances();
 
@@ -349,7 +349,7 @@ function DisplayMonopolies()
 end
 
 function RefreshMonopolies()
-	print("RefreshMonopolies()");
+	--print("RefreshMonopolies()");
 
 	g_WorldMonopolyResourcesIM:ResetInstances();
 	
@@ -362,13 +362,15 @@ function RefreshMonopolies()
 			local iMonopolyPercent = 0;
 			local szResourceName = Locale.ConvertTextKey( pResource.Description );
 			local szCivName = 0;
+			local bValid = true;
 			if( ePlayer ~= -1 ) then
 				iMonopolyPercent = Players[ePlayer]:GetMonopolyPercent(eResource);
 				szCivName = Locale.ConvertTextKey(GetPlayerCiv(ePlayer).Description);
+				bValid = IsMonopolyValidType(ePlayer, eResource);
 			end
 		
 			if(IsResourceValid(eResource, ePlayer)) then
-				if(IsMonopolyValidType(iMonopolyPercent, eResource)) then
+				if(bValid) then
 					-- Build control for hookup
 					local info = {
 						ResourceIcon = pResource.IconString,
@@ -421,20 +423,25 @@ function ChooseMonopolyPlayer( eResource )
 end
 
 -- Player can choose what type of monopoly he will evaluate
-function IsMonopolyValidType( iMonopolyPercent, eResource )
+function IsMonopolyValidType( ePlayer, eResource )
 	local bStrategicResource = Game.GetResourceUsageType(eResource) == ResourceUsageTypes.RESOURCEUSAGE_STRATEGIC;
+	
+	-- must have a valid player
+	if(ePlayer == -1) then
+		return;
+	end
+	
+	local pPlayer = Players[ePlayer];
 
 	if(g_MonopolyResourceType == "All") then
 		return true;
 	elseif(g_MonopolyResourceType == "Global") then
-		return iMonopolyPercent > 50;
+		return pPlayer:HasGlobalMonopoly(eResource);
 	elseif(g_MonopolyResourceType == "Strategic") then
-		return (bStrategicResource and iMonopolyPercent < 50 and iMonopolyPercent > 25);
+		return pPlayer:HasStrategicMonopoly(eResource);
 	elseif(g_MonopolyResourceType == "Potential") then
-		if(bStrategicResource) then
-			return iMonopolyPercent < 25 and iMonopolyPercent > 0;
-		else
-			return iMonopolyPercent < 50 and iMonopolyPercent > 0;
+		if(not pPlayer:HasGlobalMonopoly(eResource) and not pPlayer:HasStrategicMonopoly(eResource)) then
+			return pPlayer:GetMonopolyPercent(eResource) > 0;
 		end
 	end
 
@@ -618,7 +625,7 @@ function UpdateAvailableCorporations()
 end
 
 function UpdateYourCorporation()
-	print( "In UpdateYourCorporation()" );
+	--print( "In UpdateYourCorporation()" );
 
 	local eCorporation = g_pPlayer:GetCorporation();
 
@@ -691,7 +698,7 @@ function UpdateYourCorporation()
 end
 
 function RefreshCorporationBenefits( pCorporation )
-	print("RefreshCorporationBenefits()");
+	--print("RefreshCorporationBenefits()");
 	g_CorporationBenefitIM:ResetInstances();
 
 	if(pCorporation == nil) then
@@ -1036,7 +1043,7 @@ function RefreshMonopolyPulldowns()
 end
 
 function OnYourCorporationPulldown( index )
-	print("OnYourCorporationPulldown()= " .. index);
+	--print("OnYourCorporationPulldown()= " .. index);
 	if(g_YourCorporationSelectedPulldown ~= nil) then
 		g_YourCorporationSelectedPulldown.Box:SetHide( true );
 	end
@@ -1050,7 +1057,7 @@ end
 Controls.YourCorporationPulldown:RegisterSelectionCallback( OnYourCorporationPulldown );
 
 function OnWorldCorporationsPulldown( index )
-	print("OnWorldCorporationsPulldown()= " .. index);
+	--print("OnWorldCorporationsPulldown()= " .. index);
 	if(g_WorldCorporationsSelectedPulldown ~= nil) then
 		g_WorldCorporationsSelectedPulldown.Box:SetHide( true );
 	end
@@ -1064,7 +1071,7 @@ end
 Controls.WorldCorporationsPulldown:RegisterSelectionCallback( OnWorldCorporationsPulldown );
 
 function OnMonopolyCivPulldown( ePlayer )
-	print("OnMonopolyCivPulldown()=" .. ePlayer);
+	--print("OnMonopolyCivPulldown()=" .. ePlayer);
 
 	g_MonopolyResourcePlayer = ePlayer;
 	
@@ -1078,7 +1085,7 @@ function OnMonopolyCivPulldown( ePlayer )
 end
 
 function OnMonopolyTypePulldown( index )
-	print("OnMonopolyTypePulldown()=" .. index);
+	--print("OnMonopolyTypePulldown()=" .. index);
 
 	Controls.MonopolyTypePulldown:GetButton():LocalizeAndSetText(g_MonopolyTypePulldownViews[index].Label);
 

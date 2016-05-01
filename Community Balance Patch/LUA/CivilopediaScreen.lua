@@ -5526,7 +5526,7 @@ CivilopediaCategory[CategoryCorporations].SelectArticle = function(entryID, shou
 						if(numYields == 0) then
 							helpStr = helpStr .. "[NEWLINE]";
 						end
-						helpStr = helpStr .. "[NEWLINE]" .. Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_TR_YIELD", row.YieldMod, yield.IconString, yield.Description );
+						helpStr = helpStr .. "[NEWLINE]" .. Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_TR_YIELD", row.Yield, yield.IconString, yield.Description );
 						numYields = numYields + 0;
 					end
 				end

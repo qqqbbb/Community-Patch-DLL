@@ -21,6 +21,9 @@ CvCorporationEntry::CvCorporationEntry(void):
 	m_iNumFreeTradeRoutes(0),
 	m_iMaxFranchises(0),
 	m_bTradeRoutesInvulnerable(false),
+	m_ppiBuildingClassYieldChanges(NULL),
+	m_ppaiSpecialistYieldChange(NULL),
+	m_ppaiResourceYieldChange(NULL),
 	m_piResourceMonopolyAnd(NULL),
 	m_piResourceMonopolyOrs(NULL),
 	m_piNumFreeResource(NULL),
@@ -34,6 +37,9 @@ CvCorporationEntry::~CvCorporationEntry(void)
 	SAFE_DELETE_ARRAY(m_piResourceMonopolyOrs);
 	SAFE_DELETE_ARRAY(m_piNumFreeResource);
 	SAFE_DELETE_ARRAY(m_piTradeRouteMod);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldChanges);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChange);
+	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldChange);
 }
 
 int CvCorporationEntry::GetMaxFranchises() const
@@ -116,6 +122,52 @@ int CvCorporationEntry::GetTradeRouteMod(int i) const
 	return m_piTradeRouteMod ? m_piTradeRouteMod[i] : -1;
 }
 
+/// Change to Resource yield by type
+int CvCorporationEntry::GetResourceYieldChange(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumResourceInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiResourceYieldChange ? m_ppaiResourceYieldChange[i][j] : -1;
+}
+
+/// Array of changes to Resource yield
+int* CvCorporationEntry::GetResourceYieldChangeArray(int i) const
+{
+	CvAssertMsg(i < GC.getNumResourceInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_ppaiResourceYieldChange[i];
+}
+
+/// Change to specialist yield by type
+int CvCorporationEntry::GetSpecialistYieldChange(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumSpecialistInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppaiSpecialistYieldChange ? m_ppaiSpecialistYieldChange[i][j] : -1;
+}
+
+/// Array of changes to specialist yield
+int* CvCorporationEntry::GetSpecialistYieldChangeArray(int i) const
+{
+	CvAssertMsg(i < GC.getNumSpecialistInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_ppaiSpecialistYieldChange[i];
+}
+
+/// Yield change for a specific BuildingClass by yield type
+int CvCorporationEntry::GetBuildingClassYieldChange(int i, int j) const
+{
+	CvAssertMsg(i < GC.getNumBuildingClassInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	CvAssertMsg(j < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(j > -1, "Index out of bounds");
+	return m_ppiBuildingClassYieldChanges[i][j];
+}
+
 bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
 	if(!CvBaseInfo::CacheResults(kResults, kUtility))
@@ -170,7 +222,75 @@ bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	kUtility.PopulateArrayByExistence(m_piResourceMonopolyAnd, "Resources", "Corporation_ResourceMonopolyAnds", "ResourceType", "CorporationType", szCorporationType);
 	kUtility.PopulateArrayByExistence(m_piResourceMonopolyOrs, "Resources", "Corporation_ResourceMonopolyOrs", "ResourceType", "CorporationType", szCorporationType);
 	kUtility.PopulateArrayByValue(m_piNumFreeResource, "Resources", "Corporation_NumFreeResource", "ResourceType", "CorporationType", szCorporationType, "NumResource");
-	kUtility.SetYields(m_piTradeRouteMod, "Building_FranchiseTradeRouteYieldMod", "CorporationType", szCorporationType);
+	kUtility.SetYields(m_piTradeRouteMod, "Corporation_TradeRouteYieldMod", "CorporationType", szCorporationType);
+
+	//BuildingClassYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppiBuildingClassYieldChanges, "BuildingClasses", "Yields");
+
+		std::string strKey("Corporation_BuildingClassYieldChanges");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select BuildingClasses.ID as BuildingClassID, Yields.ID as YieldID, YieldChange from Corporation_BuildingClassYieldChanges inner join BuildingClasses on BuildingClasses.Type = BuildingClassType inner join Yields on Yields.Type = YieldType where CorporationType = ?");
+		}
+
+		pResults->Bind(1, szCorporationType);
+
+		while (pResults->Step())
+		{
+			const int BuildingClassID = pResults->GetInt(0);
+			const int iYieldID = pResults->GetInt(1);
+			const int iYieldChange = pResults->GetInt(2);
+
+			m_ppiBuildingClassYieldChanges[BuildingClassID][iYieldID] = iYieldChange;
+		}
+	}
+	//ResourceYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppaiResourceYieldChange, "Resources", "Yields");
+
+		std::string strKey("Corporation_ResourceYieldChanges");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Resources.ID as ResourceID, Yields.ID as YieldID, Yield from Corporation_ResourceYieldChanges inner join Resources on Resources.Type = ResourceType inner join Yields on Yields.Type = YieldType where CorporationType = ?");
+		}
+
+		pResults->Bind(1, szCorporationType);
+
+		while (pResults->Step())
+		{
+			const int ResourceID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiResourceYieldChange[ResourceID][YieldID] = yield;
+		}
+	}
+
+	//SpecialistYieldChanges
+	{
+		kUtility.Initialize2DArray(m_ppaiSpecialistYieldChange, "Specialists", "Yields");
+
+		std::string strKey("Corporation_SpecialistYieldChanges");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if (pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Specialists.ID as SpecialistID, Yields.ID as YieldID, Yield from Corporation_SpecialistYieldChanges inner join Specialists on Specialists.Type = SpecialistType inner join Yields on Yields.Type = YieldType where CorporationType = ?");
+		}
+
+		pResults->Bind(1, szCorporationType);
+
+		while (pResults->Step())
+		{
+			const int SpecialistID = pResults->GetInt(0);
+			const int YieldID = pResults->GetInt(1);
+			const int yield = pResults->GetInt(2);
+
+			m_ppaiSpecialistYieldChange[SpecialistID][YieldID] = yield;
+		}
+	}
 
 	return true;
 }
@@ -453,6 +573,8 @@ void CvPlayerCorporations::DestroyCorporation()
 			}
 		}
 	}
+
+	m_pPlayer->processCorporations(m_eFoundedCorporation, -1);
 
 	// Push notification to all players about destroyed Corporation
 	for (int iLoopPlayer = 0; iLoopPlayer < MAX_MAJOR_CIVS; iLoopPlayer++)
@@ -1149,6 +1271,8 @@ void CvGameCorporations::FoundCorporation(PlayerTypes ePlayer, CorporationTypes 
 		BuildingTypes eOffice = (BuildingTypes) GET_PLAYER(ePlayer).getCivilizationInfo().getCivilizationBuildings(eOfficeClass);
 		pHeadquarters->GetCityBuildings()->SetNumFreeBuilding(eOffice, 1);
 	}
+
+	kPlayer.processCorporations(eCorporation, 1);
 
 	// Add corporation to game active corporations
 	m_ActiveCorporations.push_back(kCorporation);

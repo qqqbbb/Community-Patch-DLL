@@ -11572,17 +11572,25 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			}
 
 #if defined(MOD_BALANCE_CORE)
-			// Corporations check: Will this building found a corporation?
-			for(int iI = 0; iI < GC.getNumCorporationInfos(); iI++)
+			// Is this a Corporation building?
+			CvBuildingClassInfo* pkBuildingClass = GC.getBuildingClassInfo(eBuildingClass);
+			if (pkBuildingClass)
 			{
-				CorporationTypes eCorporation = (CorporationTypes) iI;
-				CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
-				if(pkCorporationInfo != NULL)
+				CorporationTypes eCorporation = pkBuildingClass->getCorporationType();
+				if (eCorporation != NO_CORPORATION)
 				{
-					// This is a corporation HQ
-					if(pkCorporationInfo->GetHeadquartersBuildingClass() == (BuildingClassTypes) pBuildingInfo->GetBuildingClassType())
+					// Valid corporation
+					CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+					if (pkCorporationInfo != NULL)
 					{
-						GC.getGame().GetGameCorporations()->FoundCorporation(getOwner(), eCorporation, this);
+						// Should we found this Corporation?
+						if (pkCorporationInfo->GetHeadquartersBuildingClass() == eBuildingClass)
+						{
+							if (iChange > 0)
+							{
+								GC.getGame().GetGameCorporations()->FoundCorporation(getOwner(), eCorporation, this);
+							}
+						}
 					}
 				}
 			}
@@ -12262,6 +12270,28 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			}
 
 #if defined(MOD_BALANCE_CORE)
+			// Is this building part of a Corporation?
+			CvBuildingClassInfo* pkBuildingClassInfo = GC.getBuildingClassInfo(eBuildingClass);
+			if (pkBuildingClassInfo)
+			{
+				CorporationTypes eCorporation = pkBuildingClassInfo->getCorporationType();
+				if (eCorporation != NO_CORPORATION)
+				{
+					CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+					if (pkCorporationInfo)
+					{
+						// Only if this is the headquarters or Office
+						if (pkCorporationInfo->GetHeadquartersBuildingClass() == eBuildingClass || pkCorporationInfo->GetOfficeBuildingClass() == eBuildingClass)
+						{
+							for (int iJ = 0; iJ < GC.getNumResourceInfos(); iJ++)
+							{
+								ChangeResourceExtraYield(((ResourceTypes)iJ), eYield, (pkCorporationInfo->GetResourceYieldChange(iJ, eYield) * iChange));
+							}
+						}
+					}
+				}
+			}
+
 			for(int iJ = 0; iJ < GC.getNumImprovementInfos(); iJ++)
 			{
 				ImprovementTypes eImprovement = (ImprovementTypes)iJ;

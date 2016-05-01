@@ -145,6 +145,19 @@
 			<Text>How do I spread my Corporation?</Text>
 		</Row>
 
+		<Row Tag="TXT_KEY_TOPIC_CORPORATION_RESOURCE_BONUS">
+			<Text>Resource Bonus</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CORPORATION_RESOURCE_BONUS_TITLE">
+			<Text>{TXT_KEY_TOPIC_CORPORATION_RESOURCE_BONUS}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CORPORATION_RESOURCE_BONUS_BODY">
+			<Text>Most Corporations have a resource bonus which applys to all Cities with a Corpoartion Headquarters and Office. Each resource bonus provides a bonus to a specific yield, such as [ICON_CULTURE] Culture, [ICON_GOLD] Gold, [ICON_PRODUCTION] Production, or [ICON_RESEARCH] Science. These bonuses stack, so a city with a Corporation HQ and Office will receive double the bonus.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_CORPORATION_RESOURCE_BONUS_QUESTION">
+			<Text>What is a resource bonus?</Text>
+		</Row>
+
 		<!-- Notifications-->
 		<Row Tag="TXT_KEY_CORPORATION_FOUNDED">
 			<Text>You have founded [COLOR_POSITIVE_TEXT]{@1_CorporationName}[ENDCOLOR]! To spread your new Corporation far and wide, build Corporate Offices in owned Cities and send [ICON_INTERNATIONAL_TRADE] Trade Routes from these Cities to foreign Cities!</Text>
@@ -388,7 +401,7 @@
 			<Text>Construct this building in one of your cities to found the Trader Sid's Corporation, focused around generating large amounts of [ICON_GOLD] Gold for the empire. Remember that each Civilization may only found [COLOR_POSITIVE_TEXT]one[ENDCOLOR] Corporation, so make sure the benefits are applicable to your Victory Strategy!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_TRADER_SIDS_HQ_HELP">
-			<Text>Founds the Trader Sid's, Inc. Corporation. +2 [ICON_GOLD] Gold to all Monopoly Resources worked by this City that are associated with Trader Sid's. Caravansaries in all cities produce +2 [ICON_GOLD] Gold and +2 [ICON_FOOD] Food.[NEWLINE][NEWLINE]Receive a free Trader Sid's Office in this City, and unlocks construction of Trader Sid's Offices in owned Cities.</Text>
+			<Text>Founds the Trader Sid's, Inc. Corporation. +2 [ICON_GOLD] Gold to all Monopoly Resources worked by this City that are associated with Trader Sid's.[NEWLINE][NEWLINE]Receive a free Trader Sid's Office in this City, and unlocks construction of Trader Sid's Offices in owned Cities.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_TRADER_SIDS_OFFICE_BENEFIT_HELP">
 			<Text>Current Office Bonus: +{1_Num} [ICON_GOLD] Gold.</Text>
@@ -430,7 +443,7 @@
 			<Text>Construct this building in one of your cities to found the LandSea Extractor's Corporation, focused around increasing you empire's [ICON_PRODUCTION] Production. Remember that each Civilization may only found [COLOR_POSITIVE_TEXT]one[ENDCOLOR] Corporation, so make sure the benefits are applicable to your Victory Strategy!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_LANDSEA_EXTRACTORS_HQ_HELP">
-			<Text>Founds the LandSea Extractors Corporation. +2 [ICON_PRODUCTION] Production on all Monopoly Resources associated with LandSea Extractors. +2 [ICON_FOOD] Food and +2 [ICON_RESEARCH] Science from Harbors and Seaports in all Cities.[NEWLINE][NEWLINE]Grants a free LandSea Extractors Office in this City, and unlocks construction of LandSea Extractors Offices in owned Cities.</Text>
+			<Text>Founds the LandSea Extractors Corporation. +2 [ICON_PRODUCTION] Production on all Monopoly Resources associated with LandSea Extractors.[NEWLINE][NEWLINE]Grants a free LandSea Extractors Office in this City, and unlocks construction of LandSea Extractors Offices in owned Cities.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_LANDSEA_EXTRACTORS_OFFICE_BENEFIT_HELP">
 			<Text>Current Office Bonus: +{1_Num} [ICON_PRODUCTION] Production.</Text>
@@ -515,7 +528,7 @@
 			<Text>Construct this building in one of your cities to found the Giorgio Armeier Corporation, focused around improving your Empire's [ICON_CULTURE] Culture generation. Remember that each Civilization may only found [COLOR_POSITIVE_TEXT]one[ENDCOLOR] Corporation, so make sure the benefits are applicable to your Victory Strategy!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_GIORGIO_ARMEIER_HQ_HELP">
-			<Text>Founds the Giorgio Armeier Corporation. +1 [ICON_CULTURE] Culture from all Specialists.[NEWLINE][NEWLINE]Receive a free Giorgio Armeier Office in this City, and unlocks construction of Giorgio Armeier Offices in owned Cities.</Text>
+			<Text>Founds the Giorgio Armeier Corporation.[NEWLINE][NEWLINE]Receive a free Giorgio Armeier Office in this City, and unlocks construction of Giorgio Armeier Offices in owned Cities.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_GIORGIO_ARMEIER_OFFICE_BENEFIT_HELP">
 			<Text>Current Office Bonus: +{1_Num} [ICON_CULTURE] Culture.</Text>
@@ -557,7 +570,7 @@
 			<Text>Construct this building in one of your cities to found the Firaxite Materials Corporation, focused around improving your Empire's [ICON_RESEARCH] Science. Remember that each Civilization may only found [COLOR_POSITIVE_TEXT]one[ENDCOLOR] Corporation, so make sure the benefits are applicable to your Victory Strategy!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_FIRAXITE_MATERIALS_HQ_HELP">
-			<Text>Founds the Firaxite Materials Corporation. All Factories produce +2 [ICON_PRODUCTION] Production and +2 [ICON_RESEARCH] Science.[NEWLINE][NEWLINE]Receive a free Firaxite Materials Office in this City, and unlocks construction of Firaxite Materials Offices in owned Cities.</Text>
+			<Text>Founds the Firaxite Materials Corporation.[NEWLINE][NEWLINE]Receive a free Firaxite Materials Office in this City, and unlocks construction of Firaxite Materials Offices in owned Cities.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_FIRAXITE_MATERIALS_OFFICE_BENEFIT_HELP">
 			<Text>Current Office Bonus: +{1_Num} [ICON_RESEARCH] Science.</Text>
@@ -599,7 +612,7 @@
 			<Text>Construct this building in one of your cities to found the TwoKay Foods Corporation, focused around improving your Empire's [ICON_FOOD] Growth. Remember that each Civilization may only found [COLOR_POSITIVE_TEXT]one[ENDCOLOR] Corporation, so make sure the benefits are applicable to your Victory Strategy!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_TWOKAY_FOODS_HQ_HELP">
-			<Text>Founds the TwoKay Foods Corporation. All Grocers produce +2 [ICON_FOOD] Food and +2 [ICON_GOLD] Gold.[NEWLINE][NEWLINE]Grants a free TwoKay Foods Office in this City, and unlocks construction of TwoKay Foods Offices in owned Cities.</Text>
+			<Text>Founds the TwoKay Foods Corporation.[NEWLINE][NEWLINE]Grants a free TwoKay Foods Office in this City, and unlocks construction of TwoKay Foods Offices in owned Cities.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_TWOKAY_FOODS_OFFICE_BENEFIT_HELP">
 			<Text>Current Office Bonus: +{1_Num} [ICON_FOOD] Food.</Text>
@@ -641,7 +654,7 @@
 			<Text>Construct this building in one of your cities to found the Firaxite Materials Corporation, focused around increasing your Empire's [ICON_GREAT_PEOPLE] Great People generation.[NEWLINE][NEWLINE]Remember that each Civilization may only found [COLOR_POSITIVE_TEXT]one[ENDCOLOR] Corporation, so make sure the benefits are applicable to your Victory Strategy!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_CIVILIZED_JEWELERS_HQ_HELP">
-			<Text>Founds the Civilized Jewelers Corporation. [ICON_GOLD] Gold from incoming Trade Routes increased by 5, and [ICON_GOLD] Gold from outgoing Trade Routes increased by 5. All Markets, Banks, Mints, and Stock Exchanges produce +1 [ICON_GOLD] Gold.[NEWLINE][NEWLINE]Receive a free Civlized Jewelers Office in this City, and unlocks construction of Civlized Jewelers Offices in owned Cities.</Text>
+			<Text>Founds the Civilized Jewelers Corporation. [ICON_GOLD] Gold from incoming Trade Routes increased by 5, and [ICON_GOLD] Gold from outgoing Trade Routes increased by 5.[NEWLINE][NEWLINE]Receive a free Civlized Jewelers Office in this City, and unlocks construction of Civilized Jewelers Offices in owned Cities.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_CIVILIZED_JEWELERS_OFFICE_BENEFIT_HELP">
 			<Text>Current Office Bonus: +{1_Num}% [ICON_GREAT_PEOPLE] Great Person Rate.</Text>
@@ -682,10 +695,10 @@
 			<Text>Trader Sid's, Inc.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_TRADER_SIDS_HELP">
-			<Text>Provides benefits geared toward [ICON_GOLD] Gold generation.</Text>
+			<Text>Provides benefits geared toward [ICON_GOLD] Gold generation. Caravansaries in all cities produce +2 [ICON_GOLD] Gold and +2 [ICON_FOOD] Food.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_RESOURCE_BONUS_TRADER_SIDS">
-			<Text>[ICON_RES_WINE] Wine, [ICON_RES_TRUFFLES] Truffles, [ICON_RES_CITRUS] Citrus provide additional [ICON_GOLD] Gold.</Text>
+			<Text>[ICON_RES_CLOVES] Cloves, [ICON_RES_COCOA] Cocoa, [ICON_RES_NUTMEG] Nutmeg, [ICON_RES_PEPPER] Pepper, [ICON_RES_SALT] Salt, [ICON_RES_SPICES] Spices, [ICON_RES_SUGAR] Sugar provide +2 [ICON_GOLD] Gold in all Cities with a Trader Sid's HQ and Office.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_OFFICE_BONUS_TRADER_SIDS">
 			<Text>+4 [ICON_GOLD] Gold for every Global Franchise.</Text>
@@ -697,7 +710,7 @@
 			<Text>LandSea Extractors, Inc.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_LANDSEA_EXTRACTORS_HELP">
-			<Text>Provides benefits geared toward [ICON_PRODUCTION] Production generation.</Text>
+			<Text>Provides benefits geared toward [ICON_PRODUCTION] Production generation. Harbors and Seaports in all Cities produce +2 [ICON_FOOD] Food and [ICON_RESEARCH] Science.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_RESOURCE_BONUS_LANDSEA_EXTRACTORS">
 			<Text>[ICON_RES_HORSE] Horses, [ICON_RES_WHALE] Whales, [ICON_RES_CRAB] Crab, [ICON_RES_IVORY] Ivory provide additional [ICON_PRODUCTION] Production.</Text>
@@ -714,9 +727,6 @@
 		<Row Tag="TXT_KEY_CORPORATION_HEXXON_REFINERY_HELP">
 			<Text>Provides benefits geared toward obtaining and enhancing critical late-game Strategic Resources.</Text>
 		</Row>
-		<Row Tag="TXT_KEY_CORPORATION_RESOURCE_BONUS_HEXXON_REFINERY">
-			<Text>[ICON_RES_COAL] Coal, [ICON_RES_OIL] Oil, [ICON_RES_INCENSE] Incense, [ICON_RES_URANIUM] Uranium provide additional [ICON_GOLD] Gold.</Text>
-		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_OFFICE_BONUS_HEXXON_REFINERY">
 			<Text>+1 additional [ICON_RES_OIL] Oil and [ICON_RES_COAL] Coal for every three Global Franchises.</Text>
 		</Row>
@@ -727,10 +737,10 @@
 			<Text>Giorgio Armeier, Inc.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_GIORGIO_ARMEIER_HELP">
-			<Text>Provides benefits geared toward [ICON_CULTURE] Culture generation.</Text>
+			<Text>Provides benefits geared toward [ICON_CULTURE] Culture generation. +1 [ICON_CULTURE] Culture from Specialists in all Cities.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_RESOURCE_BONUS_GIORGIO_ARMEIER">
-			<Text>[ICON_RES_SILK] Silk, [ICON_RES_COTTON] Cotton, [ICON_RES_DYE] Dyes, [ICON_RES_FUR] Furs provide additional [ICON_CULTURE] Culture.</Text>
+			<Text>[ICON_RES_SILK] Silk, [ICON_RES_COTTON] Cotton, [ICON_RES_DYE] Dyes, [ICON_RES_FUR] Furs provide +2 [ICON_CULTURE] Culture.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_OFFICE_BONUS_GIORGIO_ARMEIER">
 			<Text>+3 [ICON_CULTURE] Culture for every Global Franchise.</Text>
@@ -742,10 +752,10 @@
 			<Text>Firaxite Materials, Inc.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_FIRAXITE_MATERIALS_HELP">
-			<Text>Provides benefits geared toward [ICON_RESEARCH] Science generation. Owned Trade Routes cannot be pillaged, except as a result of a Declaration of War.</Text>
+			<Text>Provides benefits geared toward [ICON_RESEARCH] Science generation. Owned Trade Routes cannot be pillaged, except as a result of a Declaration of War. Factories in all cities produce +2 [ICON_PRODUCTION] Production and [ICON_RESEARCH] Science.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_RESOURCE_BONUS_FIRAXITE_MATERIALS">
-			<Text>[ICON_RES_IRON] Iron, [ICON_RES_ALUMINUM] Aluminum, [ICON_RES_MARBLE] Marble, [ICON_RES_COPPER] Copper, [ICON_RES_PORCELAIN] Porcelain provide +3 [ICON_SCIENCE] Science.</Text>
+			<Text>[ICON_RES_IRON] Iron, [ICON_RES_ALUMINUM] Aluminum, [ICON_RES_MARBLE] Marble, [ICON_RES_COPPER] Copper, [ICON_RES_PORCELAIN] Porcelain provide +3 [ICON_RESEARCH] Science.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_OFFICE_BONUS_FIRAXITE_MATERIALS">
 			<Text>+3 [ICON_RESEARCH] Science for every Global Franchise.</Text>
@@ -753,12 +763,11 @@
 		<Row Tag="TXT_KEY_CORPORATION_TRADE_ROUTE_BONUS_FIRAXITE_MATERIALS">
 			<Text>[ICON_INTERNATIONAL_TRADE] Trade Routes to foreign Cities with a Firaxite Materials Franchise produce double [ICON_RESEARCH] Science. [ICON_INTERNATIONAL_TRADE] Trade Routes cannot be pillaged.</Text>
 		</Row>
-		
 		<Row Tag="TXT_KEY_CORPORATION_TWOKAY_FOODS">
 			<Text>TwoKay Foods, Inc.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_TWOKAY_FOODS_HELP">
-			<Text>Provides benefits geared toward [ICON_FOOD] Food generation.</Text>
+			<Text>Provides benefits geared toward [ICON_FOOD] Food generation. Grocers in all Cities produce +2 [ICON_GOLD] Gold and [ICON_FOOD] Food.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_RESOURCE_BONUS_TWOKAY_FOODS">
 			<Text>[ICON_RES_WINE] Wine, [ICON_RES_TRUFFLES] Truffles, [ICON_RES_CITRUS] Citrus provide +2 [ICON_FOOD] Food.</Text>
@@ -773,7 +782,7 @@
 			<Text>Civilized Jewelers, Inc.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_CIVILIZED_JEWELERS_HELP">
-			<Text>Provides benefits geared toward [ICON_GREAT_PEOPLE] Great People generation.</Text>
+			<Text>Provides benefits geared toward [ICON_GREAT_PEOPLE] Great People generation. Markets, Banks, Mints, and Stock Exchanges in all Cities produce +1 [ICON_GOLD] Gold.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_OFFICE_BONUS_CIVILIZED_JEWELERS">
 			<Text>+5% [ICON_GREAT_PEOPLE] Great Person Rate for every Global Franchise.</Text>

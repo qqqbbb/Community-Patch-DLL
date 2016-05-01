@@ -32,6 +32,14 @@ public:
 	int GetNumFreeResource(int i) const;
 
 	int GetTradeRouteMod(int i) const;
+
+	int GetResourceYieldChange(int i, int j) const;
+	int* GetResourceYieldChangeArray(int i) const;
+
+	int GetBuildingClassYieldChange(int i, int j) const;
+
+	int GetSpecialistYieldChange(int i, int j) const;
+	int* GetSpecialistYieldChangeArray(int i) const;
 protected:
 	BuildingClassTypes m_eHeadquartersBuildingClass;
 	BuildingClassTypes m_eOfficeBuildingClass;
@@ -50,6 +58,10 @@ protected:
 	int* m_piNumFreeResource;
 
 	int* m_piTradeRouteMod;
+
+	int** m_ppiBuildingClassYieldChanges;
+	int** m_ppaiSpecialistYieldChange;
+	int** m_ppaiResourceYieldChange;
 private:
 	CvCorporationEntry(const CvCorporationEntry&);
 	CvCorporationEntry& operator=(const CvCorporationEntry&);
@@ -104,6 +116,46 @@ FDataStream& operator<<(FDataStream&, const CvCorporation&);
 FDataStream& operator>>(FDataStream&, CorporationTypes&);
 FDataStream& operator<<(FDataStream&, const CorporationTypes&);
 
+class CvPlayerCorporations;
+
+typedef FStaticVector<CvCorporation, 16, false, c_eCiv5GameplayDLL > CorporationList;
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  CLASS:		CvGameCorporations
+//!  \brief		All the information about corporations founded and active in the game
+//
+//!  Key Attributes:
+//!  - Core data in this class is a list of CvCorporations
+//!  - This object is created inside the CvGame object and accessed through CvGame
+//!  - Provides convenience functions to the other game subsystems to quickly summarize
+//!    information on the corporations in place
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+class CvGameCorporations
+{
+public:
+	CvGameCorporations(void);
+	~CvGameCorporations(void);
+
+	void Init();
+	void DoTurn();
+
+	CvCorporation* GetCorporation(CorporationTypes eCorporation);
+	int GetNumActiveCorporations() const;
+	int GetNumAvailableCorporations() const;
+
+	void DestroyCorporation(CorporationTypes eCorporation);
+	void FoundCorporation(PlayerTypes ePlayer, CorporationTypes eCorporation, CvCity* pHeadquarters);
+	bool CanFoundCorporation(PlayerTypes ePlayer, CorporationTypes eCorporation) const;
+
+	bool IsCorporationFounded(CorporationTypes eCorporation) const;
+	bool IsCorporationHeadquarters(CvCity* pCity) const;
+
+	CorporationList m_ActiveCorporations;
+};
+
+FDataStream& operator>>(FDataStream&, CvGameCorporations&);
+FDataStream& operator<<(FDataStream&, const CvGameCorporations&);
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  CLASS:		CvPlayerCorporations
 //!  \brief		All the information about corporations for a player
@@ -113,6 +165,8 @@ FDataStream& operator<<(FDataStream&, const CorporationTypes&);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class CvPlayerCorporations
 {
+	friend void CvGameCorporations::DestroyCorporation(CorporationTypes eCorporation);
+
 public:
 	CvPlayerCorporations(void);
 	~CvPlayerCorporations(void);
@@ -152,7 +206,6 @@ public:
 	bool HasFoundedCorporation() const;
 	CorporationTypes GetFoundedCorporation() const;
 	void SetFoundedCorporation(CorporationTypes eCorporation);
-	void DestroyCorporation();
 
 	bool IsCorporationOfficesAsFranchises() const;
 	void SetCorporationOfficesAsFranchises(bool bValue);
@@ -164,6 +217,8 @@ public:
 	void SetCorporationFreeFranchiseAbovePopular(bool bValue);
 
 private:
+	void DestroyCorporation();
+
 	CvPlayer* m_pPlayer;
 	CorporationTypes m_eFoundedCorporation;
 
@@ -176,44 +231,6 @@ private:
 	bool m_bCorporationRandomForeignFranchise;
 	bool m_bCorporationFreeFranchiseAbovePopular;
 };
-
-typedef FStaticVector<CvCorporation, 16, false, c_eCiv5GameplayDLL > CorporationList;
-
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//  CLASS:		CvGameCorporations
-//!  \brief		All the information about corporations founded and active in the game
-//
-//!  Key Attributes:
-//!  - Core data in this class is a list of CvCorporations
-//!  - This object is created inside the CvGame object and accessed through CvGame
-//!  - Provides convenience functions to the other game subsystems to quickly summarize
-//!    information on the corporations in place
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-class CvGameCorporations
-{
-public:
-	CvGameCorporations(void);
-	~CvGameCorporations(void);
-
-	void Init();
-	void DoTurn();
-
-	CvCorporation* GetCorporation(CorporationTypes eCorporation);
-	int GetNumActiveCorporations() const;
-	int GetNumAvailableCorporations() const;
-
-	void DestroyCorporation(CorporationTypes eCorporation);
-	void FoundCorporation(PlayerTypes ePlayer, CorporationTypes eCorporation, CvCity* pHeadquarters);
-	bool CanFoundCorporation(PlayerTypes ePlayer, CorporationTypes eCorporation) const;
-
-	bool IsCorporationFounded(CorporationTypes eCorporation) const;
-	bool IsCorporationHeadquarters(CvCity* pCity) const;
-
-	CorporationList m_ActiveCorporations;
-};
-
-FDataStream& operator>>(FDataStream&, CvGameCorporations&);
-FDataStream& operator<<(FDataStream&, const CvGameCorporations&);
 
 #endif
 #endif

@@ -2231,6 +2231,11 @@ int CvDealAI::GetCityValue(int iX, int iY, bool bFromMe, PlayerTypes eOtherPlaye
 			return INT_MAX;
 		}
 	}
+	// Never sell a Corporation headquarters
+	if (bFromMe && pCity->IsHeadquarters())
+	{
+		return INT_MAX;
+	}
 #endif
 
 

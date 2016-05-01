@@ -36529,6 +36529,30 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	GC.GetEngineUserInterface()->setDirty(GameData_DIRTY_BIT, true);
 }
 
+#if defined(MOD_BALANCE_CORE)
+void CvPlayer::processCorporations(CorporationTypes eCorporation, int iChange)
+{
+	CvCorporationEntry* pkCorporationEntry = GC.getCorporationInfo(eCorporation);
+	if(pkCorporationEntry == NULL)
+		return;
+
+	int iI, jJ;
+
+	for (iI = 0; iI < GC.getNUM_YIELD_TYPES(); iI++)
+	{
+		for (jJ = 0; jJ < GC.getNumSpecialistInfos(); jJ++)
+		{
+			changeSpecialistExtraYield((SpecialistTypes)jJ, (YieldTypes)iI, pkCorporationEntry->GetSpecialistYieldChange(jJ, iI) * iChange);
+		}
+
+		for (jJ = 0; jJ < GC.getNumBuildingClassInfos(); jJ++)
+		{
+			changeBuildingClassYieldChange((BuildingClassTypes)jJ, (YieldTypes)iI, pkCorporationEntry->GetBuildingClassYieldChange(jJ, iI) * iChange);
+		}
+	}
+}
+#endif
+
 //	--------------------------------------------------------------------------------
 /// If we should see where the locations of all current Barb Camps are, do it
 void CvPlayer::doUpdateBarbarianCampVisibility()
