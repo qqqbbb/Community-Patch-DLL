@@ -19,6 +19,8 @@
 		<Column name="FranchiseBuildingClass" type="text" reference="BuildingClasses(Type)"/>
 		<Column name="MaxFranchises" type="integer" default="0"/>
 		<Column name="NumFreeTradeRoutes" type="integer" default="0"/>
+		<Column name="TradeRouteRecipientBonus" type="integer" default="0"/>
+		<Column name="TradeRouteTargetBonus" type="integer" default="0"/>
 		<Column name="TradeRouteLandDistanceModifier" type="integer" default="0"/>
 		<Column name="TradeRouteSeaDistanceModifier" type="integer" default="0"/>
 		<Column name="TradeRouteSpeedModifier" type="integer" default="100"/>
@@ -173,6 +175,8 @@
 			<TradeRouteBonusHelp>TXT_KEY_CORPORATION_TRADE_ROUTE_BONUS_CIVILIZED_JEWELERS</TradeRouteBonusHelp>
 			<MaxFranchises>25</MaxFranchises>
 			<NumFreeTradeRoutes>1</NumFreeTradeRoutes>
+			<TradeRouteRecipientBonus>1</TradeRouteRecipientBonus>
+			<TradeRouteTargetBonus>1</TradeRouteTargetBonus>
 			<PortraitIndex>4</PortraitIndex>
 			<IconAtlas>CORP_ATLAS</IconAtlas>
 		</Row>

@@ -12,15 +12,15 @@
 			<Text>Corporations</Text>
 		</Row>
 		<Row Tag="TXT_KEY_PEDIA_CORPORATIONS_HOMEPAGE_BLURB">
-			<Text>"If you don't drive your business, you will be driven out of business."[NEWLINE]- B.C. Forbes</Text>
+			<Text>[NEWLINE]"If you don't drive your business, you will be driven out of business."[NEWLINE]  - B.C. Forbes[NEWLINE]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_PEDIA_CORPORATIONS_HOMEPAGE_TEXT1">
 			<Text>Trade and commerce has been a focal point of civilization since ancient times. Corporations are modern entities that authorizes a company or single group to act as a single entity. Corporations have become the largest facilitators of trade and influence in today's society. In Civilization V, Corporations allow you cement your civilization's wealth and deliver powerful trade benefits to your civilization.[NEWLINE][NEWLINE]To establish a Corporation, you must secure a Global Monopoly on any of its required resources, and found its Corporation Headquarters. After your Corporation is established, you may construct Offices in your cities and use them to build Franchises in foreign capitals via [ICON_INTERNATIONAL_TRADE] Trade Routes.</Text>
 		</Row>
-		<Row Tag="TXT_KEY_PEDIA_CORPORATIONS_CATEGORY_1">
-			<Text>Corporations</Text>
-		</Row>
 
+		<Row Tag="TXT_KEY_PEDIA_CORPORATION_LABEL">
+			<Text>Corporation</Text>
+		</Row>
 		<Row Tag="TXT_KEY_PEDIA_CORP_HEADQUARTERS_LABEL">
 			<Text>Headquarters</Text>
 		</Row>
@@ -654,7 +654,7 @@
 			<Text>Construct this building in one of your cities to found the Firaxite Materials Corporation, focused around increasing your Empire's [ICON_GREAT_PEOPLE] Great People generation.[NEWLINE][NEWLINE]Remember that each Civilization may only found [COLOR_POSITIVE_TEXT]one[ENDCOLOR] Corporation, so make sure the benefits are applicable to your Victory Strategy!</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_CIVILIZED_JEWELERS_HQ_HELP">
-			<Text>Founds the Civilized Jewelers Corporation. [ICON_GOLD] Gold from incoming Trade Routes increased by 5, and [ICON_GOLD] Gold from outgoing Trade Routes increased by 5.[NEWLINE][NEWLINE]Receive a free Civlized Jewelers Office in this City, and unlocks construction of Civilized Jewelers Offices in owned Cities.</Text>
+			<Text>Founds the Civilized Jewelers Corporation.[NEWLINE][NEWLINE]Receive a free Civilized Jewelers Office in this City, and unlocks construction of Civilized Jewelers Offices in owned Cities.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_BUILDING_CIVILIZED_JEWELERS_OFFICE_BENEFIT_HELP">
 			<Text>Current Office Bonus: +{1_Num}% [ICON_GREAT_PEOPLE] Great Person Rate.</Text>
@@ -782,7 +782,7 @@
 			<Text>Civilized Jewelers, Inc.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_CIVILIZED_JEWELERS_HELP">
-			<Text>Provides benefits geared toward [ICON_GREAT_PEOPLE] Great People generation. Markets, Banks, Mints, and Stock Exchanges in all Cities produce +1 [ICON_GOLD] Gold.</Text>
+			<Text>Provides benefits geared toward [ICON_GREAT_PEOPLE] Great People generation. +1 [ICON_GOLD] for all [ICON_INTERNATIONAL_TRADE] Trade Routes to your Cities (+1 [ICON_GOLD] Gold for the trade route owner). Markets, Banks, Mints, and Stock Exchanges in all Cities produce +1 [ICON_GOLD] Gold.</Text>
 		</Row>
 		<Row Tag="TXT_KEY_CORPORATION_OFFICE_BONUS_CIVILIZED_JEWELERS">
 			<Text>+5% [ICON_GREAT_PEOPLE] Great Person Rate for every Global Franchise.</Text>

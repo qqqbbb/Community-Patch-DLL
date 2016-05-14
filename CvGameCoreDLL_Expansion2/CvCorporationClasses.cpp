@@ -20,6 +20,8 @@ CvCorporationEntry::CvCorporationEntry(void):
 	m_iTradeRouteVisionBoost(0),
 	m_iNumFreeTradeRoutes(0),
 	m_iMaxFranchises(0),
+	m_iTradeRouteRecipientBonus(0),
+	m_iTradeRouteTargetBonus(0),
 	m_bTradeRoutesInvulnerable(false),
 	m_ppiBuildingClassYieldChanges(NULL),
 	m_ppaiSpecialistYieldChange(NULL),
@@ -85,6 +87,16 @@ int CvCorporationEntry::GetNumFreeTradeRoutes() const
 int CvCorporationEntry::GetTradeRouteVisionBoost() const
 {
 	return m_iTradeRouteVisionBoost;
+}
+
+int CvCorporationEntry::GetTradeRouteRecipientBonus() const
+{
+	return m_iTradeRouteRecipientBonus;
+}
+
+int CvCorporationEntry::GetTradeRouteTargetBonus() const
+{
+	return m_iTradeRouteTargetBonus;
 }
 
 bool CvCorporationEntry::IsTradeRoutesInvulnerable() const
@@ -180,6 +192,8 @@ bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	m_iTradeRouteSpeedModifier = kResults.GetInt("TradeRouteSpeedModifier");
 	m_iTradeRouteVisionBoost = kResults.GetInt("TradeRouteVisionBoost");
 	m_bTradeRoutesInvulnerable = kResults.GetBool("TradeRoutesInvulnerable");
+	m_iTradeRouteRecipientBonus = kResults.GetInt("TradeRouteRecipientBonus");
+	m_iTradeRouteTargetBonus = kResults.GetInt("TradeRouteTargetBonus");
 
 	//References
 	const char* szTextVal = NULL;

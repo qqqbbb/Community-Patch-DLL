@@ -27,6 +27,9 @@ public:
 	bool IsTradeRoutesInvulnerable() const;
 	int GetTradeRouteVisionBoost() const;
 
+	int GetTradeRouteRecipientBonus() const;
+	int GetTradeRouteTargetBonus() const;
+
 	int GetResourceMonopolyAnd(int i) const;
 	int GetResourceMonopolyOr(int i) const;
 	int GetNumFreeResource(int i) const;
@@ -52,6 +55,9 @@ protected:
 	int m_iMaxFranchises;
 	int m_bTradeRoutesInvulnerable;
 	int m_iTradeRouteVisionBoost;
+	
+	int m_iTradeRouteRecipientBonus;
+	int m_iTradeRouteTargetBonus;
 
 	int* m_piResourceMonopolyAnd;
 	int* m_piResourceMonopolyOrs;

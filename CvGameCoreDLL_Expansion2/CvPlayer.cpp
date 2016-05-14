@@ -2829,12 +2829,6 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 				{
 					GET_PLAYER(ePlayer).GetDiplomacyAI()->ChangeOtherPlayerWarValueLost(pOldCity->getOwner(), GetID(), iValue);
 				}
-#if defined(MOD_BALANCE_CORE)
-				if(ePlayer != NO_PLAYER)
-				{
-					GET_PLAYER(ePlayer).GetCorporations()->ClearCorporationFromCity(pOldCity);
-				}
-#endif
 			}
 
 #if defined(MOD_DIPLOMACY_CIV4_FEATURES)
@@ -2877,6 +2871,14 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 
 		GetMilitaryAI()->LogCityCaptured(pOldCity, pOldCity->getOwner());
 	}
+
+#if defined(MOD_BALANCE_CORE)
+	// Remove Corporation from this city if acquired to another player by any means
+	if (pOldCity->getOwner() != NO_PLAYER && pOldCity->getOwner() != pNewCity->getOwner())
+	{
+		GET_PLAYER(pOldCity->getOwner()).GetCorporations()->ClearCorporationFromCity(pOldCity);
+	}
+#endif
 
 	if(pOldCity->getOriginalOwner() == pOldCity->getOwner())
 	{
@@ -14401,6 +14403,18 @@ int CvPlayer::GetBuildingClassYieldChange(BuildingClassTypes eBuildingClass, Yie
 			}
 		}
 	}
+
+#if defined(MOD_BALANCE_CORE)
+	CorporationTypes eCorporation = GetCorporations()->GetFoundedCorporation();
+	if (eCorporation != NO_CORPORATION)
+	{
+		CvCorporationEntry* pkCorporation = GC.getCorporationInfo(eCorporation);
+		if (pkCorporation)
+		{
+			rtnValue += pkCorporation->GetBuildingClassYieldChange(eBuildingClass, eYieldType);
+		}
+	}
+#endif
 
 	return rtnValue;
 }
@@ -32608,7 +32622,10 @@ int CvPlayer::getBuildingClassYieldChange(BuildingClassTypes eIndex1, YieldTypes
 	return m_ppiBuildingClassYieldChange[eIndex1][eIndex2];
 }
 
-
+#if defined(MOD_BALANCE_CORE)
+// (Corp) Note to future modders: if you think this works as you expect, you're wrong. just ignore it. Use ::GetBuildingClassYieldChange() instead (note the capital), or fix this so it's functional.
+// grrrr....
+#endif
 //	--------------------------------------------------------------------------------
 void CvPlayer::changeBuildingClassYieldChange(BuildingClassTypes eIndex1, YieldTypes eIndex2, int iChange)
 {
@@ -36543,11 +36560,6 @@ void CvPlayer::processCorporations(CorporationTypes eCorporation, int iChange)
 		for (jJ = 0; jJ < GC.getNumSpecialistInfos(); jJ++)
 		{
 			changeSpecialistExtraYield((SpecialistTypes)jJ, (YieldTypes)iI, pkCorporationEntry->GetSpecialistYieldChange(jJ, iI) * iChange);
-		}
-
-		for (jJ = 0; jJ < GC.getNumBuildingClassInfos(); jJ++)
-		{
-			changeBuildingClassYieldChange((BuildingClassTypes)jJ, (YieldTypes)iI, pkCorporationEntry->GetBuildingClassYieldChange(jJ, iI) * iChange);
 		}
 	}
 }

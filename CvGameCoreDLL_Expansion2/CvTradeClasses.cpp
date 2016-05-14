@@ -2895,11 +2895,35 @@ int CvPlayerTrade::GetTradeConnectionTheirBuildingValueTimes100(const TradeConne
 		if (kTradeConnection.m_eOriginOwner == m_pPlayer->GetID())
 		{
 			iBonus += pDestCity->GetTradeRouteTargetBonus() * 100;
+
+#if defined(MOD_BALANCE_CORE)
+			CorporationTypes eCorporation = GET_PLAYER(kTradeConnection.m_eDestOwner).GetCorporations()->GetFoundedCorporation();
+			if (eCorporation != NO_CORPORATION)
+			{
+				CvCorporationEntry* pkCorporation = GC.getCorporationInfo(eCorporation);
+				if (pkCorporation)
+				{
+					iBonus += pkCorporation->GetTradeRouteTargetBonus() * 100;
+				}
+			}
+#endif
 		}
 
 		if (kTradeConnection.m_eDestOwner == m_pPlayer->GetID())
 		{
 			iBonus += pDestCity->GetTradeRouteRecipientBonus() * 100;
+
+#if defined(MOD_BALANCE_CORE)
+			CorporationTypes eCorporation = GET_PLAYER(kTradeConnection.m_eOriginOwner).GetCorporations()->GetFoundedCorporation();
+			if (eCorporation != NO_CORPORATION)
+			{
+				CvCorporationEntry* pkCorporation = GC.getCorporationInfo(eCorporation);
+				if (pkCorporation)
+				{
+					iBonus += pkCorporation->GetTradeRouteRecipientBonus() * 100;
+				}
+			}
+#endif
 		}
 	}
 

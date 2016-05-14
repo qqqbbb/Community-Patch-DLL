@@ -53,9 +53,6 @@
 		<Row Tag="TXT_KEY_CPO_FRANCHISES">
 			<Text>Franchises Established</Text>
 		</Row>
-		<Row Tag="TXT_KEY_CPO_NO_CORPORATION">
-			<Text>You have not yet established a Corporation.</Text>
-		</Row>
 		<Row Tag="TXT_KEY_CPO_FOUND_CORPORATION_AVAILABLE">
 			<Text>Corporations are available to be established.</Text>
 		</Row>
