@@ -65,5 +65,23 @@
 			<Advisor>ECONOMIC</Advisor>
 			<CivilopediaHeaderType>HEADER_CORPORATIONS</CivilopediaHeaderType>
 		</Row>
+		<Row>
+			<Type>CONCEPT_CORPORATION_OFFICE_BONUS</Type>
+			<Topic>TXT_KEY_TOPIC_CORPORATION_OFFICE_BONUS</Topic>
+			<Description>TXT_KEY_CORPORATION_OFFICE_BONUS_TITLE</Description>
+			<Summary>TXT_KEY_CORPORATION_OFFICE_BONUS_BODY</Summary>
+			<AdvisorQuestion>TXT_KEY_CORPORATION_OFFICE_BONUS_QUESTION</AdvisorQuestion>
+			<Advisor>ECONOMIC</Advisor>
+			<CivilopediaHeaderType>HEADER_CORPORATIONS</CivilopediaHeaderType>
+		</Row>
+		<Row>
+			<Type>CONCEPT_CORPORATION_TRADE_ROUTE_BONUS</Type>
+			<Topic>TXT_KEY_TOPIC_CORPORATION_TRADE_ROUTE_BONUS</Topic>
+			<Description>TXT_KEY_CORPORATION_TRADE_ROUTE_BONUS_TITLE</Description>
+			<Summary>TXT_KEY_CORPORATION_TRADE_ROUTE_BONUS_BODY</Summary>
+			<AdvisorQuestion>TXT_KEY_CORPORATION_TRADE_ROUTE_BONUS_QUESTION</AdvisorQuestion>
+			<Advisor>ECONOMIC</Advisor>
+			<CivilopediaHeaderType>HEADER_CORPORATIONS</CivilopediaHeaderType>
+		</Row>
 	</Concepts>
 </GameData>

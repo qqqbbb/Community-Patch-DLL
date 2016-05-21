@@ -1017,21 +1017,15 @@ public:
 	void ChangeFreeBuildingTradeTargetCity(int iChange);
 	void SetFreeBuildingTradeTargetCity(int iValue);
 
+	int GetTradeRouteCityMod(YieldTypes eIndex) const;
+
+	int GetGPRateModifierPerXFranchises() const;
+	void ChangeGPRateModifierPerXFranchises(int iChange);
+	void SetGPRateModifierPerXFranchises(int iValue);
+
 	bool IsHeadquarters() const;
 	bool IsHasOffice() const;
 	bool IsHasFranchise(CorporationTypes eCorporation) const;
-
-	int GetCorporationYieldChange(YieldTypes eIndex) const;
-	void ChangeCorporationYieldChange(YieldTypes eIndex, int iChange);
-	void SetCorporationYieldChange(YieldTypes eIndex, int iValue);
-
-	int GetCorporationYieldModChange(YieldTypes eIndex) const;
-	void ChangeCorporationYieldModChange(YieldTypes eIndex, int iChange);
-	void SetCorporationYieldModChange(YieldTypes eIndex, int iValue);
-
-	int GetCorporationGPChange() const;
-	void ChangeCorporationGPChange(int iChange);
-	void SetCorporationGPChange(int iValue);
 
 	int GetResourceQuantityPerXFranchises(ResourceTypes eResource) const;
 	void ChangeResourceQuantityPerXFranchises(ResourceTypes eResource, int iChange);
@@ -1612,9 +1606,7 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromReligion;
 #if defined(MOD_BALANCE_CORE)
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromCSAlliance;
-	FAutoVariable<std::vector<int>, CvCity> m_aiCorporationYieldChange;
-	FAutoVariable<std::vector<int>, CvCity> m_aiCorporationYieldModChange;
-	FAutoVariable<int, CvCity> m_iCorporationGPChange;
+	FAutoVariable<int, CvCity> m_iGPRateModifierPerXFranchises;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceQuantityPerXFranchises;
 	FAutoVariable<int, CvCity> m_iLandTourismBonus;
 	FAutoVariable<int, CvCity> m_iSeaTourismBonus;

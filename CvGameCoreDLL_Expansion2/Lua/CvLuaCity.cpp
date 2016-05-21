@@ -571,10 +571,10 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 #endif
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_BALANCE_CORE)
 	Method(GetBaseYieldRateFromCSAlliance);
-	Method(GetCorporationYieldChange);
-	Method(GetCorporationYieldModChange);
+	//Method(GetCorporationYieldChange);
+	Method(GetTradeRouteCityMod);
 	Method(GetResourceQuantityPerXFranchises);
-	Method(GetCorporationGPChange);
+	Method(GetGPRateModifierPerXFranchises);
 	Method(IsFranchised);
 	Method(HasOffice);
 	Method(GetYieldChangeTradeRoute);
@@ -4953,21 +4953,21 @@ int CvLuaCity::lGetBaseYieldRateFromCSAlliance(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
-int CvLuaCity::lGetCorporationYieldChange(lua_State* L)
+//int CvLuaCity::lGetCorporationYieldChange(lua_State* L)
+//{
+//	CvCity* pkCity = GetInstance(L);
+//	const YieldTypes eIndex = (YieldTypes)lua_tointeger(L, 2);
+//	int iFranchises = GET_PLAYER(pkCity->getOwner()).GetCorporations()->GetNumFranchises();
+//	const int iResult = (pkCity->GetCorporationYieldChange(eIndex) * iFranchises);
+//
+//	lua_pushinteger(L, iResult);
+//	return 1;
+//}
+int CvLuaCity::lGetTradeRouteCityMod(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
 	const YieldTypes eIndex = (YieldTypes)lua_tointeger(L, 2);
-	int iFranchises = GET_PLAYER(pkCity->getOwner()).GetCorporations()->GetNumFranchises();
-	const int iResult = (pkCity->GetCorporationYieldChange(eIndex) * iFranchises);
-
-	lua_pushinteger(L, iResult);
-	return 1;
-}
-int CvLuaCity::lGetCorporationYieldModChange(lua_State* L)
-{
-	CvCity* pkCity = GetInstance(L);
-	const YieldTypes eIndex = (YieldTypes)lua_tointeger(L, 2);
-	const int iResult = (pkCity->GetCorporationYieldModChange(eIndex));
+	const int iResult = (pkCity->GetTradeRouteCityMod(eIndex));
 
 	lua_pushinteger(L, iResult);
 	return 1;
@@ -4987,11 +4987,11 @@ int CvLuaCity::lGetResourceQuantityPerXFranchises(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
-int CvLuaCity::lGetCorporationGPChange(lua_State* L)
+int CvLuaCity::lGetGPRateModifierPerXFranchises(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
 	int iFranchises = GET_PLAYER(pkCity->getOwner()).GetCorporations()->GetNumFranchises();
-	const int iResult = (pkCity->GetCorporationGPChange() * iFranchises);
+	const int iResult = (pkCity->GetGPRateModifierPerXFranchises() * iFranchises);
 
 	lua_pushinteger(L, iResult);
 	return 1;

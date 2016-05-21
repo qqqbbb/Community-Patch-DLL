@@ -569,10 +569,10 @@ protected:
 #endif
 #if defined(MOD_API_LUA_EXTENSIONS) && defined(MOD_BALANCE_CORE)
 	LUAAPIEXTN(GetBaseYieldRateFromCSAlliance, int);
-	LUAAPIEXTN(GetCorporationYieldChange, int);
-	LUAAPIEXTN(GetCorporationYieldModChange, int);
+	//LUAAPIEXTN(GetCorporationYieldChange, int);
+	LUAAPIEXTN(GetTradeRouteCityMod, int);
 	LUAAPIEXTN(GetResourceQuantityPerXFranchises, int);
-	LUAAPIEXTN(GetCorporationGPChange, int);
+	LUAAPIEXTN(GetGPRateModifierPerXFranchises, int);
 	LUAAPIEXTN(HasOffice, bool);
 	LUAAPIEXTN(IsFranchised, bool);
 	LUAAPIEXTN(GetYieldChangeTradeRoute, int);

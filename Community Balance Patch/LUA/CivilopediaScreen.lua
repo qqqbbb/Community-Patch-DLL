@@ -5536,30 +5536,6 @@ CivilopediaCategory[CategoryCorporations].SelectArticle = function(corporationID
 				end
 			end
 			
-			local numYields = 0;
-			bFirstTime = true;
-			for row in GameInfo.Corporation_TradeRouteYieldMod( condition ) do
-				local yield = GameInfo.Yields[row.YieldType];
-				if yield then
-					if(numYields == 0) then
-						helpStr = helpStr .. "[NEWLINE]";
-					end
-					helpStr = helpStr .. "[NEWLINE]" .. Locale.ConvertTextKey( "TXT_KEY_PEDIA_CORPORATIONS_TR_YIELD", row.Yield, yield.IconString, yield.Description );
-					numYields = numYields + 0;
-				end
-			end
-			
-			if(thisCorporation.TradeRouteLandDistanceModifier ~= 0 or thisCorporation.TradeRouteSeaDistanceModifier ~= 0) then
-				helpStr = helpStr .. "[NEWLINE]";
-				if(thisCorporation.TradeRouteLandDistanceModifier ~= 0) then
-					helpStr = helpStr .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_PEDIA_CORPORATIONS_TR_LAND_RANGE", thisCorporation.TradeRouteLandDistanceModifier);
-				end
-				
-				if(thisCorporation.TradeRouteSeaDistanceModifier ~= 0) then
-					helpStr = helpStr .. "[NEWLINE]" .. Locale.ConvertTextKey("TXT_KEY_PEDIA_CORPORATIONS_TR_SEA_RANGE", thisCorporation.TradeRouteSeaDistanceModifier);
-				end
-			end
-			
 			-- update the summary
 			if (helpStr ~= nil) then
 				UpdateTextBlock( helpStr, Controls.SummaryLabel, Controls.SummaryInnerFrame, Controls.SummaryFrame );

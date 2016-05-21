@@ -354,10 +354,8 @@ CvCity::CvCity() :
 	, m_aiStaticCityYield("CvCity::m_aiStaticCityYield", m_syncArchive)
 	, m_aiThemingYieldBonus("CvCity::m_aiThemingYieldBonus", m_syncArchive)
 	, m_aiBaseYieldRateFromCSAlliance("CvCity::m_aiBaseYieldRateFromCSAlliance", m_syncArchive)
-	, m_aiCorporationYieldChange("CvCity::m_aiCorporationYieldChange", m_syncArchive)
-	, m_aiCorporationYieldModChange("CvCity::m_aiCorporationYieldModChange", m_syncArchive)
+	, m_iGPRateModifierPerXFranchises("CvCity::m_iGPRateModifierPerXFranchises", m_syncArchive)
 	, m_aiResourceQuantityPerXFranchises("CvCity::m_aiResourceQuantityPerXFranchises", m_syncArchive)
-	, m_iCorporationGPChange("CvCity::m_iCorporationGPChange", m_syncArchive)
 	, m_iLandTourismBonus("CvCity::m_iLandTourismBonus", m_syncArchive)
 	, m_iSeaTourismBonus("CvCity::m_iSeaTourismBonus", m_syncArchive)
 	, m_iAlwaysHeal("CvCity::m_iAlwaysHeal", m_syncArchive)
@@ -1467,7 +1465,6 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iBlockUnrest = 0;
 	m_iBlockScience = 0;
 	m_iBlockGold = 0;
-	m_iCorporationGPChange = 0;
 	m_iExtraBuildingMaintenance = 0;
 	m_iLandTourismBonus = 0;
 	m_iSeaTourismBonus = 0;
@@ -1482,8 +1479,7 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_aiBaseYieldRateFromReligion.resize(NUM_YIELD_TYPES);
 #if defined(MOD_BALANCE_CORE)
 	m_aiBaseYieldRateFromCSAlliance.resize(NUM_YIELD_TYPES);
-	m_aiCorporationYieldChange.resize(NUM_YIELD_TYPES);
-	m_aiCorporationYieldModChange.resize(NUM_YIELD_TYPES);
+	m_iGPRateModifierPerXFranchises = 0;
 #endif
 	m_aiYieldPerPop.resize(NUM_YIELD_TYPES);
 	m_aiYieldPerReligion.resize(NUM_YIELD_TYPES);
@@ -1529,8 +1525,6 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiBaseYieldRateFromReligion.setAt(iI, 0);
 #if defined(MOD_BALANCE_CORE)
 		m_aiBaseYieldRateFromCSAlliance.setAt(iI, 0);
-		m_aiCorporationYieldChange.setAt(iI, 0);
-		m_aiCorporationYieldModChange.setAt(iI, 0);
 		m_aiStaticCityYield.setAt(iI, 0);
 #endif
 		m_aiYieldPerPop.setAt(iI, 0);
@@ -10362,6 +10356,30 @@ int CvCity::getProductionModifier(UnitTypes eUnit, CvString* toolTipSink) const
 		}
 	}
 
+#if defined(MOD_BALANCE_CORE)
+	// Production bonus from Corporation
+	CorporationTypes eCorporation = GET_PLAYER(getOwner()).GetCorporations()->GetFoundedCorporation();
+	if (eCorporation != NO_CORPORATION)
+	{
+		CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+		if (pkCorporationInfo)
+		{
+			for (int iResource = 0; iResource < GC.getNumResourceInfos(); iResource++)
+			{
+				if (pkUnitInfo->GetResourceQuantityRequirement(iResource) > 0)
+				{
+					iTempMod = pkCorporationInfo->GetUnitResourceProductionModifier(iResource);
+					iMultiplier += iTempMod;
+					if (toolTipSink && iTempMod)
+					{
+						GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_UNIT_CORPORATION", iTempMod);
+					}
+				}
+			}
+		}
+	}
+#endif
+
 	// Military production bonus
 	if(pkUnitInfo->IsMilitaryProduction())
 	{
@@ -11869,10 +11887,6 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 		{
 			ChangeReligiousTradeModifier(pBuildingInfo->GetTradeReligionModifier() * iChange);
 		}
-		if(MOD_BALANCE_CORE && (pBuildingInfo->GetCorporationGPChange() > 0))
-		{
-			ChangeCorporationGPChange(pBuildingInfo->GetCorporationGPChange() * iChange);
-		}
 		if(MOD_BALANCE_CORE && (pBuildingInfo->GetBorderObstacleCity() > 0))
 		{
 			ChangeBorderObstacleCity(pBuildingInfo->GetBorderObstacleCity() * iChange);
@@ -12161,16 +12175,6 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			if(MOD_BALANCE_CORE && (pBuildingInfo->GetYieldFromPurchase(eYield) > 0))
 			{
 				ChangeYieldFromPurchase(eYield, pBuildingInfo->GetYieldFromPurchase(eYield) * iChange);
-			}
-#endif
-#if defined(MOD_BALANCE_CORE)
-			if(MOD_BALANCE_CORE && (pBuildingInfo->GetCorporationYieldChange(eYield) > 0))
-			{
-				ChangeCorporationYieldChange(eYield, pBuildingInfo->GetCorporationYieldChange(eYield) * iChange);
-			}
-			if(MOD_BALANCE_CORE && (pBuildingInfo->GetCorporationYieldModTrade(eYield) > 0))
-			{
-				ChangeCorporationYieldModChange(eYield, pBuildingInfo->GetCorporationYieldModTrade(eYield) * iChange);
 			}
 #endif
 #if defined(MOD_BALANCE_CORE_EVENTS)
@@ -13408,7 +13412,7 @@ int CvCity::foodDifferenceTimes100(bool bBottom, CvString* toolTipSink) const
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_FOODMOD_PLAYER", iCityGrowthMod);
 		}
 #if defined(MOD_BALANCE_CORE)
-		int iCorpMod = (GetCorporationYieldModChange(YIELD_FOOD));
+		int iCorpMod = (GetTradeRouteCityMod(YIELD_FOOD));
 		if(iCorpMod > 0)
 		{
 			iTotalMod += iCorpMod;
@@ -14560,15 +14564,11 @@ int CvCity::getGreatPeopleRateModifier() const
 			iNewValue = (iNumMarried * GC.getBALANCE_MARRIAGE_GP_RATE());
 		}
 	}
-#endif
-#if defined(MOD_BALANCE_CORE)
-	if(GetCorporationGPChange() > 0)
+
+	// Corporations: Great people rate modifier by number of franchises
+	if (GetGPRateModifierPerXFranchises() > 0)
 	{
-		int iFranchises = GET_PLAYER(getOwner()).GetCorporations()->GetNumFranchises();
-		if(iFranchises > 0)
-		{
-			iNewValue += (iFranchises * GetCorporationGPChange());
-		}
+		iNewValue += GetGPRateModifierPerXFranchises() * GET_PLAYER(getOwner()).GetCorporations()->GetNumFranchises();
 	}
 #endif
 #if defined(MOD_BALANCE_CORE)
@@ -19115,7 +19115,7 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_CAPITAL", iTempMod);
 	}
 #if defined(MOD_BALANCE_CORE)
-	iTempMod = (GetCorporationYieldModChange(eIndex));
+	iTempMod = (GetTradeRouteCityMod(eIndex));
 	if(iTempMod > 0)
 	{
 		iModifier += iTempMod;
@@ -19575,16 +19575,6 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex) const
 #endif
 #if defined(MOD_BALANCE_CORE)
 	iValue += GetEventCityYield(eIndex);
-#endif
-#if defined(MOD_BALANCE_CORE)
-	if(GetCorporationYieldChange(eIndex) > 0)
-	{
-		int iFranchises = GET_PLAYER(getOwner()).GetCorporations()->GetNumFranchises();
-		if(iFranchises > 0)
-		{
-			iValue += (iFranchises * GetCorporationYieldChange(eIndex));
-		}
-	}
 #endif
 
 #if defined(MOD_API_UNIFIED_YIELDS)
@@ -20413,46 +20403,26 @@ void CvCity::SetBaseYieldRateFromCSAlliance(YieldTypes eIndex, int iValue)
 }
 //CORPORATIONS
 //	--------------------------------------------------------------------------------
-int CvCity::GetCorporationYieldChange(YieldTypes eIndex) const
-{
-	VALIDATE_OBJECT
-	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
-	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
-	return m_aiCorporationYieldChange[eIndex];
-}
-//	--------------------------------------------------------------------------------
-void CvCity::ChangeCorporationYieldChange(YieldTypes eIndex, int iChange)
+// Get the yield modifier change from having a Corporation
+int CvCity::GetTradeRouteCityMod(YieldTypes eIndex) const
 {
 	VALIDATE_OBJECT
 	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
 	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
 
-	if(iChange != 0)
-	{
-		m_aiCorporationYieldChange.setAt(eIndex, m_aiCorporationYieldChange[eIndex] + iChange);
-		CvAssert(GetCorporationYieldChange(eIndex) >= 0); 
-	}
-}
-void CvCity::SetCorporationYieldChange(YieldTypes eIndex, int iValue)
-{
-	if(GetCorporationYieldChange(eIndex) != iValue)
-	{
-		m_aiCorporationYieldChange.setAt(eIndex, iValue);
-	}
-}
-//CORPORATIONS
-//	--------------------------------------------------------------------------------
-int CvCity::GetCorporationYieldModChange(YieldTypes eIndex) const
-{
-	VALIDATE_OBJECT
-	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
-	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+	CorporationTypes eCorporation = GET_PLAYER(getOwner()).GetCorporations()->GetFoundedCorporation();
+	if (eCorporation == NO_CORPORATION)
+		return 0;
+
+	CvCorporationEntry* pkCorporationInfo = GC.getCorporationInfo(eCorporation);
+	if (pkCorporationInfo == NULL)
+		return 0;
+
+	// If our Corporation does not have a city yield mod, remove
+	if (pkCorporationInfo->GetTradeRouteCityMod(eIndex) == 0)
+		return 0;
 
 	int iMod = 0;
-	if(m_aiCorporationYieldModChange[eIndex] == 0)
-	{
-		return 0;
-	}
 	CvGameTrade* pGameTrade = GC.getGame().GetGameTrade();
 	for (uint ui = 0; ui < pGameTrade->GetNumTradeConnections(); ui++)
 	{
@@ -20461,77 +20431,41 @@ int CvCity::GetCorporationYieldModChange(YieldTypes eIndex) const
 			continue;
 		}
 
-		if (pGameTrade->GetTradeConnection(ui).m_eConnectionType == TRADE_CONNECTION_INTERNATIONAL)
+		CvCity* pOriginCity = CvGameTrade::GetOriginCity(pGameTrade->GetTradeConnection(ui));
+		CvCity* pDestCity = CvGameTrade::GetDestCity(pGameTrade->GetTradeConnection(ui));
+		if (pOriginCity != NULL && pDestCity != NULL)
 		{
-			CvCity* pOriginCity = CvGameTrade::GetOriginCity(pGameTrade->GetTradeConnection(ui));
-			CvCity* pDestCity = CvGameTrade::GetDestCity(pGameTrade->GetTradeConnection(ui));
-			if(pOriginCity != NULL && pDestCity != NULL)
+			if (pOriginCity->IsHasOffice() && pDestCity->IsHasFranchise(eCorporation))
 			{
-				if (pOriginCity->getX() == getX() && pOriginCity->getY() == getY())
-				{
-					if(pDestCity->IsHasFranchise(GET_PLAYER(getOwner()).GetCorporations()->GetFoundedCorporation()))
-					{
-						iMod += m_aiCorporationYieldModChange[eIndex];
-					}
-				}
-			}
-		}
-		else if (GET_PLAYER(getOwner()).GetCorporations()->IsCorporationOfficesAsFranchises() && (pGameTrade->GetTradeConnection(ui).m_eConnectionType == TRADE_CONNECTION_FOOD || pGameTrade->GetTradeConnection(ui).m_eConnectionType == TRADE_CONNECTION_PRODUCTION))
-		{
-			CvCity* pOriginCity = CvGameTrade::GetOriginCity(pGameTrade->GetTradeConnection(ui));
-			CvCity* pDestCity = CvGameTrade::GetDestCity(pGameTrade->GetTradeConnection(ui));
-			if(pOriginCity != NULL && pDestCity != NULL)
-			{
-				if (pOriginCity->getX() == getX() && pOriginCity->getY() == getY())
-				{
-					if(pDestCity->getOwner() == pOriginCity->getOwner() && pDestCity->IsHasOffice())
-					{
-						iMod += m_aiCorporationYieldModChange[eIndex];
-					}
-				}
+				iMod += pkCorporationInfo->GetTradeRouteCityMod(eIndex);
 			}
 		}
 	}
 	return iMod;
 }
-//	--------------------------------------------------------------------------------
-void CvCity::ChangeCorporationYieldModChange(YieldTypes eIndex, int iChange)
-{
-	VALIDATE_OBJECT
-	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
-	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
 
-	if(iChange != 0)
-	{
-		m_aiCorporationYieldModChange.setAt(eIndex, m_aiCorporationYieldModChange[eIndex] + iChange);
-		CvAssert(GetCorporationYieldModChange(eIndex) >= 0); 
-	}
-}
-void CvCity::SetCorporationYieldModChange(YieldTypes eIndex, int iValue)
-{
-	if(GetCorporationYieldModChange(eIndex) != iValue)
-	{
-		m_aiCorporationYieldModChange.setAt(eIndex, iValue);
-	}
-}
-//	--------------------------------------------------------------------------------
-int CvCity::GetCorporationGPChange() const
+int CvCity::GetGPRateModifierPerXFranchises() const
 {
 	VALIDATE_OBJECT
-	return m_iCorporationGPChange;
+	return m_iGPRateModifierPerXFranchises;
 }
 
-//	--------------------------------------------------------------------------------
-void CvCity::ChangeCorporationGPChange(int iChange)
+void CvCity::ChangeGPRateModifierPerXFranchises(int iChange)
 {
 	VALIDATE_OBJECT
-	m_iCorporationGPChange = (m_iCorporationGPChange + iChange);
+	if (iChange != 0)
+	{
+		SetGPRateModifierPerXFranchises(GetGPRateModifierPerXFranchises() + iChange);
+	}
 }
-//	--------------------------------------------------------------------------------
-void CvCity::SetCorporationGPChange(int iChange)
+
+void CvCity::SetGPRateModifierPerXFranchises(int iValue)
 {
 	VALIDATE_OBJECT
-	m_iCorporationGPChange = iChange;
+	if (iValue != GetGPRateModifierPerXFranchises())
+	{
+		m_iGPRateModifierPerXFranchises = iValue;
+	}
 }
 
 bool CvCity::IsHeadquarters() const

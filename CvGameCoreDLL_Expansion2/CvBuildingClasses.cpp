@@ -316,10 +316,9 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piLocalFeatureAnds(NULL),
 	m_piResourceMonopolyAnds(NULL),
 	m_piResourceMonopolyOrs(NULL),
-	m_piCorporationYield(NULL),
 	m_piFranchiseTradeRouteCityYieldMod(NULL),
 	m_piFranchiseTradeRouteYieldMod(NULL),
-	m_iCorporationGPChange(0),
+	m_iGPRateModifierPerXFranchises(0),
 	m_piResourceQuantityPerXFranchises(NULL),
 #endif
 	m_paiHurryModifier(NULL),
@@ -420,7 +419,7 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piLocalFeatureAnds);
 	SAFE_DELETE_ARRAY(m_piResourceMonopolyAnds);
 	SAFE_DELETE_ARRAY(m_piResourceMonopolyOrs);
-	SAFE_DELETE_ARRAY(m_piCorporationYield);
+	SAFE_DELETE_ARRAY(m_piYieldPerFranchise);
 	SAFE_DELETE_ARRAY(m_piFranchiseTradeRouteCityYieldMod);
 	SAFE_DELETE_ARRAY(m_piFranchiseTradeRouteYieldMod);
 	SAFE_DELETE_ARRAY(m_piResourceQuantityPerXFranchises);
@@ -708,14 +707,6 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	szTextVal = kResults.GetText("ThemingBonusHelp");
 	m_strThemingBonusHelp = szTextVal;
 
-#if defined(MOD_BALANCE_CORE)
-	szTextVal = kResults.GetText("CorporationHelper");
-	m_strCorporationHelper = szTextVal;
-
-	szTextVal = kResults.GetText("OfficeBenefitHelper");
-	m_strOfficeBenefitHelper = szTextVal;
-#endif
-
 	szTextVal = kResults.GetText("NearbyTerrainRequired");
 	m_iNearbyTerrainRequired = GC.getInfoTypeForString(szTextVal, true);
 
@@ -901,10 +892,10 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.PopulateArrayByExistence(m_piResourceMonopolyAnds, "Resources", "Building_ResourceMonopolyAnds", "ResourceType", "BuildingType", szBuildingType);
 
 	kUtility.PopulateArrayByValue(m_piResourceQuantityPerXFranchises, "Resources", "Building_ResourceQuantityPerXFranchises", "ResourceType", "BuildingType", szBuildingType, "NumFranchises");
-	kUtility.SetYields(m_piCorporationYield, "Building_YieldPerFranchise", "BuildingType", szBuildingType);
+	kUtility.SetYields(m_piYieldPerFranchise, "Building_YieldPerFranchise", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piFranchiseTradeRouteCityYieldMod, "Building_FranchiseTradeRouteCityYieldMod", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piFranchiseTradeRouteYieldMod, "Building_FranchiseTradeRouteYieldMod", "BuildingType", szBuildingType);
-	m_iCorporationGPChange = kResults.GetInt("CorporationGPChange");
+	m_iGPRateModifierPerXFranchises = kResults.GetInt("GPRateModifierPerXFranchises");
 #endif
 	//ResourceYieldChanges
 	{
@@ -2371,17 +2362,6 @@ CvString CvBuildingEntry::GetThemingBonusHelp() const
 {
 	return m_strThemingBonusHelp;
 }
-#if defined(MOD_BALANCE_CORE)
-CvString CvBuildingEntry::GetCorporationHelper() const
-{
-	return m_strCorporationHelper;
-}
-
-CvString CvBuildingEntry::GetOfficeBenefitHelper() const
-{
-	return m_strOfficeBenefitHelper;
-}
-#endif
 // ARRAYS
 
 #if defined(MOD_DIPLOMACY_CITYSTATES) || defined(MOD_BALANCE_CORE)
@@ -2902,30 +2882,6 @@ int CvBuildingEntry::GetResourceMonopolyOr(int i) const
 	return m_piResourceMonopolyOrs ? m_piResourceMonopolyOrs[i] : -1;
 }
 /// Corporate building yield.
-int CvBuildingEntry::GetCorporationYieldChange(int i) const
-{
-	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
-	CvAssertMsg(i > -1, "Index out of bounds");
-	return m_piCorporationYield ? m_piCorporationYield[i] : -1;
-}
-/// Corporate building yield.
-int* CvBuildingEntry::GetCorporationYieldChangeArray() const
-{
-	return m_piCorporationYield;
-}
-/// Corporate building yield.
-int CvBuildingEntry::GetCorporationYieldModTrade(int i) const
-{
-	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
-	CvAssertMsg(i > -1, "Index out of bounds");
-	return m_piFranchiseTradeRouteCityYieldMod ? m_piFranchiseTradeRouteCityYieldMod[i] : -1;
-}
-/// Corporate building yield.
-int* CvBuildingEntry::GetCorporationYieldModTradeArray() const
-{
-	return m_piFranchiseTradeRouteCityYieldMod;
-}
-/// Corporate building yield.
 int CvBuildingEntry::GetFranchiseTradeRouteYieldMod(int i) const
 {
 	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
@@ -2937,9 +2893,9 @@ int* CvBuildingEntry::GetFranchiseTradeRouteYieldModArray() const
 {
 	return m_piFranchiseTradeRouteYieldMod;
 }
-int CvBuildingEntry::GetCorporationGPChange() const
+int CvBuildingEntry::GetGPRateModifierPerXFranchises() const
 {
-	return m_iCorporationGPChange;
+	return m_iGPRateModifierPerXFranchises;
 }
 /// Resources provided once constructed
 int CvBuildingEntry::GetResourceQuantityPerXFranchises(int i) const

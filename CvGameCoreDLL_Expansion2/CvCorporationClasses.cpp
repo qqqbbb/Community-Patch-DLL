@@ -23,13 +23,15 @@ CvCorporationEntry::CvCorporationEntry(void):
 	m_iTradeRouteRecipientBonus(0),
 	m_iTradeRouteTargetBonus(0),
 	m_bTradeRoutesInvulnerable(false),
-	m_ppiBuildingClassYieldChanges(NULL),
-	m_ppaiSpecialistYieldChange(NULL),
-	m_ppaiResourceYieldChange(NULL),
 	m_piResourceMonopolyAnd(NULL),
 	m_piResourceMonopolyOrs(NULL),
 	m_piNumFreeResource(NULL),
-	m_piTradeRouteMod(NULL)
+	m_piTradeRouteMod(NULL),
+	m_piTradeRouteCityMod(NULL),
+	m_ppiBuildingClassYieldChanges(NULL),
+	m_ppaiSpecialistYieldChange(NULL),
+	m_ppaiResourceYieldChange(NULL),
+	m_strOfficeBenefitHelper("")
 {
 }
 
@@ -39,6 +41,7 @@ CvCorporationEntry::~CvCorporationEntry(void)
 	SAFE_DELETE_ARRAY(m_piResourceMonopolyOrs);
 	SAFE_DELETE_ARRAY(m_piNumFreeResource);
 	SAFE_DELETE_ARRAY(m_piTradeRouteMod);
+	SAFE_DELETE_ARRAY(m_piTradeRouteCityMod);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiBuildingClassYieldChanges);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiSpecialistYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldChange);
@@ -126,12 +129,26 @@ int CvCorporationEntry::GetNumFreeResource(int i) const
 	return m_piNumFreeResource ? m_piNumFreeResource[i] : -1;
 }
 
+int CvCorporationEntry::GetUnitResourceProductionModifier(int i) const
+{
+	CvAssertMsg(i < GC.getNUM_BUILDING_RESOURCE_PREREQS(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piUnitResourceProductionModifier ? m_piUnitResourceProductionModifier[i] : -1;
+}
+
 /// Yield Modifier for Trade Routes to cities from an office to cities with a Franchise
 int CvCorporationEntry::GetTradeRouteMod(int i) const
 {
 	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piTradeRouteMod ? m_piTradeRouteMod[i] : -1;
+}
+
+int CvCorporationEntry::GetTradeRouteCityMod(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piTradeRouteCityMod ? m_piTradeRouteCityMod[i] : -1;
 }
 
 /// Change to Resource yield by type
@@ -170,6 +187,11 @@ int* CvCorporationEntry::GetSpecialistYieldChangeArray(int i) const
 	return m_ppaiSpecialistYieldChange[i];
 }
 
+CvString CvCorporationEntry::GetOfficeBenefitHelper() const
+{
+	return m_strOfficeBenefitHelper;
+}
+
 /// Yield change for a specific BuildingClass by yield type
 int CvCorporationEntry::GetBuildingClassYieldChange(int i, int j) const
 {
@@ -206,9 +228,8 @@ bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	szTextVal = kResults.GetText("FranchiseBuildingClass");
 	m_eFranchiseBuildingClass = (BuildingClassTypes) GC.getInfoTypeForString(szTextVal, true);
 
-	CUSTOMLOG("HQ class: %d", m_eHeadquartersBuildingClass);
-	CUSTOMLOG("Office class: %d", m_eOfficeBuildingClass);
-	CUSTOMLOG("Franchise class: %d", m_eFranchiseBuildingClass);
+	szTextVal = kResults.GetText("OfficeBenefitHelper");
+	m_strOfficeBenefitHelper = szTextVal;
 
 	// This is not ideal, but Corporations are loaded last, and I want an easy way to tell if a building class is owned by a Corporation
 	// Note: Intellisense may lie here! This will compile (declared as friend)
@@ -236,7 +257,9 @@ bool CvCorporationEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 	kUtility.PopulateArrayByExistence(m_piResourceMonopolyAnd, "Resources", "Corporation_ResourceMonopolyAnds", "ResourceType", "CorporationType", szCorporationType);
 	kUtility.PopulateArrayByExistence(m_piResourceMonopolyOrs, "Resources", "Corporation_ResourceMonopolyOrs", "ResourceType", "CorporationType", szCorporationType);
 	kUtility.PopulateArrayByValue(m_piNumFreeResource, "Resources", "Corporation_NumFreeResource", "ResourceType", "CorporationType", szCorporationType, "NumResource");
+	kUtility.PopulateArrayByValue(m_piUnitResourceProductionModifier, "Resources", "Corporation_UnitResourceProductionModifier", "ResourceType", "CorporationType", szCorporationType, "Modifier");
 	kUtility.SetYields(m_piTradeRouteMod, "Corporation_TradeRouteYieldMod", "CorporationType", szCorporationType);
+	kUtility.SetYields(m_piTradeRouteCityMod, "Corporation_TradeRouteCityYieldMod", "CorporationType", szCorporationType);
 
 	//BuildingClassYieldChanges
 	{
@@ -477,7 +500,6 @@ void CvPlayerCorporations::Uninit()
 	SetFoundedCorporation(NO_CORPORATION);
 	m_iNumFranchises = 0;
 	m_iNumOffices = 0;
-	m_iNumFranchises = 0;
 	m_iAdditionalNumFranchises = 0;
 	m_iAdditionalNumFranchisesMod = 0;
 	m_bCorporationOfficesAsFranchises = false;
@@ -624,8 +646,7 @@ void CvPlayerCorporations::SetCorporationOfficesAsFranchises(bool bValue)
 	if(bValue != m_bCorporationOfficesAsFranchises)
 		m_bCorporationOfficesAsFranchises = bValue;
 
-	if (m_bCorporationOfficesAsFranchises)
-		RecalculateNumFranchises();
+	RecalculateNumFranchises();
 }
 
 bool CvPlayerCorporations::IsCorporationRandomForeignFranchise() const
@@ -1011,9 +1032,9 @@ CvString CvPlayerCorporations::GetCurrentOfficeBenefit()
 	if (iNumFranchises > 0)
 	{
 		// Civilized Jewelers
-		if (pkOfficeInfo->GetCorporationGPChange() > 0)
+		if (pkOfficeInfo->GetGPRateModifierPerXFranchises() > 0)
 		{
-			iCurrentValue = iNumFranchises * pkOfficeInfo->GetCorporationGPChange();
+			iCurrentValue = iNumFranchises * pkOfficeInfo->GetGPRateModifierPerXFranchises();
 			bFoundOne = true;
 		}
 
@@ -1048,7 +1069,7 @@ CvString CvPlayerCorporations::GetCurrentOfficeBenefit()
 		}
 	}
 
-	szOfficeBenefit = GetLocalizedText(pkOfficeInfo->GetOfficeBenefitHelper(), iCurrentValue);
+	szOfficeBenefit = GetLocalizedText(pkCorporationInfo->GetOfficeBenefitHelper(), iCurrentValue);
 
 	return szOfficeBenefit;
 }

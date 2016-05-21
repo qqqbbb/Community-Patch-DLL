@@ -6,8 +6,8 @@ include( "InstanceManager" );
 include("InfoTooltipInclude");
 
 local g_AvailableCorporationsIM = InstanceManager:new( "AvailableCorporationInstance", "AvailableCorporationBox", Controls.AvailableCorporationsStack );
--- new IM for each corporation instance
-local g_CorporationMonopolyResourceIMList = {};	
+
+local g_CorporationMonopolyResourceIMList = {};
 			
 local g_CorporationBenefitIM = InstanceManager:new( "CorporationBenefitInstance", "Base", Controls.CorporationBenefitStack );
 local g_YourOfficesIM = InstanceManager:new( "OfficeCityInstance", "Base", Controls.YourOfficesStack );
@@ -210,12 +210,12 @@ function DisplayCorporations()
 	Controls.YourCorporationsNotReady:SetHide( bHasCorpTech );
 	Controls.AvailableCorporationBox:SetHide( not bHasCorpTech );
 
-	local bHasCorporation = (g_pPlayer:GetCorporation() ~= -1);
-
 	if(bHasCorpTech) then
+		local bHasCorporation = (g_pPlayer:GetCorporation() ~= -1);
+
 		Controls.AvailableCorporationBox:SetHide( bHasCorporation );
 		Controls.YourCorporationBox:SetHide( not bHasCorporation );
-
+	
 		if( not bHasCorporation ) then
 			UpdateAvailableCorporations();
 		else
@@ -584,19 +584,6 @@ function UpdateAvailableCorporations()
 				resourceInstance.ResourcesLabel:LocalizeAndSetToolTip( requiredResource.Description );
 			end		
 		end
-
-		-- build info string
-		local strInfo = "";
-		
-		if( row.ResourceBonusHelp ~= nil ) then
-			strInfo = strInfo .. "[ICON_BULLET]" .. Locale.ConvertTextKey( row.ResourceBonusHelp ) .. "[NEWLINE]";
-		end
-		if( row.OfficeBonusHelp ~= nil ) then
-			strInfo = strInfo .. "[ICON_BULLET]" .. Locale.ConvertTextKey( row.OfficeBonusHelp ) .. "[NEWLINE]";
-		end
-		if( row.TradeRouteBonusHelp ~= nil ) then
-			strInfo = strInfo .. "[ICON_BULLET]" .. Locale.ConvertTextKey( row.TradeRouteBonusHelp );
-		end
 		
 		-- darken the box if it is not available
 		if( not bAvailable ) then
@@ -604,8 +591,11 @@ function UpdateAvailableCorporations()
 		else
 			instance.AvailableCorporationBox:SetAlpha( 1.0 );
 		end
-
-		instance.CorporationBonus:LocalizeAndSetText( strInfo );
+		
+		if( row.Help ~= nil) then
+			local str = Locale.ConvertTextKey( row.Help ) .. " " .. Locale.ConvertTextKey( "TXT_KEY_CPO_RIGHT_CLICK_MORE_INFO" );
+			instance.CorporationBonus:LocalizeAndSetText( str );
+		end
 	end
 
 	if(Game.GetNumAvailableCorporations() > 0) then

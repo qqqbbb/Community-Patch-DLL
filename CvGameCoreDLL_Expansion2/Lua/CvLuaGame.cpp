@@ -2368,7 +2368,7 @@ int CvLuaGame::lGetBuildingCorporateGPChange(lua_State* L)
 	int iYieldChange = 0;
 	if(pkBuildingInfo)
 	{
-		iYieldChange = pkBuildingInfo->GetCorporationGPChange();
+		iYieldChange = pkBuildingInfo->GetGPRateModifierPerXFranchises();
 	}
 
 	lua_pushinteger(L, iYieldChange);

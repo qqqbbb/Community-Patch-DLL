@@ -351,10 +351,6 @@ public:
 
 	const char* GetWonderSplashAudio() const;
 	CvString GetThemingBonusHelp() const;
-#if defined(MOD_BALANCE_CORE)
-	CvString GetCorporationHelper() const;
-	CvString GetOfficeBenefitHelper() const;
-#endif
 
 	// Accessor Functions (Arrays)
 
@@ -455,13 +451,8 @@ public:
 	int GetFeatureAnd(int i) const;
 	int GetResourceMonopolyAnd(int i) const;
 	int GetResourceMonopolyOr(int i) const;
-	int GetCorporationYieldChange(int i) const;
-	int* GetCorporationYieldChangeArray() const;
-	int GetCorporationGPChange() const;
+	int GetGPRateModifierPerXFranchises() const;
 	int GetResourceQuantityPerXFranchises(int i) const;
-
-	int GetCorporationYieldModTrade(int i) const;
-	int* GetCorporationYieldModTradeArray() const;
 
 	int GetFranchiseTradeRouteYieldMod(int i) const;
 	int* GetFranchiseTradeRouteYieldModArray() const;
@@ -771,10 +762,6 @@ private:
 	CvString m_strArtDefineTag;
 	CvString m_strWonderSplashAudio;
 	CvString m_strThemingBonusHelp;
-#if defined(MOD_BALANCE_CORE)
-	CvString m_strCorporationHelper;
-	CvString m_strOfficeBenefitHelper;
-#endif
 
 	// Arrays
 
@@ -835,10 +822,10 @@ private:
 	int* m_piLocalFeatureAnds;
 	int* m_piResourceMonopolyAnds;
 	int* m_piResourceMonopolyOrs;
-	int* m_piCorporationYield;
+	int* m_piYieldPerFranchise;
 	int* m_piFranchiseTradeRouteCityYieldMod;
 	int* m_piFranchiseTradeRouteYieldMod;
-	int m_iCorporationGPChange;
+	int m_iGPRateModifierPerXFranchises;
 	int* m_piResourceQuantityPerXFranchises;
 #endif
 	int* m_paiHurryModifier;

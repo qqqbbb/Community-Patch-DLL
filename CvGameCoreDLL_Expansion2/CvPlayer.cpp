@@ -2874,7 +2874,7 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 
 #if defined(MOD_BALANCE_CORE)
 	// Remove Corporation from this city if acquired to another player by any means
-	if (pOldCity->getOwner() != NO_PLAYER && pOldCity->getOwner() != pNewCity->getOwner())
+	if (pOldCity->getOwner() != NO_PLAYER && pOldCity->getOwner() != GetID())
 	{
 		GET_PLAYER(pOldCity->getOwner()).GetCorporations()->ClearCorporationFromCity(pOldCity);
 	}
@@ -36559,7 +36559,7 @@ void CvPlayer::processCorporations(CorporationTypes eCorporation, int iChange)
 	{
 		for (jJ = 0; jJ < GC.getNumSpecialistInfos(); jJ++)
 		{
-			changeSpecialistExtraYield((SpecialistTypes)jJ, (YieldTypes)iI, pkCorporationEntry->GetSpecialistYieldChange(jJ, iI) * iChange);
+			changeSpecialistYieldChange((SpecialistTypes)jJ, (YieldTypes)iI, pkCorporationEntry->GetSpecialistYieldChange(jJ, iI) * iChange);
 		}
 	}
 }

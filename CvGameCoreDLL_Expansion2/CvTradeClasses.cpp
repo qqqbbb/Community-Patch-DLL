@@ -5895,19 +5895,19 @@ int CvTradeAI::ScoreInternationalTR (const TradeConnection& kTradeConnection)
 								//Not franchised? Let's see what we get if we franchise it.
 								if ((iFranchises < iMax) && !m_pPlayer->GetCorporations()->IsCorporationOfficesAsFranchises() && !pDestCity->IsHasFranchise(eCorporation))
 								{
-									int iGPYieldFromCorp = pOriginCity->GetCorporationGPChange();
+									int iGPYieldFromCorp = pOriginCity->GetGPRateModifierPerXFranchises();
 									if (iGPYieldFromCorp > 0)
 									{
 										iScore *= (iGPYieldFromCorp * 25);
 									}
-									for (int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
-									{
-										int iYieldFromCorp = pOriginCity->GetCorporationYieldChange((YieldTypes)iYield);
-										if (iYieldFromCorp > 0)
-										{
-											iScore *= (iYieldFromCorp * 25);
-										}
-									}
+									//for (int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
+									//{
+									//	int iYieldFromCorp = pOriginCity->GetCorporationYieldChange((YieldTypes)iYield);
+									//	if (iYieldFromCorp > 0)
+									//	{
+									//		iScore *= (iYieldFromCorp * 25);
+									//	}
+									//}
 									if (m_pPlayer->GetCulture()->GetInfluenceLevel(pDestCity->getOwner()) >= INFLUENCE_LEVEL_POPULAR && m_pPlayer->GetCorporations()->IsCorporationFreeFranchiseAbovePopular())
 									{
 										iScore *= 50;
@@ -5918,7 +5918,7 @@ int CvTradeAI::ScoreInternationalTR (const TradeConnection& kTradeConnection)
 								{
 									for (int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 									{
-										int iYieldFromCorp = pOriginCity->GetCorporationYieldModChange((YieldTypes)iYield);
+										int iYieldFromCorp = pOriginCity->GetTradeRouteCityMod((YieldTypes)iYield);
 										if (iYieldFromCorp > 0)
 										{
 											iScore *= (iYieldFromCorp * 15);

@@ -491,11 +491,11 @@ function AddBuildingButton( pCity, building )
 			local ToolTipString = specialistName .. " ";						
 			-- Culture
 			local iCultureFromSpecialist = pCity:GetCultureFromSpecialist(iSpecialistID);
+			--CBP
+			local extraYield = (pCity:GetSpecialistYield( iSpecialistID, YieldTypes.YIELD_CULTURE ) + pCity:GetSpecialistYieldChange(YieldTypes.YIELD_CULTURE, iSpecialistID))
+			iCultureFromSpecialist = (iCultureFromSpecialist + extraYield)	
+			-- END
 			if (iCultureFromSpecialist > 0) then
-				--CBP
-				local extraYield = (pCity:GetSpecialistYield( iSpecialistID, YieldTypes.YIELD_CULTURE ) + pCity:GetSpecialistYieldChange(YieldTypes.YIELD_CULTURE, iSpecialistID))
-				iCultureFromSpecialist = (iCultureFromSpecialist + extraYield)
-				-- END
 				ToolTipString = ToolTipString .. " +" .. iCultureFromSpecialist .. "[ICON_CULTURE]";
 			end
 			-- Yield
@@ -1412,11 +1412,11 @@ function OnCityViewUpdate()
 				local ToolTipString = specialistName .. " ";						
 				-- Culture
 				local iCultureFromSpecialist = pCity:GetCultureFromSpecialist(iSpecialistID);
+				--CBP
+				local extraYield = (pCity:GetSpecialistYield( iSpecialistID, YieldTypes.YIELD_CULTURE ) + pCity:GetSpecialistYieldChange(iSpecialistID, YieldTypes.YIELD_CULTURE))
+				iCultureFromSpecialist = (iCultureFromSpecialist + extraYield)
+				-- END
 				if (iCultureFromSpecialist > 0) then
-					--CBP
-					local extraYield = (pCity:GetSpecialistYield( iSpecialistID, YieldTypes.YIELD_CULTURE ) + pCity:GetSpecialistYieldChange(iSpecialistID, YieldTypes.YIELD_CULTURE))
-					iCultureFromSpecialist = (iCultureFromSpecialist + extraYield)
-					-- END
 					ToolTipString = ToolTipString .. " +" .. iCultureFromSpecialist .. "[ICON_CULTURE]";
 				end
 				-- Yield

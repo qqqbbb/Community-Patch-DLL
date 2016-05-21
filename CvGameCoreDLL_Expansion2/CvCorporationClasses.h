@@ -33,8 +33,10 @@ public:
 	int GetResourceMonopolyAnd(int i) const;
 	int GetResourceMonopolyOr(int i) const;
 	int GetNumFreeResource(int i) const;
+	int GetUnitResourceProductionModifier(int i) const;
 
 	int GetTradeRouteMod(int i) const;
+	int GetTradeRouteCityMod(int i) const;
 
 	int GetResourceYieldChange(int i, int j) const;
 	int* GetResourceYieldChangeArray(int i) const;
@@ -43,6 +45,8 @@ public:
 
 	int GetSpecialistYieldChange(int i, int j) const;
 	int* GetSpecialistYieldChangeArray(int i) const;
+
+	CvString GetOfficeBenefitHelper() const;
 protected:
 	BuildingClassTypes m_eHeadquartersBuildingClass;
 	BuildingClassTypes m_eOfficeBuildingClass;
@@ -62,12 +66,16 @@ protected:
 	int* m_piResourceMonopolyAnd;
 	int* m_piResourceMonopolyOrs;
 	int* m_piNumFreeResource;
+	int* m_piUnitResourceProductionModifier;
 
 	int* m_piTradeRouteMod;
+	int* m_piTradeRouteCityMod;
 
 	int** m_ppiBuildingClassYieldChanges;
 	int** m_ppaiSpecialistYieldChange;
 	int** m_ppaiResourceYieldChange;
+
+	CvString m_strOfficeBenefitHelper;
 private:
 	CvCorporationEntry(const CvCorporationEntry&);
 	CvCorporationEntry& operator=(const CvCorporationEntry&);
